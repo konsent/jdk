@@ -19,8 +19,8 @@ plugins: [jekyll-paginate]
 paginate: 5
 
 navigation:
-    - title: 소개
-      url: /index.html
+    # - title: 소개
+    #   url: /index.html
     - title: 회칙
       url: /about
 
