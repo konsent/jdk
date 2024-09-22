@@ -1,7 +1,7 @@
 title: 장단콩 보드게임 & 미니어쳐 게임 클럽
 description: 장단콩 보드게임 & 미니어쳐 게임 클럽
 
-url: https://konsent.github.io/jdk/about/
+url: https://konsent.github.io/jdk/contact/
 # Only necessary when hosting your site in a sub-directory. Project sites hosted on GitHub Pages are the common use-case of this variable.
 baseurl: # Ex: /project-page
 paginate_path: "blog/page:num/"
@@ -19,10 +19,10 @@ plugins: [jekyll-paginate]
 paginate: 5
 
 navigation:
-    - title: 장단콩
-      url: /about
-    - title: 회칙
+    - title: 소개
       url: /contact
+    - title: 회칙
+      url: /about
 
 
 social:
