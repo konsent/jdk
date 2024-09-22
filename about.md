@@ -5,7 +5,7 @@ title: 회칙
 
 <div class="post">
 	<h1 class="pageTitle">장단콩 회칙</h1>
-	<img src="{{ '/assets/img/jdk_main.jpeg' | relative_url }}" alt="" width="700">
+	<img src="{{ '/assets/img/jdk_main.jpeg' | relative_url }}" alt="" width="700" style="text-align: center;">
 	<p class="intro">장단콩 보드게임 & 미니어처 게임 클럽 회칙 및 공지사항</p>
 	<h2>모임 안내</h2>
 	<p>장단콩 보드게임 & 미니어처게임 클럽은 파주에 위치한 보드게임과 미니어처게임을 즐기는 취미인 모임입니다. 서로 배려하는 태도로 즐거운 소통과 취미의 장이 되길 기대합니다.</p>
