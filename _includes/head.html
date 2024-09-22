@@ -78,9 +78,11 @@
 	<!-- Canonical URL -->
 	<link
 		rel="canonical"
-		href="{{ page.url | absolute_url | replace:'index.html','' }}"
+		href="{{ page.url | absolute_url | replace:'/contact','' }}"
 	/>
 
 	{%- if site.google_analytics -%} {%- include google_analytics.html -%} {%-
 	endif -%}
 </head>
+
+<!-- href="{{ page.url | absolute_url | replace:'index.html','' }}" -->
