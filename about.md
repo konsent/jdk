@@ -46,10 +46,10 @@ title: 회칙
 		<li><a>아지트 위치: 경기 파주시 탄현면 성동로 17 통일프라자 2층 209호
 엘리베이터 내리자마자 오른쪽으로 쭉~!</a></li>
 		<li>후원 계좌: 3333162488851 카카오뱅크</li>
-		<img src="{{ '/assets/img/money.png' | relative_url }}" alt="" width="300">
+		<img src="{{ '/assets/img/money.png' | relative_url }}" alt="" width="300" style="display: block; margin-left: auto; margin-right: auto;">
   	</ul>
 	<p>아지트 운영은 후원금으로 진행되며, 이용 시 후원금은 아래와 같습니다.</p>
-	<img src="{{ '/assets/img/table.png' | relative_url }}" alt="">
+	<img src="{{ '/assets/img/table.png' | relative_url }}" alt="" style="display: block; margin-left: auto; margin-right: auto;">
 	<p>월 회원, 연 회원은 기간에 맞추어 디지털 도어락 키를 제공합니다.</p>
 	<ul>
 		<li>후원금 입금일부터 각각 1개월 / 1년간 사용 가능합니다.</li>
