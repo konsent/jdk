@@ -20,7 +20,7 @@ paginate: 5
 
 navigation:
     - title: 소개
-      url: /contact
+      url: /index.html
     - title: 회칙
       url: /about
 
