@@ -1,7 +1,7 @@
-title: Long Haul
-description: Long Form Jekyll theme built with SASS
+title: 장단콩 보드게임 & 미니어쳐 게임 클럽
+description: 장단콩 보드게임 & 미니어쳐 게임 클럽
 
-url: https://long-haul.netlify.app
+url: https://konsent.github.io/jdk
 # Only necessary when hosting your site in a sub-directory. Project sites hosted on GitHub Pages are the common use-case of this variable.
 baseurl: # Ex: /project-page
 paginate_path: "blog/page:num/"
