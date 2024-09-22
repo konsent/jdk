@@ -19,12 +19,11 @@ plugins: [jekyll-paginate]
 paginate: 5
 
 navigation:
-    - title: Home
-      url: /index.html
-    - title: About
+    - title: 장단콩
       url: /about
-    - title: Contact
+    - title: 회칙
       url: /contact
+
 
 social:
     github: brianmaierjr
