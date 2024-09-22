@@ -13,7 +13,8 @@ html {
 }
 
 body {
-	font-family: $serif;
+	font-family: $HakgyoansimBadasseugiTTF-L;
+	// font-family: $serif;
 	line-height: 1.75;
 	font-size: 90%; // 18px base font size
 	// font-size: 112.5%; // 18px base font size
@@ -200,7 +201,8 @@ HEADER STYLING
 		padding-left: 2rem;
 		font-size: 1em;
 		line-height: 3em;
-		font-family: $sans-serif;
+		font-family: $HakgyoansimBadasseugiTTF-L;
+		// font-family: $sans-serif;
 		font-weight: 800;
 		text-transform: uppercase;
 
@@ -255,7 +257,8 @@ POST STYLING
 	.meta {
 		text-align: center;
 		color: lighten(black, 50%);
-		font-family: $sans-serif;
+		font-family: $HakgyoansimBadasseugiTTF-L;
+		// font-family: $sans-serif;
 		font-weight: 300;
 	}
 
@@ -315,7 +318,8 @@ POST NAV STYLING
 		height: 5rem;
 		overflow: hidden;
 		position: relative;
-		font-family: $sans-serif;
+		font-family: $HakgyoansimBadasseugiTTF-L;
+		// font-family: $sans-serif;
 		font-weight: 800;
 		font-size: 0.9em;
 		text-transform: uppercase;
@@ -486,7 +490,8 @@ POST LIST STYLING
 
 		.date {
 			color: lighten(black, 50%);
-			font-family: $sans-serif;
+			font-family: $HakgyoansimBadasseugiTTF-L;
+			// font-family: $sans-serif;
 			font-weight: 300;
 			font-size: 0.8em;
 		}
