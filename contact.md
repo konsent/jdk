@@ -1,13 +1,13 @@
 ---
 layout: default
-title: 장단콩이란?
+title: 명예의 전당
 ---
 
 <div id="contact">
-  <h1 class="pageTitle">장단콩즈에 참여하세요!</h1>
-  <img src="{{ '/assets/img/jdk1.jpeg' | relative_url }}" alt="" width="500">
-	<a>뜨거운 영웅호걸들의 즐거운 도피처 유부남 대 환 영</a>
-  <p>보드게임과 미니어처 게임이 궁금하다면?</p>
-  <p>영웅호걸들의 가슴뛰는 모임, 장단콩즈에 합류하세요</p>
-  <img src="{{ '/assets/img/jdk5.png' | relative_url }}" alt="" width="500">
+  <h1 class="pageTitle">장단콩즈 명예의 전당</h1>
+	<a>장단콩즈의 창립멤버와 장단콩즈를 위해 후원해주신 연회원분들을 소개하는 공간입니다. </a>
+  <h2>모임 창립멤버</h2>
+  <img src="{{ '/assets/img/founders.jpg' | relative_url }}" alt="" width="500" style="display: block; margin-left: auto; margin-right: auto;">
+  <h2>후원해주신 분</h2>
+  <img src="{{ '/assets/img/donator.jpg' | relative_url }}" alt="" width="500" style="display: block; margin-left: auto; margin-right: auto;">
 </div>
