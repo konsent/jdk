@@ -1,0 +1,71 @@
+---
+layout: post
+title:  "장단콩 도색 설명회(9/21 토요일)"
+date:   2024-09-10
+description: 제 1회 장단콩 도색 설명회
+---
+
+<p>말리 폭스 고인물, 할모니님이 말아주는 말리폭스 잡수시러 오세요</p>
+
+<div id="contact" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+
+  
+  <img src="{{ '/assets/img/paint1.png' | relative_url }}" alt="" width="700">
+  <img src="{{ '/assets/img/paint2.png' | relative_url }}" alt="" width="700">
+  
+  
+  <a>도색 민수와 함께하는 도색 설명회</a>
+  <a>관심있으셨던 분들 많은 참여 부탁드립니다</a>
+</div>
+
+<!-- # Heading 1
+
+## Heading 2
+
+### Heading 3
+
+#### Heading 4
+
+##### Heading 5
+
+###### Heading 6
+
+<blockquote>Aenean lacinia bibendum nulla sed consectetur. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum. Nulla vitae elit libero, a pharetra augue. Curabitur blandit tempus porttitor. Donec sed odio dui. Cras mattis consectetur purus sit amet fermentum.</blockquote>
+
+Nullam quis risus eget urna mollis ornare vel eu leo. Cras mattis consectetur purus sit amet fermentum. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
+
+## Unordered List
+* List Item
+* Longer List Item
+  * Nested List Item
+  * Nested Item
+* List Item
+
+## Ordered List
+1. List Item
+2. Longer List Item
+    1. Nested OL Item
+    2. Another Nested Item
+3. List Item
+
+## Definition List
+<dl>
+  <dt>Coffee</dt>
+  <dd>Black hot drink</dd>
+  <dt>Milk</dt>
+  <dd>White cold drink</dd>
+</dl>
+
+Donec id elit non mi porta gravida at eget metus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Maecenas faucibus mollis interdum. Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam.
+
+## Table
+
+| Syntax      | Description |
+| ----------- | ----------- |
+| Header      | Title       |
+| Paragraph   | Text        |
+| Header      | Title       |
+| Paragraph   | Text        |
+
+Cras justo odio, dapibus ac facilisis in, egestas eget quam. Curabitur blandit tempus porttitor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec id elit non mi porta gravida at eget metus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
+ -->
