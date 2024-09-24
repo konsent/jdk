@@ -20,11 +20,13 @@ paginate: 5
 
 navigation:
     # - title: 소개
-    #   url: /index.html
+    #   url: /index.html /about /contact
     - title: 회칙
-      url: /about
+      url: /rules 
     - title: 명예의 전당
-      url: /contact
+      url: /honor
+    - title: 소식
+      url: /event
 
 
 social:

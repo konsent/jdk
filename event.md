@@ -1,9 +1,9 @@
 ---
 layout: default
-title: Your New Jekyll Site
+title: 소식지
 ---
 
-<div id="게시글">
+<div id="주요 이벤트">
   <h1>Articles</h1>
   <ul class="posts noList">
     {%- for post in site.posts -%}
