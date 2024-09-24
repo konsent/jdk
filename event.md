@@ -4,7 +4,7 @@ title: 소식지
 ---
 
 <div id="주요 이벤트">
-  <h1>Articles</h1>
+  <h1>이벤트</h1>
   <ul class="posts noList">
     {%- for post in site.posts -%}
       <li>
