@@ -1,13 +1,22 @@
 ---
 layout: post
-title:  "테스트 포스팅"
+title:  "장단콩 말리폭스 설명회(9/29 일요일)"
 date:   2024-09-24
-description: 테스트 포스팅입니다
+description: 9/29일 장단콩에서 파주 말리폭스 설명회가 열립니다!
 ---
 
-<p class="intro"><span class="dropcap">C</span>urabitur blandit tempus porttitor. Nullam quis risus eget urna mollis ornare vel eu leo. Vestibulum id ligula porta felis euismod semper. Donec sed odio dui. Aenean lacinia bibendum nulla sed consectetur.</p>
+<p class="intro"><span class="dropcap">말리 폭스</span>고인물, 할모니님이 말아주는 말리폭스 잡수시러 오세요</p>
 
-# Heading 1
+<div id="contact" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+
+  
+  <img src="{{ '/assets/img/malfox.png' | relative_url }}" alt="" width="700">
+  <a>모델도 카드도 없어도 됩니다!</a>
+  <a>배우고 싶은 팩션만 있다면 모두모두 참여!!</a>
+  <a>말리폭스에  관심있으셨던 분들 많은 참여 부탁드립니다</a>
+</div>
+
+<!-- # Heading 1
 
 ## Heading 2
 
@@ -57,4 +66,4 @@ Donec id elit non mi porta gravida at eget metus. Cum sociis natoque penatibus e
 | Paragraph   | Text        |
 
 Cras justo odio, dapibus ac facilisis in, egestas eget quam. Curabitur blandit tempus porttitor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec id elit non mi porta gravida at eget metus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
-
+ -->
