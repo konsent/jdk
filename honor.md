@@ -11,5 +11,5 @@ title: 명예의 전당
   
   <img src="{{ '/assets/img/donator1.jpg' | relative_url }}" alt="" width="500">
     
-  <img src="{{ '/assets/img/donator2.jpg' | relative_url }}" alt="" width="500">
+  <img src="{{ '/assets/img/donator2.jpeg' | relative_url }}" alt="" width="500">
 </div>
