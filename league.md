@@ -2,22 +2,30 @@
 layout: default
 title: Interesting Facts
 ---
-<div id="contact" class="container text-center my-5">
-  <h1 class="pageTitle mb-4">장단콩즈 명예의 전당</h1>
-  <p class="lead">장단콩즈의 창립멤버와 장단콩즈를 위해 후원해주신 연회원분들을 소개하는 공간입니다.</p>
-  
-  <div class="row justify-content-center">
-    <div class="col-md-6 mb-3">
-      <img src="{{ '/assets/img/founders.jpg' | relative_url }}" alt="Founders" class="img-fluid rounded">
+<div id="carouselExampleIndicators" class="carousel slide">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+  </div>
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="/assets/img/founders.jpg" class="d-block w-100" alt="Founders">
     </div>
-    <div class="col-md-6 mb-3">
-      <img src="{{ '/assets/img/donator1.jpg' | relative_url }}" alt="Donator 1" class="img-fluid rounded">
+    <div class="carousel-item">
+      <img src="/assets/img/donator1.jpeg" class="d-block w-100" alt="Donator 1">
     </div>
-    <div class="col-md-6 mb-3">
-      <img src="{{ '/assets/img/donator2.jpeg' | relative_url }}" alt="Donator 2" class="img-fluid rounded">
-    </div>
-    <div class="col-md-6 mb-3">
-      <img src="{{ '/assets/img/donator3.jpeg' | relative_url }}" alt="Donator 3" class="img-fluid rounded">
+    <div class="carousel-item">
+      <img src="/assets/img/donator2.jpeg" class="d-block w-100" alt="Donator 2">
     </div>
   </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
 </div>
+
