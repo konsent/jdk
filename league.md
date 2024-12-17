@@ -7,17 +7,17 @@ title: 장단콩 리그
   <div class="carousel-inner">
     <div class="carousel-item active">
         <a href="https://www.jdkclub.click/infinityleague1" target="_blank">
-            <img src="/assets/img/infinityleague1.png" class="d-block img-fluid" style="max-width: 500px; height: auto; margin: 0 auto;" alt="1">
+            <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" style="max-width: 500px;" alt="1">
         </a>
     </div>
     <div class="carousel-item">
         <a href="https://www.jdkclub.click/infinityleague1" target="_blank">
-            <img src="/assets/img/infinityleague1.png" class="d-block img-fluid" style="max-width: 500px; height: auto; margin: 0 auto;" alt="2">
+            <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" style="max-width: 500px;" alt="2">
         </a>
     </div>
     <div class="carousel-item">
         <a href="https://www.jdkclub.click/infinityleague1" target="_blank">
-            <img src="/assets/img/infinityleague1.png" class="d-block img-fluid" style="max-width: 500px; height: auto; margin: 0 auto;" alt="3">
+            <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" style="max-width: 500px;" alt="3">
         </a>
     </div>
   </div>
@@ -30,6 +30,7 @@ title: 장단콩 리그
     <span class="visually-hidden">다음</span>
   </button>
 </div>
+
 
 
 <div id="contact" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
