@@ -1,8 +1,8 @@
 ---
-layout: post
+layout: post2
 title: "About the Author"
 author: "Paul Le"
-# categories: facts
+categories: facts
 tags: [sample]
 image: cuba-2.jpg
 ---
