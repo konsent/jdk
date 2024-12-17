@@ -27,6 +27,8 @@ navigation:
       url: /honor
     - title: 소식
       url: /event
+    - title: 리그
+      url: /league
 
 
 social:
