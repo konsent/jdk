@@ -7,17 +7,17 @@ title: 장단콩 리그
   <div class="carousel-inner">
     <div class="carousel-item active">
         <a href="https://www.jdkclub.click/infinityleague1" target="_blank">
-            <img src="/assets/img/infinityleague1.png" class="d-block" style="max-width: 300px; height: auto; margin: 0 auto;" alt="1">
+            <img src="/assets/img/infinityleague1.png" class="d-block" style="max-width: 500px; height: auto; margin: 0 auto;" alt="1">
         </a>
     </div>
     <div class="carousel-item">
         <a href="https://www.jdkclub.click/infinityleague1" target="_blank">
-            <img src="/assets/img/infinityleague1.png" class="d-block" style="max-width: 300px; height: auto; margin: 0 auto;" alt="2">
+            <img src="/assets/img/infinityleague1.png" class="d-block" style="max-width: 500px; height: auto; margin: 0 auto;" alt="2">
         </a>
     </div>
     <div class="carousel-item">
         <a href="https://www.jdkclub.click/infinityleague1" target="_blank">
-            <img src="/assets/img/infinityleague1.png" class="d-block" style="max-width: 300px; height: auto; margin: 0 auto;" alt="3">
+            <img src="/assets/img/infinityleague1.png" class="d-block" style="max-width: 500px; height: auto; margin: 0 auto;" alt="3">
         </a>
     </div>
   </div>
