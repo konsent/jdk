@@ -1,17 +1,17 @@
 ---
 layout: default
-title: Interesting Facts
+title: 장단콩 리그
 ---
 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="/assets/img/founders.jpg" class="d-block w-100" alt="Founders">
+      <img src="/assets/img/founders.jpg" class="d-block w-100" alt="Founders" width="300">
     </div>
     <div class="carousel-item">
-      <img src="/assets/img/donator1.jpg" class="d-block w-100" alt="Donator 1">
+      <img src="/assets/img/donator1.jpg" class="d-block w-100" alt="Donator 1" width="300">
     </div>
     <div class="carousel-item">
-      <img src="/assets/img/donator2.jpeg" class="d-block w-100" alt="Donator 2">
+      <img src="/assets/img/donator2.jpeg" class="d-block w-100" alt="Donator 2" width="300">
     </div>
   </div>
   <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
