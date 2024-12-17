@@ -6,13 +6,19 @@ title: 장단콩 리그
 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="/assets/img/infinityleague1.png" class="d-block" style="max-width: 300px; height: auto; margin: 0 auto;" alt="1">
+        <a href="https://www.jdkclub.click/infinityleague1" target="_blank">
+            <img src="/assets/img/infinityleague1.png" class="d-block" style="max-width: 300px; height: auto; margin: 0 auto;" alt="1">
+        </a>
     </div>
     <div class="carousel-item">
-      <img src="/assets/img/infinityleague1.png" class="d-block" style="max-width: 300px; height: auto; margin: 0 auto;" alt="2">
+        <a href="https://www.jdkclub.click/infinityleague1" target="_blank">
+            <img src="/assets/img/infinityleague1.png" class="d-block" style="max-width: 300px; height: auto; margin: 0 auto;" alt="2">
+        </a>
     </div>
     <div class="carousel-item">
-      <img src="/assets/img/infinityleague1.png" class="d-block" style="max-width: 300px; height: auto; margin: 0 auto;" alt="3">
+        <a href="https://www.jdkclub.click/infinityleague1" target="_blank">
+            <img src="/assets/img/infinityleague1.png" class="d-block" style="max-width: 300px; height: auto; margin: 0 auto;" alt="3">
+        </a>
     </div>
   </div>
   <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
@@ -23,4 +29,9 @@ title: 장단콩 리그
     <span class="carousel-control-next-icon" aria-hidden="true"></span>
     <span class="visually-hidden">다음</span>
   </button>
+</div>
+
+<div id="contact" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+  <h1 class="pageTitle">장단콩 리그전</h1>
+	<a>아래에 대충 사진들을 넣어볼까~ </a>
 </div>
