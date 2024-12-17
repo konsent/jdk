@@ -1,5 +1,5 @@
 ---
-layout: category2
+layout: default2
 title: Interesting Facts
 permalink: /league
 ---
