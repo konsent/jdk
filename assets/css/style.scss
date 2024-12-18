@@ -15,6 +15,9 @@
 @import "partials/typography";
 @import "partials/mixins";
 
+// 밀레니얼 sccs 가져오기
+@import "mil/-sections-dir";
+
 // Modules
 @import "modules/buttons";
 @import "modules/forms";
