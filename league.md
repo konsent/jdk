@@ -169,7 +169,7 @@ title: 장단콩 리그
 </style>
 
 <!-- 캐러샐  -->
-<div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+<div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
   <div class="carousel-inner">
     <div class="carousel-item active">
         <a href="https://www.jdkclub.click/infinity">
@@ -177,7 +177,7 @@ title: 장단콩 리그
         </a>
     </div>
     <div class="carousel-item">
-        <a href="https://www.jdkclub.click/conquest">
+        <a href="https://www.jdkclub.click/infinity">
             <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" alt="2">
         </a>
     </div>
@@ -185,7 +185,7 @@ title: 장단콩 리그
         <a href="https://www.jdkclub.click/infinity">
             <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" alt="3">
         </a>
-    </div>
+    </div>  
   </div>
   <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
