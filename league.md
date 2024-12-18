@@ -22,17 +22,17 @@ title: 장단콩 리그
 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
   <div class="carousel-inner">
     <div class="carousel-item active">
-        <a href="{{ post2.url | relative_url }}" target="_blank">
+        <a href="https://www.jdkclub.click/infinity">
             <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" alt="1">
         </a>
     </div>
     <div class="carousel-item">
-        <a href="https://www.jdkclub.click/infinity" target="_blank">
+        <a href="https://www.jdkclub.click/infinity">
             <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" alt="2">
         </a>
     </div>
     <div class="carousel-item">
-        <a href="https://www.jdkclub.click/infinity" target="_blank">
+        <a href="https://www.jdkclub.click/infinity">
             <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" alt="3">
         </a>
     </div>
