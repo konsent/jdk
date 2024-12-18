@@ -101,7 +101,7 @@ title: 장단콩 리그
     }
     .gal-item a:after{
         content:"\e003";
-        font-family: 'Glyphicons Halflings';
+        /* font-family: 'Glyphicons Halflings'; */
         opacity: 0;
         background-color: rgba(0, 0, 0, 0.75);
         position: absolute;
@@ -111,7 +111,7 @@ title: 장단콩 리그
         bottom: 3px;
         text-align: center;
         line-height: 350px;
-        font-size: 30px;
+        /* font-size: 30px; */
         color: #fff;
         -webkit-transition: all 0.5s ease-in-out 0s;
         -moz-transition: all 0.5s ease-in-out 0s;
@@ -311,7 +311,7 @@ Fancybox JS
 
 <!-- 갤러리 2안 -->
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 <section>
   <div class="container gal-container">
     <div class="col-md-8 col-sm-12 co-xs-12 gal-item">
@@ -327,7 +327,6 @@ Fancybox JS
                 <img src="http://nabeel.co.in/files/bootsnipp/gallery/1.jpg">
               </div>
                 <div class="col-md-12 description">
-                  <h4>This is the first one on my Gallery</h4>
                 </div>
             </div>
           </div>
@@ -635,12 +634,83 @@ Fancybox JS
       </div>
     </div>
   </div>
-</section>
-<footer>
-    <div class="container">
-        <div class="col-md-10 col-md-offset-1 text-center">
-            
-            <h6>Coded with <i class="fa fa-heart red"></i> by <a href="http://www.nabeel.co.in" target="_blank">Nabeel Kondotty</a></h6>
-        </div>   
+</section> -->
+
+
+<section>
+    <div class="container gal-container">
+        <div class="row" id="gallery"></div>
     </div>
-</footer>
+</section>
+
+<script>
+    // Define image paths
+    const imagePaths = [
+        'assets/img/league/1.jpeg',
+        'assets/img/league/2.jpeg',
+        'assets/img/league/3.jpeg',
+        'assets/img/league/4.jpeg',
+        'assets/img/league/5.jpeg',
+    ];
+
+    const galleryContainer = document.getElementById('gallery');
+
+    // Dynamically generate gallery items
+    imagePaths.forEach((path, index) => {
+        const colDiv = document.createElement('div');
+        colDiv.className = `col-md-4 col-sm-6 co-xs-12 gal-item`;
+
+        const boxDiv = document.createElement('div');
+        boxDiv.className = 'box';
+
+        const anchor = document.createElement('a');
+        anchor.href = '#';
+        anchor.setAttribute('data-toggle', 'modal');
+        anchor.setAttribute('data-target', `#modal-${index}`);
+
+        const img = document.createElement('img');
+        img.src = path;
+        anchor.appendChild(img);
+
+        boxDiv.appendChild(anchor);
+        colDiv.appendChild(boxDiv);
+        galleryContainer.appendChild(colDiv);
+
+        // Create modal structure
+        const modalDiv = document.createElement('div');
+        modalDiv.className = 'modal fade';
+        modalDiv.id = `modal-${index}`;
+        modalDiv.tabIndex = -1;
+        modalDiv.setAttribute('role', 'dialog');
+
+        const modalDialogDiv = document.createElement('div');
+        modalDialogDiv.className = 'modal-dialog';
+        modalDialogDiv.setAttribute('role', 'document');
+
+        const modalContentDiv = document.createElement('div');
+        modalContentDiv.className = 'modal-content';
+
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'close';
+        closeButton.setAttribute('data-dismiss', 'modal');
+        closeButton.setAttribute('aria-label', 'Close');
+        closeButton.innerHTML = '<span aria-hidden="true">&times;</span>';
+
+        const modalBodyDiv = document.createElement('div');
+        modalBodyDiv.className = 'modal-body';
+
+        const modalImg = document.createElement('img');
+        modalImg.src = path;
+        modalBodyDiv.appendChild(modalImg);
+
+        modalContentDiv.appendChild(closeButton);
+        modalContentDiv.appendChild(modalBodyDiv);
+        modalDialogDiv.appendChild(modalContentDiv);
+        modalDiv.appendChild(modalDialogDiv);
+        document.body.appendChild(modalDiv);
+    });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
