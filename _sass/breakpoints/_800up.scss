@@ -240,11 +240,11 @@ FOOTER STYLES
 
 .footer {
 	&-links {
-		float: right;
+		float: center; //right
 	}
 
 	.copy {
-		float: left;
+		float: center; //left
 	}
 
 	.container {
