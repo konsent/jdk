@@ -639,7 +639,7 @@ Fancybox JS
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 <section>
   <div class="container gal-container">
-    {% assign images = site.static_files | where: "path", "assets/img/league" %}
+    {% assign images = site.static_files | where_exp: "item", "item.path contains '/assets/img/league/'" %}
     {% for image in images %}
     <div class="col-md-4 col-sm-6 co-xs-12 gal-item">
       <div class="box">
