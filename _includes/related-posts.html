@@ -1,9 +1,9 @@
-<div class="related">
+<!-- <div class="related">
   <h2>{{ site.data.settings.related_posts }}</h2>
   {% assign listed_posts_urls = page.url | split: ' ' %}
   <ul class="related-posts">
     {% for tag in page.tags %}
-      <!-- {% for mypost in site.tags[tag] limit:2 %} -->
+      {% for mypost in site.tags[tag] limit:2 %}
         {% if listed_posts_urls contains mypost.url %}
         {% else %}
           <li>
@@ -17,14 +17,14 @@
                 <div class="related-title">
                   {{ mypost.title }}
                 </div>
-                <!--<small>{{ mypost.date | date: "%B %-d, %Y" }}</small> 밀레니얼 추가분 문제시 삭제 -->
+                <small>{{ mypost.date | date: "%B %-d, %Y" }}</small>
               </a>
             </h3>
           </li>
           {% assign listed_posts_urls = listed_posts_urls | push: mypost.url %}
         {% endif %}
-      <!-- {% endfor %} -->
+      {% endfor %}
     {% endfor %}
   </ul>
 </div>
-
+ -->
