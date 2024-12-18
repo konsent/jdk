@@ -178,12 +178,12 @@ title: 장단콩 리그
     </div>
     <div class="carousel-item">
         <a href="https://www.jdkclub.click/infinity">
-            <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" alt="2">
+            <img src="/assets/img/infi1.jpg" class="d-block img-fluid mx-auto" alt="2">
         </a>
     </div>
     <div class="carousel-item">
         <a href="https://www.jdkclub.click/infinity">
-            <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" alt="3">
+            <img src="/assets/img/infi2.jpg" class="d-block img-fluid mx-auto" alt="3">
         </a>
     </div>  
   </div>
