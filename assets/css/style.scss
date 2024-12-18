@@ -16,7 +16,15 @@
 @import "partials/mixins";
 
 // 밀레니얼 sccs 가져오기
-@import "mil/-sections-dir";
+@import "base",
+        "code",
+        "default",
+        "footer",
+        "header",
+        "home",
+        "page",
+        "post",
+        "social-icons";
 
 // Modules
 @import "modules/buttons";
