@@ -1,5 +1,5 @@
 ---
-layout: home2
+layout: category2
 title: 테스트
 ---
 
