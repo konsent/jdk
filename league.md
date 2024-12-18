@@ -20,10 +20,9 @@ title: 장단콩 리그
 </style>
 
 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
-  {%- for post in site.posts2 -%}
   <div class="carousel-inner">
     <div class="carousel-item active">
-        <a href="{{ post.url | relative_url }}" target="_blank">
+        <a href="{{ post2.url | relative_url }}" target="_blank">
             <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" alt="1">
         </a>
     </div>
@@ -46,7 +45,6 @@ title: 장단콩 리그
     <span class="carousel-control-next-icon" aria-hidden="true"></span>
     <span class="visually-hidden">다음</span>
   </button>
-  {%- endfor -%}
 </div>
 
 
