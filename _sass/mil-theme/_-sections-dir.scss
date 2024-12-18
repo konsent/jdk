@@ -1,11 +1,11 @@
 // Importing Sass/SCSS partials from `sass_dir` (defaults to `_sass`)
-@import "base",
-        "code",
-        "default",
-        "footer",
-        "header",
-        "home",
-        "page",
-        "post",
-        "social-icons";
+@import "mil-theme/base",
+        "mil-theme/code",
+        "mil-theme/default",
+        "mil-theme/footer",
+        "mil-theme/header",
+        "mil-theme/home",
+        "mil-theme/page",
+        "mil-theme/post",
+        "mil-theme/social-icons";
 // SCSS files roughly correspond to HTML files in _includes and _layouts
