@@ -161,6 +161,10 @@ title: 장단콩 리그
     footer a,footer a:hover{
         color: #88C425;
     }
+    .modal-backdrop.in {
+    filter: alpha(opacity=50);
+    opacity:0;
+}
   
 </style>
 
