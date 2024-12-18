@@ -2,6 +2,7 @@
 layout: post
 title:  "장단콩 도색 설명회(9/21 토요일)"
 date:   2024-09-10
+categories: event
 description: 제 1회 장단콩 도색 설명회
 ---
 
