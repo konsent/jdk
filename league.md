@@ -196,9 +196,6 @@ title: 장단콩 리그
     <span class="visually-hidden">다음</span>
   </button>
 </div>
-
-
-
 <div id="contact" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
   <a> 이미지를 클릭하세요</a> 
   <a></a>
@@ -206,6 +203,34 @@ title: 장단콩 리그
   <a></a>
 </div>
 
+<!-- 카드 -->
+<div class="row">
+  <div class="col-sm-6 mb-3 mb-sm-0">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Special title treatment</h5>
+        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a href="#" class="btn btn-primary">Go somewhere</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Special title treatment</h5>
+        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a href="#" class="btn btn-primary">Go somewhere</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<!-- 갤러리 -->
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 <section>
