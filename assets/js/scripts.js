@@ -13,17 +13,4 @@ $( document ).ready(function() {
         return Math.round(parseFloat(value));
     });
 
-    // Fancybox 초기화
-    $(".fancybox").fancybox({
-        openEffect: "fade",
-        closeEffect: "fade"
-    });
-
-    // Hover 이벤트로 확대 효과 적용
-    $(".zoom").hover(function(){
-        $(this).addClass('transition');
-    }, function(){
-        $(this).removeClass('transition');
-    });
-
 });
