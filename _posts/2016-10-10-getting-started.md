@@ -197,7 +197,7 @@ To use RSS 2.0, ensure the following is done:
 
 * In `_data/settings.yml`, under 'social', comment out the rss-square that points to `feed.xml`, and uncomment the rss-square that points to `rss-feed.xml`.
 
-* In `_includes/head.html`, comment out `{% feed_meta %}` and uncomment the line under the RSS 2.0 comment.
+<!-- * In `_includes/head.html`, comment out `{% feed_meta %}` and uncomment the line under the RSS 2.0 comment. -->
 
 ### Social Media Icons
 
