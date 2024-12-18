@@ -239,19 +239,46 @@ FOOTER STYLES
 ***************/
 
 .footer {
-	&-links {
-		float: center; //right
-	}
+	display: flex;  /* flexbox로 설정 */
+	justify-content: center;  /* 수평 가운데 정렬 */
+	align-items: center;  /* 수직 가운데 정렬 */
+	text-align: center;  /* 텍스트 가운데 정렬 */
+	padding: 1rem 0;  /* 상하 여백 설정 */
+  }
+  
+  .footer-links {
+	float: right;  /* 오른쪽으로 정렬된 링크들 */
+	text-align: right;  /* 텍스트를 오른쪽 정렬 */
+  }
+  
+  .copy {
+	float: left;  /* 왼쪽으로 정렬된 저작권 텍스트 */
+  }
+  
+  .container {
+	width: 100%;  /* 부모 요소에 맞게 100%로 설정 */
+	max-width: 800px;  /* 최대 너비 설정 */
+	display: flex;  /* 자식 요소들을 flex로 설정 */
+	justify-content: space-between;  /* 좌우에 있는 항목들을 구분 */
+	align-items: center;  /* 수직 가운데 정렬 */
+	padding: 1rem 0;  /* 상하 여백 설정 */
+  }
 
-	.copy {
-		float: center; //left
-	}
+// .footer {
+// 	&-links {
+// 		float: center; //right
+// 	}
 
-	.container {
-		padding: 1rem 0;
-		max-width: 800px;
-	}
-}
+// 	.copy {
+// 		float: center; //left
+// 	}
+
+// 	.container {
+// 		padding: 1rem 0;
+// 		max-width: 800px;
+// 	}
+// }
+
 
 
 /***************
