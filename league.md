@@ -20,6 +20,7 @@ title: 장단콩 리그
 </style>
 
 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+  {%- for post in site.posts2 -%}
   <div class="carousel-inner">
     <div class="carousel-item active">
         <a href="{{ post.url | relative_url }}" target="_blank">
