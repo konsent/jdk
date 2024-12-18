@@ -29,6 +29,8 @@ navigation:
       url: /event
     - title: 리그
       url: /league
+    - title: 테스트
+      url: /test
 
 
 social:
