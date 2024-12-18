@@ -112,7 +112,6 @@ title: 장단콩 리그
 
 
 <div class="container page-top">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
   <div class="row">
       <div class="col-lg-3 col-md-4 col-xs-6 thumb">
           <a href="https://images.pexels.com/photos/62307/air-bubbles-diving-underwater-blow-62307.jpeg?auto=compress&cs=tinysrgb&h=650&w=940" class="fancybox" rel="ligthbox">
