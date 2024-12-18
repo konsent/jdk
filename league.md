@@ -18,11 +18,11 @@ title: 장단콩 리그
     }
   }
   body {
-      background-color: #1d1d1d !important;
+      /* background-color: #1d1d1d !important;
       font-family: "Asap", sans-serif;
       color: #989898;
       margin: 10px;
-      font-size: 16px;
+      font-size: 16px; */
   }
 
   #demo {
