@@ -169,7 +169,7 @@ title: 장단콩 리그
 </style>
 
 <!-- 캐러샐  -->
-<div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
+<div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
   <div class="carousel-inner">
     <div class="carousel-item active">
         <a href="https://www.jdkclub.click/infinity">
