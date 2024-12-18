@@ -636,81 +636,30 @@ Fancybox JS
   </div>
 </section> -->
 
-
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 <section>
-    <div class="container gal-container">
-        <div class="row" id="gallery"></div>
+  <div class="container gal-container">
+    {% assign images = site.static_files | where: "path", "assets/img/league" %}
+    {% for image in images %}
+    <div class="col-md-4 col-sm-6 co-xs-12 gal-item">
+      <div class="box">
+        <a href="#" data-toggle="modal" data-target="#modal-{{ forloop.index }}">
+          <img src="{{ image.path }}">
+        </a>
+        <div class="modal fade" id="modal-{{ forloop.index }}" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              <div class="modal-body">
+                <img src="{{ image.path }}">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+    {% endfor %}
+  </div>
 </section>
-
-<script>
-    // Define image paths
-    const imagePaths = [
-        'assets/img/league/1.jpeg',
-        'assets/img/league/2.jpeg',
-        'assets/img/league/3.jpeg',
-        'assets/img/league/4.jpeg',
-        'assets/img/league/5.jpeg',
-    ];
-
-    const galleryContainer = document.getElementById('gallery');
-
-    // Dynamically generate gallery items
-    imagePaths.forEach((path, index) => {
-        const colDiv = document.createElement('div');
-        colDiv.className = `col-md-4 col-sm-6 co-xs-12 gal-item`;
-
-        const boxDiv = document.createElement('div');
-        boxDiv.className = 'box';
-
-        const anchor = document.createElement('a');
-        anchor.href = '#';
-        anchor.setAttribute('data-toggle', 'modal');
-        anchor.setAttribute('data-target', `#modal-${index}`);
-
-        const img = document.createElement('img');
-        img.src = path;
-        anchor.appendChild(img);
-
-        boxDiv.appendChild(anchor);
-        colDiv.appendChild(boxDiv);
-        galleryContainer.appendChild(colDiv);
-
-        // Create modal structure
-        const modalDiv = document.createElement('div');
-        modalDiv.className = 'modal fade';
-        modalDiv.id = `modal-${index}`;
-        modalDiv.tabIndex = -1;
-        modalDiv.setAttribute('role', 'dialog');
-
-        const modalDialogDiv = document.createElement('div');
-        modalDialogDiv.className = 'modal-dialog';
-        modalDialogDiv.setAttribute('role', 'document');
-
-        const modalContentDiv = document.createElement('div');
-        modalContentDiv.className = 'modal-content';
-
-        const closeButton = document.createElement('button');
-        closeButton.type = 'button';
-        closeButton.className = 'close';
-        closeButton.setAttribute('data-dismiss', 'modal');
-        closeButton.setAttribute('aria-label', 'Close');
-        closeButton.innerHTML = '<span aria-hidden="true">&times;</span>';
-
-        const modalBodyDiv = document.createElement('div');
-        modalBodyDiv.className = 'modal-body';
-
-        const modalImg = document.createElement('img');
-        modalImg.src = path;
-        modalBodyDiv.appendChild(modalImg);
-
-        modalContentDiv.appendChild(closeButton);
-        modalContentDiv.appendChild(modalBodyDiv);
-        modalDialogDiv.appendChild(modalContentDiv);
-        modalDiv.appendChild(modalDialogDiv);
-        document.body.appendChild(modalDiv);
-    });
-</script>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
