@@ -12,6 +12,9 @@ permalink: blog/:title/
 
 sass:
     style: compressed
+    load_paths:
+    - assets/css/style.scss
+    - assets/css/main.scss
 
 markdown: kramdown
 highlighter: rouge
@@ -29,8 +32,6 @@ navigation:
       url: /event
     - title: 리그
       url: /league
-    - title: 테스트
-      url: /test
 
 
 social:
