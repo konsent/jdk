@@ -20,9 +20,9 @@ title: 장단콩 리그
   body {
       /* background-color: #1d1d1d !important;
       font-family: "Asap", sans-serif; */
-      color: #989898;
+      /* color: #989898;
       margin: 10px;
-      font-size: 16px;
+      font-size: 16px; */
   }
 
   #demo {
@@ -160,7 +160,6 @@ title: 장단콩 리그
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
-
 <script>
     $(document).ready(function(){
         $(".fancybox").fancybox({
