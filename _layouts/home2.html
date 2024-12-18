@@ -3,8 +3,10 @@ layout: default2
 title: league
 ---
 
-{% for post in paginator.posts2 %}
-  {% include featured-post.html %}
+{% for post in paginator.posts %}
+  {% if post.categories contains page.category %}
+    {% include featured-post.html %}
+  {% endif %}
 {% endfor %}
 
 <!-- Pagination links -->
