@@ -1,7 +1,7 @@
 ---
 layout: post2
-title: "Getting Started"
-author: "Paul Le"
+title: "infinity"
+categories: infinity
 image: city-1.jpg
 ---
 

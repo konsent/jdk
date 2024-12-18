@@ -1,7 +1,7 @@
 ---
 layout: post2
-title: "Welcome to Millennial!"
-author: "Paul Le"
+title: "conquest"
+categories: conquest
 image: cuba-1.jpg
 ---
 
