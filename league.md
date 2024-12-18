@@ -112,7 +112,7 @@ title: 장단콩 리그
 </div>
 
 
-<body>
+
 <div class="container page-top">
   <div class="row">
       <div class="col-lg-3 col-md-4 col-xs-6 thumb">
@@ -158,18 +158,9 @@ title: 장단콩 리그
   </div>
 </div>
 
+<!-- jQuery 라이브러리 -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Fancybox JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
-<script>
-    $(document).ready(function(){
-        $(".fancybox").fancybox({
-            openEffect: "none",
-            closeEffect: "none"
-        });
-        $(".zoom").hover(function(){
-            $(this).addClass('transition');
-        }, function(){
-            $(this).removeClass('transition');
-        });
-    });
-</script>
+
+
