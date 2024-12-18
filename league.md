@@ -210,7 +210,7 @@ title: 장단콩 리그
       <div class="card-body">
         <h5 class="card-title">24년 1분기 장단콩 잉피 리그</h5>
         <p class="card-text">장단콩 첫 잉피니티 정규 시즌 리그</p>
-        <a href="https://www.jdkclub.click/infinity_post" class="btn btn-primary">리그 알아보기</a>
+        <a href="https://www.jdkclub.click/blog/infinity_post" class="btn btn-primary">리그 알아보기</a>
       </div>
     </div>
   </div>
@@ -219,7 +219,7 @@ title: 장단콩 리그
       <div class="card-body">
         <h5 class="card-title">24년 2분기 잉피 섬머 리그</h5>
         <p class="card-text">올해는 다르다! 에어컨 빵빵 파주에서 서늘한 리그</p>
-        <a href="https://www.jdkclub.click/infinity_post2" class="btn btn-primary">리그 알아보기</a>
+        <a href="https://www.jdkclub.click/blog/infinity_post2" class="btn btn-primary">리그 알아보기</a>
       </div>
     </div>
   </div>
