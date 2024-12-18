@@ -17,14 +17,14 @@ title: 장단콩 리그
       max-width: 100%; /* 부모 컨테이너에 맞게 */
     }
   }
-  body {
-      /* background-color: #1d1d1d !important;
-      font-family: "Asap", sans-serif; */
-      /* color: #989898;
+  /* body {
+      background-color: #1d1d1d !important;
+      font-family: "Asap", sans-serif;
+      color: #989898;
       margin: 10px;
-      font-size: 16px; */
+      font-size: 16px;
   }
-  /* 갤러리 */
+
   #demo {
     height: 100%;
     position: relative;
@@ -71,7 +71,7 @@ title: 장단콩 리그
 
   .modal-footer {
     display: none;
-  }
+  } */
 </style>
 
 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
