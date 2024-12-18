@@ -27,7 +27,7 @@ title: 장단콩 리그
         </a>
     </div>
     <div class="carousel-item">
-        <a href="https://www.jdkclub.click/infinity">
+        <a href="https://www.jdkclub.click/conquest">
             <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" alt="2">
         </a>
     </div>
