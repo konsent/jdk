@@ -46,6 +46,7 @@ title: 장단콩 리그
     <span class="carousel-control-next-icon" aria-hidden="true"></span>
     <span class="visually-hidden">다음</span>
   </button>
+  {%- endfor -%}
 </div>
 
 
