@@ -73,7 +73,7 @@ title: 장단콩 리그
     display: none;
   }
 </style>
-
+<!-- 캐러샐  -->
 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
   <div class="carousel-inner">
     <div class="carousel-item active">
@@ -110,8 +110,8 @@ title: 장단콩 리그
 </div>
 
 
-
-<div class="container page-top">
+<!-- 갤러리 -->
+<!-- <div class="container page-top">
   <div class="row">
       <div class="col-lg-3 col-md-4 col-xs-6 thumb">
           <a href="https://images.pexels.com/photos/62307/air-bubbles-diving-underwater-blow-62307.jpeg?auto=compress&cs=tinysrgb&h=650&w=940" class="fancybox" rel="ligthbox">
@@ -154,11 +154,57 @@ title: 장단콩 리그
           </a>
       </div>
   </div>
-</div>
+</div> -->
 
-<!-- jQuery 라이브러리 -->
+<!-- 
+jQuery 라이브러리
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Fancybox JS -->
+Fancybox JS
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
 
+ -->
 
+<!-- 갤러리 탬플릿 2안 -->
+<div class="container">
+    <header class="text-center">
+        <h1>게임 갤러리</h1>
+        </header>
+	<div class="row">
+	  <div class="col-md-8 col-sm-12 co-xs-12 gal-item">
+		   <div class="row h-50">
+				  <div class="col-md-12 col-sm-12 co-xs-12 gal-item">
+							<div class="box">
+						 <img src="http://fakeimg.pl/758x370/" class="img-ht img-fluid rounded">
+							</div>
+					</div>
+			</div>
+	    <div class="row h-50">
+				 <div class="col-md-6 col-sm-6 co-xs-12 gal-item">
+				  <div class="box">
+					<img src="http://fakeimg.pl/748x177/" class="img-ht img-fluid rounded">
+				</div>
+				</div>
+
+				<div class="col-md-6 col-sm-6 co-xs-12 gal-item">
+				 <div class="box">
+					<img src="http://fakeimg.pl/371x370/" class="img-ht img-fluid rounded">
+				</div>
+				</div>
+            </div>
+      </div>
+           <div class="col-md-4 col-sm-6 co-xs-12 gal-item">
+			   <div class="col-md-12 col-sm-6 co-xs-12 gal-item h-25">
+				<div class="box">
+					<img src="http://fakeimg.pl/748x177/" class="img-ht img-fluid rounded">
+				</div>
+				</div>
+
+				  <div class="col-md-12 col-sm-6 co-xs-12 gal-item h-75">
+				   <div class="box">
+					<img src="http://fakeimg.pl/748x177/" class="img-ht img-fluid rounded">
+				</div>
+				</div>
+            </div>
+	</div>
+	<br/>
+</div>
