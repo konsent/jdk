@@ -63,7 +63,7 @@ title: 장단콩 리그
         transition: all 0.5s ease-in-out 0s;
     }
     .gal-item a:hover:after{
-        opacity: 0;
+        opacity: 1;
     }
     .modal-open .gal-container .modal{
         background-color: rgba(0,0,0,0.4);
@@ -76,7 +76,7 @@ title: 장단콩 리그
         width: 25px;
         height: 25px;
         background-color: #000;
-        opacity: 0;
+        opacity: 1;
         color: #fff;
         z-index: 999;
         right: -12px;
@@ -134,7 +134,7 @@ title: 장단콩 리그
         transform: scale(1);
         -webkit-transform: translate3d(0, -100px, 0);
         transform: translate3d(0, -100px, 0);
-        opacity: 0;
+        opacity: 1;
     }
     @media (min-width: 768px) {
     .gal-container .modal-dialog {
