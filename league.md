@@ -200,8 +200,10 @@ title: 장단콩 리그
 
 
 <div id="contact" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+  <a> 이미지를 클릭하세요</a> 
+  <a></a>
   <h1 class="pageTitle">장단콩 리그전</h1>
-	<a></a>
+  <a></a>
 </div>
 
 
