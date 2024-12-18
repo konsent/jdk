@@ -72,6 +72,22 @@ title: 장단콩 리그
   .modal-footer {
     display: none;
   }
+  
+  .gal-item{
+	overflow: hidden;
+	padding: 8px;
+  }
+   
+  .gal-item .box{
+        height: 100%;
+        overflow: hidden;
+  }
+    
+  .box img{
+        height: 100%;
+        width: auto;
+        object-fit:cover;
+  }
 </style>
 <!-- 캐러샐  -->
 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
