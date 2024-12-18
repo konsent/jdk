@@ -4,5 +4,3 @@ title: "infinity1"
 categories: infinity
 image: city-1.jpg
 ---
-
-인피니티
