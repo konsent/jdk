@@ -125,16 +125,6 @@ title: 회칙
 		</li>
 		<div class="collapse" id="collapseExample">
 			<div class="card card-body">
-				기습숭배
-			</div>
-		</div>
-		<p class="d-inline-flex gap-1">
-			<a data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-				다소
-			</a>
-		</p>
-		<div class="collapse" id="collapseExample">
-			<div class="card card-body">
 				기습 숭배
 			</div>
 		</div>
