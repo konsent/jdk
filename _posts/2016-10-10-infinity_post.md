@@ -2,7 +2,7 @@
 layout: post2
 title: "24년 1분기 장단콩 잉피 리그"
 categories: infinity
-image: ariadna1.jpeg
+image: infinityleague1.png
 ---
 
 <div id="contact" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
