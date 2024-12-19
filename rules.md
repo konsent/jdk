@@ -123,9 +123,9 @@ title: 회칙
 		<li><a>건전하지 않은 모든 종류의 이미지, 영상, 짤방 등은 오전 8시부터 오후 8시까지 금합니다.</a> 채팅 매너의 일부이니 반드시 지켜주시기 바랍니다.</li>
 		<li>장단콩즈 홍보사령관 <b data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">다소</b>는 너무 잘생겼고 그의 만화는 정말 완벽하다는 점을 잊으면 안됩니다.</li>
 		<div class="collapse" id="collapseExample">
-		<div class="card card-body">
-			기습숭배
-		</div>
+			<div class="card card-body">
+				기습숭배
+			</div>
 		</div>
 		<li><a>정떡, 조롱, 종교, 광고, 야짤 등에 대해 이야기하는 것은 금합니다.</a> 어길 시 1회 경고를 드리며, 해당 안건에 대해서는 별도의 경고 없이 영구추방될 수 있습니다.</li>
 		<li>야짤의 기준은 특정 신체부위 노출이 유발된 짤, 혹은 성적 흥분감을 일으키는 짤을 의미합니다.</li>
