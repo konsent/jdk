@@ -121,7 +121,8 @@ title: 회칙
 		<li><a>중고거래는 주 1회 홍보를 허용합니다.</a> 지나친 거래 홍보 행위는 자제해주세요. 줄세우기, 가격 비딩 등등 지정된 가격으로 판매/구매자를 찾는 행위 외에는 모두 제재 사유입니다. </li>
 		<li>홍보는 판매내용을 정리한 게시글 링크를 직접 올리는 것과 짧은 설명까지 허용하며, 판매와 관한 대화는 개인톡, 게시글 댓글 등을 이용하십시오. 톡방 내에서 직접거래 및 이와 관련한 채팅 남발은 금합니다.</li>
 		<li><a>건전하지 않은 모든 종류의 이미지, 영상, 짤방 등은 오전 8시부터 오후 8시까지 금합니다.</a> 채팅 매너의 일부이니 반드시 지켜주시기 바랍니다.</li>
-		<li>장단콩즈 홍보사령관 <b data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">다소</b>는 너무 잘생겼고 그의 만화는 정말 완벽하다는 점을 잊으면 안됩니다.</li>
+		<li>장단콩즈 홍보사령관 <b data-bs-toggle="collapse" data-bs-target="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">다소</b>는 너무 잘생겼고 그의 만화는 정말 완벽하다는 점을 잊으면 안됩니다.
+		</li>
 		<div class="collapse" id="collapseExample">
 			<div class="card card-body">
 				기습숭배
