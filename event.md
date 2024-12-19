@@ -47,13 +47,15 @@ title: 소식지
       {% if post.categories contains 'event' %}
         <li>
           <div class="post-item">
-            {% if post.thumbnail %}
-              <img src="{{ post.thumbnail | relative_url }}" alt="{{ post.title }}" class="post-thumbnail">
-            {% elsif post.image %}
-              <img src="{{ post.image | relative_url }}" alt="{{ post.title }}" class="post-thumbnail">
-            {% else %}
-              <img src="/assets/img/jdk2.jpeg" alt="기본 썸네일" class="post-thumbnail">
-            {% endif %}
+            <a href="{{ post.url | relative_url }}">
+              {% if post.thumbnail %}
+                <img src="{{ post.thumbnail | relative_url }}" alt="{{ post.title }}" class="post-thumbnail">
+              {% elsif post.image %}
+                <img src="{{ post.image | relative_url }}" alt="{{ post.title }}" class="post-thumbnail">
+              {% else %}
+                <img src="/assets/img/jdk2.jpeg" alt="기본 썸네일" class="post-thumbnail">
+              {% endif %}
+            </a>
             <div class="post-info">
               <span class="date">{{ post.date | date: "%Y년 %m월 %d일" }}</span>
               <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
