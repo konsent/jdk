@@ -28,8 +28,8 @@ title: 소식지
   }
 
   .post-thumbnail {
-    width: 200px;  /* 너비와 높이를 동일하게 설정 */
-    height: 200px;
+    width: 150px;  /* 너비와 높이를 동일하게 설정 */
+    height: 150px;
     object-fit: cover;
     border-radius: 5px;
     border: 2px solid #000000; /* 3픽셀 두께의 검은색 테두리 추가 */
