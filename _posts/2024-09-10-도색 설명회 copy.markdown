@@ -4,7 +4,7 @@ title:  "장단콩 도색 설명회(9/21 토요일)"
 date:   2024-09-10
 categories: event
 description: 제 1회 장단콩 도색 설명회
-thumbnail: /assets/img/jdk1.jpeg
+thumbnail: /assets/img/paint_thumb.png
 ---
 
 <div id="contact" style="display: flex; flex-direction: column; align-items: center; text-align: center;">

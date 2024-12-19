@@ -3,7 +3,9 @@ layout: post
 title:  "장단콩 말리폭스 설명회(9/29 일요일)"
 date:   2024-09-24
 categories: event
+thumbnail: /assets/img/malfox_thumb.png
 description: 9/29일 장단콩에서 파주 말리폭스 설명회가 열립니다!
+
 ---
 
 <p>말리 폭스 고인물, 할모니님이 말아주는 말리폭스 잡수시러 오세요</p>
