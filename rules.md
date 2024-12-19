@@ -128,6 +128,16 @@ title: 회칙
 				기습숭배
 			</div>
 		</div>
+		<p class="d-inline-flex gap-1">
+			<a data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+				다소
+			</a>
+		</p>
+		<div class="collapse" id="collapseExample">
+			<div class="card card-body">
+				기습 숭배
+			</div>
+		</div>
 		<li><a>정떡, 조롱, 종교, 광고, 야짤 등에 대해 이야기하는 것은 금합니다.</a> 어길 시 1회 경고를 드리며, 해당 안건에 대해서는 별도의 경고 없이 영구추방될 수 있습니다.</li>
 		<li>야짤의 기준은 특정 신체부위 노출이 유발된 짤, 혹은 성적 흥분감을 일으키는 짤을 의미합니다.</li>
 		<li>가급적 보드게임, 미니어처게임 외 콘텐츠에 대해서는 이야기하는 것을 지양해주시기 바랍니다. 마작, 홀덤 등의 게임 역시 모두 보드게임의 영역에 있으나, 해당 콘텐츠에 대해서 깊이 있게 이야기하는 것은 가급적 삼가해주시면 감사하겠습니다.</li>
