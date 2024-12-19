@@ -55,7 +55,7 @@ title: 소식지
               <img src="/assets/img/jdk2.jpeg" alt="기본 썸네일" class="post-thumbnail">
             {% endif %}
             <div class="post-info">
-              <span class="date">{{ post.date | date_to_string }}</span>
+              <span class="date">{{ post.date | date: "%Y년 %m월 %d일" }}</span>
               <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
               <p class="description">{%- if post.description -%}{{ post.description  | strip_html | strip_newlines | truncate: 120 }}{%- else -%}{{ post.content | strip_html | strip_newlines | truncate: 120 }}{%- endif -%}</p>
             </div>
@@ -65,3 +65,4 @@ title: 소식지
     {%- endfor -%}
   </ul>
 </div>
+
