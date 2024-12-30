@@ -30,7 +30,7 @@ navigation:
     - title: 소식
       url: /event
     - title: 리그
-      url: /infinity
+      url: /league
 
 
 social:
