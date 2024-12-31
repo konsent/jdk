@@ -11,7 +11,10 @@ thumbnail: /assets/img/infinityleague1.png
 
   
   <img src="{{ '/assets/img/infinityleague1.png' | relative_url }}" alt="" width="700">
-  
+  <img src="{{ '/assets/img/202501_infinityleague/1.png' | relative_url }}" alt="" width="500">
+  <img src="{{ '/assets/img/202501_infinityleague/2.png' | relative_url }}" alt="" width="500">
+  <img src="{{ '/assets/img/202501_infinityleague/3.png' | relative_url }}" alt="" width="500">
+  <img src="{{ '/assets/img/202501_infinityleague/4.png' | relative_url }}" alt="" width="500">
   
   <a>25년 장단콩 Infinity 리그</a>
 </div>

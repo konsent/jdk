@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 소식지
+title: 공식 이벤트
 ---
 
 <!-- <div id="주요 이벤트">
@@ -59,18 +59,18 @@ title: 소식지
 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
   <div class="carousel-inner">
     <div class="carousel-item active">
-        <a href="https://www.jdkclub.click/infinity">
+        <a href="https://www.jdkclub.click/blog/25%EB%85%84%EC%9D%B8%ED%94%BC%EB%8B%88%ED%8B%B0%EB%A6%AC%EA%B7%B8/">
             <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" alt="1">
         </a>
     </div>
     <div class="carousel-item">
-        <a href="https://www.jdkclub.click/infinity">
-            <img src="/assets/img/infi1.jpg" class="d-block img-fluid mx-auto" alt="2">
+        <a href="https://www.jdkclub.click/blog/25%EB%85%84%EC%9D%B8%ED%94%BC%EB%8B%88%ED%8B%B0%EB%A6%AC%EA%B7%B8/">
+            <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" alt="2">
         </a>
     </div>
     <div class="carousel-item">
-        <a href="https://www.jdkclub.click/infinity">
-            <img src="/assets/img/infi2.jpg" class="d-block img-fluid mx-auto" alt="3">
+        <a href="https://www.jdkclub.click/blog/25%EB%85%84%EC%9D%B8%ED%94%BC%EB%8B%88%ED%8B%B0%EB%A6%AC%EA%B7%B8/">
+            <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" alt="3">
         </a>
     </div>  
   </div>
