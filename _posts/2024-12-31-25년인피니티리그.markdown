@@ -23,5 +23,6 @@ thumbnail: /assets/img/infinityleague1.png
   <a style="color: red;">* 비치 아미를 이용한 참가는 불가능합니다.</a>
   <a style="color: red;">* 어뷰징 행위는 금지입니다.</a>
   <a style="color: red;">* 미도색 아미 허용 / 풀도색 아미 환영</a>
-
+  <a>  </a>
+  <a>  </a>
 </div>
