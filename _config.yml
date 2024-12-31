@@ -31,14 +31,14 @@ navigation:
       url: /event
 
 
-social:
-    github: brianmaierjr
-    twitter: brianmaierjr
-    facebook: brianmaierjr
-    email: brimaidesigns@gmail.com
-    linkedin: brianmaierjr
-    youtube: RickAstleyYT
-    tumblr: i-am-a-fish
+# social:
+#     github: brianmaierjr
+#     twitter: brianmaierjr
+#     facebook: brianmaierjr
+#     email: brimaidesigns@gmail.com
+#     linkedin: brianmaierjr
+#     youtube: RickAstleyYT
+#     tumblr: i-am-a-fish
 
 google_analytics: "UA-58263416-1"
 
