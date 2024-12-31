@@ -14,10 +14,14 @@ thumbnail: /assets/img/infinityleague1.png
   <!-- <img src="{{ '/assets/img/202501_infinityleague/1.png' | relative_url }}" alt="" width="500"> -->
   <img src="{{ '/assets/img/202501_infinityleague/2.png' | relative_url }}" alt="" width="500">
   <img src="{{ '/assets/img/202501_infinityleague/3.png' | relative_url }}" alt="" width="500">
+  <a>  </a>
   <a href="https://forms.gle/znNf95Tf66fgbsba9" target="_blank">
     <img src="{{ '/assets/img/202501_infinityleague/banner.png' | relative_url }}" alt="" width="500">
   </a>
 
-  
-  <a>25년 장단콩 Infinity 리그</a>
+  <a>  </a>
+  <a>* 비치 아미를 이용한 참가는 불가능합니다.</a>
+  <a>* 어뷰징 행위는 금지입니다.</a>
+  <a>* 미도색 아미 허용 / 풀도색 아미 환영</a>
+
 </div>
