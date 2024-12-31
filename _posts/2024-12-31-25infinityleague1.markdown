@@ -18,6 +18,8 @@ thumbnail: /assets/img/infinityleague1.png
   <a href="https://forms.gle/znNf95Tf66fgbsba9" target="_blank">
     <img src="{{ '/assets/img/202501_infinityleague/banner.png' | relative_url }}" alt="" width="500">
   </a>
+  <a>  </a>
+  <img src="{{ '/assets/img/202501_infinityleague/4.png' | relative_url }}" alt="" width="500">
 
   <a>  </a>
   <a style="color: red;">* 비치 아미를 이용한 참가는 불가능합니다.</a>
