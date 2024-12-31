@@ -2,7 +2,7 @@
 layout: category2
 title: Infinity
 category: infinity
-permalink: /league
+permalink: /infinity
 ---
 
 

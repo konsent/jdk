@@ -1,0 +1,17 @@
+---
+layout: post
+title:  "25년 장단콩 Infinity 리그"
+date:   2024-12-31
+categories: event
+description: 제 1회 장단콩 Infinity 리그
+thumbnail: /assets/img/infinityleague1.png
+---
+
+<div id="contact" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+
+  
+  <img src="{{ '/assets/img/infinityleague1.png' | relative_url }}" alt="" width="700">
+  
+  
+  <a>25년 장단콩 Infinity 리그</a>
+</div>

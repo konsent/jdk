@@ -27,10 +27,8 @@ navigation:
       url: /rules 
     - title: 명예의 전당
       url: /honor
-    - title: 소식
+    - title: 공식 이벤트
       url: /event
-    - title: 리그
-      url: /league
 
 
 social:

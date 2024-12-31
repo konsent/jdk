@@ -203,7 +203,7 @@ title: 장단콩 리그
 </div>
 
 <!-- 카드 -->
-<div class="row">
+<!-- <div class="row">
   <div class="col-sm-6 mb-3 mb-sm-0">
     <div class="card">
       <div class="card-body">
@@ -222,7 +222,7 @@ title: 장단콩 리그
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
 
 
@@ -231,7 +231,7 @@ title: 장단콩 리그
 
 <!-- 갤러리 -->
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 <section>
   <div class="container gal-container">
     {% assign images = site.static_files | where_exp: "item", "item.path contains '/assets/img/league/'" %}
@@ -257,4 +257,4 @@ title: 장단콩 리그
     </div>
     {% endfor %}
   </div>
-</section>
+</section> -->
