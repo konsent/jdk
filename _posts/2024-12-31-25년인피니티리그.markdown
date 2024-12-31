@@ -14,8 +14,8 @@ thumbnail: /assets/img/infinityleague1.png
   <!-- <img src="{{ '/assets/img/202501_infinityleague/1.png' | relative_url }}" alt="" width="500"> -->
   <img src="{{ '/assets/img/202501_infinityleague/2.png' | relative_url }}" alt="" width="500">
   <img src="{{ '/assets/img/202501_infinityleague/3.png' | relative_url }}" alt="" width="500">
-  <a href="https://forms.gle/znNf95Tf66fgbsba9">
-    <img src="{{ '/assets/img/202501_infinityleague/4.png' | relative_url }}" alt="" width="500">
+  <a href="https://forms.gle/znNf95Tf66fgbsba9" target="_blank">
+    <img src="{{ '/assets/img/202501_infinityleague/banner.png' | relative_url }}" alt="" width="500">
   </a>
 
   
