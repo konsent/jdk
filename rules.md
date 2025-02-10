@@ -121,13 +121,13 @@ title: 회칙
 		<li><a>중고거래는 주 1회 홍보를 허용합니다.</a> 지나친 거래 홍보 행위는 자제해주세요. 줄세우기, 가격 비딩 등등 지정된 가격으로 판매/구매자를 찾는 행위 외에는 모두 제재 사유입니다. </li>
 		<li>홍보는 판매내용을 정리한 게시글 링크를 직접 올리는 것과 짧은 설명까지 허용하며, 판매와 관한 대화는 개인톡, 게시글 댓글 등을 이용하십시오. 톡방 내에서 직접거래 및 이와 관련한 채팅 남발은 금합니다.</li>
 		<li><a>건전하지 않은 모든 종류의 이미지, 영상, 짤방 등은 오전 8시부터 오후 8시까지 금합니다.</a> 채팅 매너의 일부이니 반드시 지켜주시기 바랍니다.</li>
-		<li>장단콩즈 홍보사령관 <a data-bs-toggle="collapse" data-bs-target="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">다소</a>는 너무 잘생겼고 그의 만화는 정말 완벽하다는 점을 잊으면 안됩니다.
+		<!-- <li>장단콩즈 홍보사령관 <a data-bs-toggle="collapse" data-bs-target="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">다소</a>는 너무 잘생겼고 그의 만화는 정말 완벽하다는 점을 잊으면 안됩니다.
 		</li>
 		<div class="collapse" id="collapseExample">
 			<div class="card card-body">
 				기습 숭배
 			</div>
-		</div>
+		</div> -->
 		<li><a>정떡, 조롱, 종교, 광고, 야짤 등에 대해 이야기하는 것은 금합니다.</a> 어길 시 1회 경고를 드리며, 해당 안건에 대해서는 별도의 경고 없이 영구추방될 수 있습니다.</li>
 		<li>야짤의 기준은 특정 신체부위 노출이 유발된 짤, 혹은 성적 흥분감을 일으키는 짤을 의미합니다.</li>
 		<li>가급적 보드게임, 미니어처게임 외 콘텐츠에 대해서는 이야기하는 것을 지양해주시기 바랍니다. 마작, 홀덤 등의 게임 역시 모두 보드게임의 영역에 있으나, 해당 콘텐츠에 대해서 깊이 있게 이야기하는 것은 가급적 삼가해주시면 감사하겠습니다.</li>
