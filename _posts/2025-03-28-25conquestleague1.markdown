@@ -15,6 +15,7 @@ thumbnail: /assets/img/202504_conquestleague/1.jpeg
 	
 	<p>장소 : 장단콩 보드게임& 미니어처게임 클럽 아지트</p>
   <p>주소 : 파주시 탄현면 성동로 17 통일프라자 2층 9호</p>
+  <a>  </a>
   <p><a>대회참가 기준 및 집계 기준</a></p>
 	<ul>
 		  <a style="color: red;">1</a>: 장단콩 보드게임 & 미니어처게임 클럽 회원일 것
@@ -22,6 +23,8 @@ thumbnail: /assets/img/202504_conquestleague/1.jpeg
       <a style="color: red;">3</a>: 1250 포인트 정규전 게임으로 수행할 것.
       <a style="color: red;">4</a>: 멋진 사진을 많이 남길 것. (최소 5장 이상)
   </ul>
+  <a>  </a>
+  <a>  </a>
   <p><a>배틀리포트 작성 방법</a></p>
   <ul>
 		  <a style="color: red;">1</a>: 게임을 재미있게 즐기며 사진을 촬영한다. (최소 5장 이상)
