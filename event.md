@@ -60,7 +60,7 @@ title: 공식 이벤트
   <div class="carousel-inner">
     <div class="carousel-item active">
         <a href="https://www.jdkclub.click/blog/25infinityleague1/">
-            <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" alt="1">
+            <img src="/assets/img/202504_conquestleague/1.jpeg" class="d-block img-fluid mx-auto" alt="1">
         </a>
     </div>
     <div class="carousel-item">
@@ -70,7 +70,7 @@ title: 공식 이벤트
     </div>
     <div class="carousel-item">
         <a href="https://www.jdkclub.click/blog/25infinityleague1/">
-            <img src="/assets/img/infinityleague1.png" class="d-block img-fluid mx-auto" alt="3">
+            <img src="/assets/img/202504_conquestleague/1.jpeg" class="d-block img-fluid mx-auto" alt="3">
         </a>
     </div>  
   </div>
