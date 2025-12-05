@@ -27,6 +27,8 @@ navigation:
       url: /rules 
     - title: 명예의 전당
       url: /honor
+    - title: 콩툰
+      url: /toon
     # - title: 공식 이벤트
     #   url: /event
 
