@@ -41,8 +41,8 @@ title: 콩툰
 
 
 <!-- 코드 -->
-<div id="콩툰">
-  <h1>장단콩툰</h1>
+<div id="콩툰" style="text-align: center;">
+  <h1 class="pageTitle">장단콩툰</h1>
   <ul class="posts noList">
     {%- for post in site.posts -%}
       {% if post.categories contains 'toon' %}
