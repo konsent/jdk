@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "우리 모임에 건실한 녀석은 필요 없어"
+title:  "남자 밖에 없는 보드게임 클럽"
 date:   2025-12-04
 categories: toon
-description: 콩툰1
+description: 콩툰2
 thumbnail: /assets/toon/250617_princess_thumb.jpg
 ---
 

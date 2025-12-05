@@ -8,6 +8,7 @@ title: 콩툰
     display: flex;
     gap: 20px;
     margin-bottom: 20px;
+    justify-content: center; /* 썸네일을 가운데 정렬합니다. */
   }
 
   .post-thumbnail {
@@ -66,4 +67,3 @@ title: 콩툰
     {%- endfor -%}
   </ul>
 </div>
-
