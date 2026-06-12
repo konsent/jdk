@@ -1,6 +1,6 @@
 import { auth, db } from "./firebase-init.js";
 import {
-  onAuthStateChanged, createUserWithEmailAndPassword
+  onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp
@@ -32,18 +32,39 @@ document.getElementById("form-register").addEventListener("submit", async (e) =>
   try {
     let user = currentUser;
 
-    // 이메일 가입: 먼저 Firebase Auth 계정 생성 (이후 로그인 상태가 되어 Firestore 쿼리 가능)
     if (!user || user.providerData[0]?.providerId !== "google.com") {
       const email = document.getElementById("input-email").value.trim();
       const password = document.getElementById("input-password").value;
       if (!email || !password) { showError("이메일과 비밀번호를 입력해주세요."); return; }
-      const result = await createUserWithEmailAndPassword(auth, email, password);
-      user = result.user;
+
+      try {
+        const result = await createUserWithEmailAndPassword(auth, email, password);
+        user = result.user;
+      } catch (err) {
+        if (err.code === "auth/email-already-in-use") {
+          // 이미 Auth 계정 있음 — 로그인 후 Firestore 재신청
+          const result = await signInWithEmailAndPassword(auth, email, password);
+          user = result.user;
+          const snap = await getDoc(doc(db, "users", user.uid));
+          if (snap.exists() && snap.data().status === "pending") {
+            showError("이미 가입 신청 중입니다. 운영자 승인을 기다려주세요.");
+            return;
+          }
+          if (snap.exists() && snap.data().status === "approved") {
+            location.href = "/board/";
+            return;
+          }
+          // rejected 또는 문서 없음 → 재신청 허용
+        } else {
+          throw err;
+        }
+      }
     }
 
-    // 로그인 상태가 된 후 닉네임 중복 확인
+    // 닉네임 중복 확인 (본인 제외)
     const dupSnap = await getDocs(query(collection(db, "users"), where("nickname", "==", nickname)));
-    if (!dupSnap.empty) { showError("이미 사용 중인 닉네임입니다."); return; }
+    const isDup = dupSnap.docs.some(d => d.id !== user.uid);
+    if (isDup) { showError("이미 사용 중인 닉네임입니다."); return; }
 
     await setDoc(doc(db, "users", user.uid), {
       status: "pending",
@@ -57,8 +78,8 @@ document.getElementById("form-register").addEventListener("submit", async (e) =>
     document.getElementById("form-register").style.display = "none";
     document.getElementById("msg-success").style.display = "block";
   } catch (err) {
-    if (err.code === "auth/email-already-in-use") {
-      showError("이미 가입된 이메일입니다. 로그인 페이지를 이용해주세요.");
+    if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
+      showError("비밀번호가 올바르지 않습니다.");
     } else {
       showError(err.message);
     }
