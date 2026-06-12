@@ -320,15 +320,17 @@
   font-size: 0.88rem;
 }
 .event-table thead th {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-  padding: 8px 12px;
-  border-bottom: 2px solid var(--divider);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #fff;
+  background: #444;
+  padding: 11px 12px;
+  border-bottom: none;
   text-align: left;
 }
+.event-table thead th:first-child { border-radius: 6px 0 0 0; }
+.event-table thead th:last-child  { border-radius: 0 6px 0 0; }
 .event-table tbody tr {
   border-bottom: 1px solid var(--divider);
   cursor: pointer;
