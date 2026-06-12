@@ -25,13 +25,13 @@
    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
    onAuthStateChanged(auth, async (user) => {
-     document.getElementById("nav-login").style.display = user ? "none" : "list-item";
-     document.getElementById("nav-register").style.display = user ? "none" : "list-item";
-     document.getElementById("nav-logout").style.display = user ? "list-item" : "none";
+     document.getElementById("nav-login").style.display = user ? "none" : "inline";
+     document.getElementById("nav-register").style.display = user ? "none" : "inline";
+     document.getElementById("nav-logout").style.display = user ? "inline" : "none";
      if (user) {
        const snap = await getDoc(doc(db, "users", user.uid));
        const isAdmin = snap.exists() && snap.data().isAdmin === true;
-       document.getElementById("nav-admin").style.display = isAdmin ? "list-item" : "none";
+       document.getElementById("nav-admin").style.display = isAdmin ? "inline" : "none";
      } else {
        document.getElementById("nav-admin").style.display = "none";
      }
