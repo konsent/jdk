@@ -3,24 +3,28 @@ layout: default
 title: 게시판
 permalink: /board/
 ---
+<link rel="stylesheet" href="/assets/css/pages.css">
 <link rel="stylesheet" href="/assets/css/board.css">
 
-<div class="mt-4">
+<div style="padding: 32px 0 48px;">
+
   <!-- 공지 섹션 -->
   <div class="mb-4">
-    <h5>공지사항</h5>
+    <p class="board-section-title">공지사항</p>
     <div id="notice-list">불러오는 중...</div>
   </div>
 
-  <hr>
+  <div class="section-divider"></div>
 
   <!-- 일정 게시판 -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0">일정 게시판</h5>
-    <div>
-      <button class="btn btn-sm btn-outline-secondary me-2" id="btn-calendar-view">캘린더</button>
-      <button class="btn btn-sm btn-outline-secondary me-2" id="btn-list-view">목록</button>
-      <a href="/write/" class="btn btn-sm btn-primary">일정 등록</a>
+  <div class="board-toolbar">
+    <p class="board-section-title" style="margin:0">일정 게시판</p>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="board-view-btns">
+        <button class="btn-view active" id="btn-calendar-view">캘린더</button>
+        <button class="btn-view" id="btn-list-view">목록</button>
+      </div>
+      <a href="/write/" class="btn-write">+ 일정 등록</a>
     </div>
   </div>
 
@@ -29,11 +33,18 @@ permalink: /board/
   </div>
 
   <div id="list-view" style="display:none">
-    <table class="table table-hover">
-      <thead><tr><th>날짜</th><th>제목</th><th>참석</th></tr></thead>
+    <table class="event-table">
+      <thead>
+        <tr>
+          <th>날짜</th>
+          <th>제목</th>
+          <th>참석</th>
+        </tr>
+      </thead>
       <tbody id="event-list">불러오는 중...</tbody>
     </table>
   </div>
+
 </div>
 
 <script type="module" src="/assets/js/board.js"></script>

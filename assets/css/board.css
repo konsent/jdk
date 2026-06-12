@@ -1,5 +1,24 @@
-.notice-item { border-left: 3px solid #0d6efd; padding-left: 12px; margin-bottom: 8px; }
-.event-row:hover { background: #f8f9fa; cursor: pointer; }
-.badge-full { background: #dc3545; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; }
-.badge-open { background: #198754; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; }
-.fc-event { cursor: pointer; }
+/* board.css - 캘린더 및 게시판 전용 스타일 */
+
+#calendar {
+  background: #ffffff;
+  border: 1px solid #e8e8e4;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+.fc-event { cursor: pointer; border-radius: 4px !important; font-size: 0.78rem !important; }
+.fc-toolbar-title { font-size: 1rem !important; font-weight: 700 !important; }
+.fc-button { background: #1a1a1a !important; border-color: #1a1a1a !important; font-size: 0.8rem !important; padding: 5px 12px !important; border-radius: 5px !important; }
+.fc-button:hover { background: #333 !important; border-color: #333 !important; }
+.fc-button-active { background: #444 !important; border-color: #444 !important; }
+
+.notice-item { border-left: 3px solid #1a1a1a; padding: 10px 14px; margin-bottom: 8px; border-radius: 0 5px 5px 0; background: #fff; border-top: 1px solid #e8e8e4; border-right: 1px solid #e8e8e4; border-bottom: 1px solid #e8e8e4; transition: box-shadow 0.15s; }
+.notice-item:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+.notice-item a { color: #1a1a1a; font-weight: 500; text-decoration: none; font-size: 0.9rem; }
+
+.event-row:hover { background: #e8f5e9; cursor: pointer; }
+
+.badge-full { background: #c62828; color: #fff; padding: 2px 8px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+.badge-open { background: #2e7d32; color: #fff; padding: 2px 8px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }

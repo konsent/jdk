@@ -3,11 +3,14 @@ layout: default
 title: 글 작성
 permalink: /write/
 ---
-<div class="row justify-content-center mt-4">
-  <div class="col-md-8">
-    <h2 class="mb-4">글 작성</h2>
+<link rel="stylesheet" href="/assets/css/pages.css">
 
-    <form id="form-write" novalidate>
+<div class="page-wrapper">
+  <div class="page-card page-card--wide">
+    <h1 class="page-card__title">글 작성</h1>
+    <p class="page-card__subtitle">일정 또는 공지를 등록합니다</p>
+
+    <form id="form-write" class="page-form" novalidate>
       <div id="section-type" class="mb-3" style="display:none">
         <label class="form-label">글 유형</label>
         <select id="select-type" class="form-select">
@@ -17,31 +20,33 @@ permalink: /write/
       </div>
 
       <div class="mb-3">
-        <label class="form-label">제목 <span class="text-danger">*</span></label>
-        <input type="text" id="input-title" class="form-control" required>
+        <label class="form-label">제목 <span style="color:var(--danger)">*</span></label>
+        <input type="text" id="input-title" class="form-control" placeholder="제목을 입력하세요" required>
       </div>
 
       <div id="section-event-fields">
         <div class="mb-3">
-          <label class="form-label">일정 날짜 <span class="text-danger">*</span></label>
+          <label class="form-label">일정 날짜 <span style="color:var(--danger)">*</span></label>
           <input type="date" id="input-date" class="form-control" required>
         </div>
         <div class="mb-3">
-          <label class="form-label">최대 참석 인원 (본인 포함) <span class="text-danger">*</span></label>
+          <label class="form-label">최대 참석 인원 (본인 포함) <span style="color:var(--danger)">*</span></label>
           <input type="number" id="input-max" class="form-control" min="1" max="20" value="5" required>
         </div>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">내용 <span class="text-danger">*</span></label>
-        <textarea id="input-content" class="form-control" rows="8" required></textarea>
+      <div class="mb-4">
+        <label class="form-label">내용 <span style="color:var(--danger)">*</span></label>
+        <textarea id="input-content" class="form-control" rows="8" placeholder="내용을 입력하세요" required></textarea>
       </div>
 
-      <button type="submit" class="btn btn-primary">등록</button>
-      <a href="/board.html" class="btn btn-outline-secondary ms-2">취소</a>
+      <div style="display:flex;gap:10px">
+        <button type="submit" class="btn-page-primary" style="width:auto;padding:11px 32px">등록</button>
+        <a href="/board/" class="btn-page-secondary" style="width:auto;padding:11px 24px">취소</a>
+      </div>
     </form>
 
-    <p id="msg-error" class="text-danger mt-3" style="display:none"></p>
+    <div id="msg-error" class="page-msg page-msg--error" style="display:none"></div>
   </div>
 </div>
 

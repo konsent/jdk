@@ -3,41 +3,47 @@ layout: default
 title: 회원가입 신청
 permalink: /register/
 ---
-<div class="row justify-content-center mt-5">
-  <div class="col-md-5">
-    <h2 class="mb-4">회원가입 신청</h2>
-    <p class="text-muted">닉네임을 입력하면 운영자 승인 후 이용 가능합니다.</p>
+<link rel="stylesheet" href="/assets/css/pages.css">
+
+<div class="page-wrapper">
+  <div class="page-card">
+    <h1 class="page-card__title">회원가입 신청</h1>
+    <p class="page-card__subtitle">닉네임을 입력하면 운영자 승인 후 이용 가능합니다</p>
 
     <div id="section-google-done" style="display:none">
-      <p>Google 계정으로 로그인됐습니다.</p>
+      <div class="page-msg page-msg--success">Google 계정으로 로그인됐습니다.</div>
     </div>
 
-    <form id="form-register" novalidate>
+    <form id="form-register" class="page-form" novalidate>
       <div id="section-email-fields">
         <div class="mb-3">
-          <label class="form-label">이메일 <span class="text-muted">(이메일 가입 시)</span></label>
-          <input type="email" id="input-email" class="form-control">
+          <label class="form-label">이메일 <span style="color:var(--text-muted);font-weight:400">(이메일 가입 시)</span></label>
+          <input type="email" id="input-email" class="form-control" placeholder="이메일 주소">
         </div>
         <div class="mb-3">
           <label class="form-label">비밀번호</label>
-          <input type="password" id="input-password" class="form-control">
+          <input type="password" id="input-password" class="form-control" placeholder="비밀번호">
         </div>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">닉네임 <span class="text-danger">*</span></label>
-        <input type="text" id="input-nickname" class="form-control" maxlength="12" required>
-        <div class="form-text">최대 12자, 게시판에 표시됩니다.</div>
+      <div class="mb-4">
+        <label class="form-label">닉네임 <span style="color:var(--danger)">*</span></label>
+        <input type="text" id="input-nickname" class="form-control" maxlength="12" placeholder="최대 12자" required>
+        <div class="form-text">게시판에 표시될 이름입니다</div>
       </div>
 
-      <button type="submit" class="btn btn-primary w-100">가입 신청</button>
+      <button type="submit" class="btn-page-primary">가입 신청하기</button>
     </form>
 
-    <p id="msg-error" class="text-danger mt-3" style="display:none"></p>
+    <div id="msg-error" class="page-msg page-msg--error" style="display:none"></div>
     <div id="msg-success" style="display:none">
-      <div class="alert alert-success mt-3">
+      <div class="page-msg page-msg--success">
         가입 신청이 완료되었습니다. 운영자 승인 후 이용 가능합니다.
       </div>
+    </div>
+
+    <div class="page-link">
+      이미 계정이 있으신가요? <a href="/login/">로그인</a>
     </div>
   </div>
 </div>

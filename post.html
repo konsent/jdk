@@ -3,35 +3,40 @@ layout: default
 title: 게시글
 permalink: /post/
 ---
-<link rel="stylesheet" href="/assets/css/board.css">
+<link rel="stylesheet" href="/assets/css/pages.css">
 
-<div class="mt-4">
-  <div id="post-content">불러오는 중...</div>
+<div style="padding: 32px 0 64px; max-width: 720px; margin: 0 auto;">
+
+  <div id="post-content">
+    <p style="color:var(--text-muted);font-size:0.9rem">불러오는 중...</p>
+  </div>
 
   <!-- 참석 섹션 (event만) -->
   <div id="section-attendees" style="display:none" class="mt-4">
-    <h5>참석 현황 <span id="attendee-count"></span></h5>
+    <p class="attendee-section-title">참석 현황 <span id="attendee-count" style="color:var(--text-primary);font-weight:700"></span></p>
     <div id="attendee-list" class="mb-3"></div>
-    <button id="btn-attend" class="btn btn-success" style="display:none">참석 신청</button>
-    <button id="btn-cancel" class="btn btn-outline-danger" style="display:none">참석 취소</button>
-    <p id="msg-full" class="text-danger mt-2" style="display:none">정원이 마감됐습니다.</p>
+    <button id="btn-attend" class="btn-attend-action join" style="display:none">참석 신청</button>
+    <button id="btn-cancel" class="btn-attend-action cancel" style="display:none">참석 취소</button>
+    <p id="msg-full" class="page-msg page-msg--error" style="display:none">정원이 마감됐습니다.</p>
   </div>
 
   <!-- 댓글 섹션 (event만) -->
-  <div id="section-comments" style="display:none" class="mt-5">
-    <h5>댓글</h5>
-    <div id="comment-list" class="mb-3"></div>
+  <div id="section-comments" style="display:none">
+    <div class="section-divider"></div>
+    <p class="attendee-section-title">댓글</p>
+    <div id="comment-list" class="mb-2"></div>
     <form id="form-comment">
-      <div class="input-group">
-        <input type="text" id="input-comment" class="form-control" placeholder="댓글을 입력하세요" maxlength="200">
-        <button type="submit" class="btn btn-primary">등록</button>
+      <div class="comment-input-row">
+        <input type="text" id="input-comment" placeholder="댓글을 입력하세요" maxlength="200">
+        <button type="submit">등록</button>
       </div>
     </form>
   </div>
 
-  <div class="mt-3">
-    <a href="/board.html" class="btn btn-outline-secondary btn-sm">목록으로</a>
+  <div style="margin-top:32px">
+    <a href="/board/" class="btn-back">← 목록으로</a>
   </div>
+
 </div>
 
 <script type="module" src="/assets/js/post.js"></script>

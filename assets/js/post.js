@@ -37,18 +37,23 @@ async function loadPost() {
 
   const canDelete = currentUser.uid === postData.authorUid || currentUserData.isAdmin;
   const deleteBtn = canDelete
-    ? `<button class="btn btn-sm btn-outline-danger ms-2" id="btn-delete-post">삭제</button>`
+    ? `<button style="background:none;border:1px solid var(--danger);color:var(--danger);border-radius:4px;font-size:0.78rem;padding:4px 10px;cursor:pointer;" id="btn-delete-post">삭제</button>`
     : "";
 
   document.getElementById("post-content").innerHTML = `
-    <div class="d-flex justify-content-between align-items-start">
-      <h2>${postData.title}</h2>
-      <div>${deleteBtn}</div>
+    <div class="post-header">
+      <span class="post-type-badge">${postData.type === "event" ? "일정" : "공지"}</span>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <h2 class="post-title">${postData.title}</h2>
+        <div style="flex-shrink:0">${deleteBtn}</div>
+      </div>
+      <div class="post-meta">
+        <span>${authorName}</span>
+        <span>${date}</span>
+        ${postData.type === "event" ? `<span>📅 ${postData.eventDate?.toDate().toLocaleDateString("ko-KR") || ""}</span>` : ""}
+      </div>
     </div>
-    <p class="text-muted small">${authorName} · ${date}</p>
-    ${eventInfo}
-    <hr>
-    <div style="white-space:pre-wrap">${postData.content}</div>
+    <div class="post-body">${postData.content}</div>
   `;
 
   if (canDelete) {
@@ -78,7 +83,7 @@ async function loadAttendees() {
     return u?.nickname || "알 수 없음";
   }));
   document.getElementById("attendee-list").innerHTML = names
-    .map(n => `<span class="badge bg-secondary me-1">${n}</span>`).join("");
+    .map(n => `<span class="attendee-chip">${n}</span>`).join("");
 }
 
 function setupAttendButtons() {
@@ -128,11 +133,12 @@ async function loadComments() {
     const name = u?.nickname || "알 수 없음";
     const date = c.createdAt?.toDate().toLocaleString("ko-KR") || "";
     const deleteBtn = (c.authorUid === currentUser.uid || currentUserData.isAdmin)
-      ? `<button class="btn btn-sm btn-link text-danger p-0 ms-2" onclick="deleteComment('${d.id}')">삭제</button>`
+      ? `<button style="background:none;border:none;color:var(--danger);font-size:0.75rem;cursor:pointer;padding:0 0 0 8px;" onclick="deleteComment('${d.id}')">삭제</button>`
       : "";
-    return `<div class="mb-2 border-bottom pb-2">
-      <strong>${name}</strong> <span class="text-muted small">${date}</span>${deleteBtn}
-      <div>${c.content}</div>
+    return `<div class="comment-item">
+      <div><span class="comment-author">${name}</span>${deleteBtn}</div>
+      <div class="comment-text">${c.content}</div>
+      <div class="comment-time">${date}</div>
     </div>`;
   }));
   el.innerHTML = rows.join("");
