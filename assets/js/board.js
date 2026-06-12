@@ -13,11 +13,15 @@ document.getElementById("btn-list-view").addEventListener("click", () => {
   document.getElementById("list-view").style.display = "block";
 });
 
-requireApproved(async () => {
+requireApproved(async (user, userData) => {
   await loadNotices();
   const events = await loadEvents();
   renderCalendar(events);
   renderList(events);
+  if (userData.isAdmin) {
+    const link = document.getElementById("link-stats");
+    if (link) link.style.display = "inline";
+  }
 });
 
 async function loadNotices() {

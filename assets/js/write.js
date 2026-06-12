@@ -1,7 +1,8 @@
 import { db } from "./firebase-init.js";
 import { requireApproved } from "./auth-guard.js";
 import {
-  collection, addDoc, serverTimestamp, Timestamp
+  collection, addDoc, serverTimestamp, Timestamp,
+  doc, setDoc, increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 let currentUser = null;
@@ -53,6 +54,16 @@ document.getElementById("form-write").addEventListener("submit", async (e) => {
 
   try {
     const ref = await addDoc(collection(db, "posts"), postData);
+
+    if (type === "event") {
+      await setDoc(doc(db, "stats", "global"), {
+        updatedAt: serverTimestamp(),
+        [`members.${currentUser.uid}.nickname`]: currentUserData.nickname,
+        [`members.${currentUser.uid}.postCount`]: increment(1),
+        [`members.${currentUser.uid}.attendCount`]: increment(0)
+      }, { merge: true });
+    }
+
     location.href = `/post/?id=${ref.id}`;
   } catch (err) {
     showError("등록 중 오류가 발생했습니다.");
