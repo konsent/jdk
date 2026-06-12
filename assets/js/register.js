@@ -3,23 +3,23 @@ import {
   onAuthStateChanged, createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  doc, setDoc, collection, query, where, getDocs, serverTimestamp
+  doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 let currentUser = null;
 
-// 이미 승인된 회원이면 게시판으로 보냄, 구글 로그인으로 온 경우 이메일 필드 숨김
 onAuthStateChanged(auth, async (user) => {
-  if (!user) return; // 로그인 안 한 상태면 그냥 register 페이지 유지
+  if (!user) return;
   currentUser = user;
 
-  // 이미 Firestore에 approved로 등록된 경우 게시판으로
-  const snap = await getDocs(query(collection(db, "users"), where("__name__", "==", user.uid)));
-  if (!snap.empty && snap.docs[0].data().status === "approved") {
+  // 이미 approved면 게시판으로
+  const snap = await getDoc(doc(db, "users", user.uid));
+  if (snap.exists() && snap.data().status === "approved") {
     location.href = "/board/";
     return;
   }
 
+  // 구글 로그인으로 온 경우 이메일 필드 숨김
   if (user.providerData[0]?.providerId === "google.com") {
     document.getElementById("section-email-fields").style.display = "none";
     document.getElementById("section-google-done").style.display = "block";
@@ -38,7 +38,7 @@ document.getElementById("form-register").addEventListener("submit", async (e) =>
   try {
     let user = currentUser;
 
-    // 이메일 가입: 아직 로그인 안 된 상태에서 계정 생성
+    // 이메일 가입: 로그인 안 된 상태에서 계정 생성
     if (!user || user.providerData[0]?.providerId !== "google.com") {
       const email = document.getElementById("input-email").value.trim();
       const password = document.getElementById("input-password").value;

@@ -12,6 +12,7 @@
                  <li> <a href="https://bit.ly/jangdankong_schedule" target="_blank">아지트 일정</a></li> -->
                  <li> <a href="https://open.kakao.com/o/g1cdFCcg" target="_blank">오픈 채팅방</a></li>
                  <li id="nav-login" style="display:none"><a href="/login/">로그인</a></li>
+                 <li id="nav-register" style="display:none"><a href="/register/">회원가입</a></li>
                  <li id="nav-logout" style="display:none"><a href="#" id="btn-logout">로그아웃</a></li>
              </ul>
          </nav>
@@ -23,6 +24,7 @@
    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
    onAuthStateChanged(auth, (user) => {
      document.getElementById("nav-login").style.display = user ? "none" : "list-item";
+     document.getElementById("nav-register").style.display = user ? "none" : "list-item";
      document.getElementById("nav-logout").style.display = user ? "list-item" : "none";
    });
    document.getElementById("btn-logout")?.addEventListener("click", async (e) => {
