@@ -9,7 +9,7 @@ import {
 let currentUser = null;
 
 onAuthStateChanged(auth, (user) => {
-  if (!user) { location.href = "/login.html"; return; }
+  if (!user) { location.href = "/login/"; return; }
   currentUser = user;
   if (user.providerData[0]?.providerId === "google.com") {
     document.getElementById("section-email-fields").style.display = "none";

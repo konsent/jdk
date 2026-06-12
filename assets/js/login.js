@@ -7,9 +7,9 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase
 
 async function redirectByStatus(uid) {
   const snap = await getDoc(doc(db, "users", uid));
-  if (!snap.exists()) { location.href = "/register.html"; return; }
+  if (!snap.exists()) { location.href = "/register/"; return; }
   const { status } = snap.data();
-  if (status === "approved") { location.href = "/board.html"; return; }
+  if (status === "approved") { location.href = "/board/"; return; }
   document.getElementById("msg-pending").style.display = status === "pending" ? "block" : "none";
   document.getElementById("msg-rejected").style.display = status === "rejected" ? "block" : "none";
 }

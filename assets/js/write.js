@@ -53,7 +53,7 @@ document.getElementById("form-write").addEventListener("submit", async (e) => {
 
   try {
     const ref = await addDoc(collection(db, "posts"), postData);
-    location.href = `/post.html?id=${ref.id}`;
+    location.href = `/post/?id=${ref.id}`;
   } catch (err) {
     showError("등록 중 오류가 발생했습니다.");
   }

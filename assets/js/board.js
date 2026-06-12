@@ -26,7 +26,7 @@ async function loadNotices() {
     const p = d.data();
     const date = p.createdAt?.toDate().toLocaleDateString("ko-KR") || "";
     return `<div class="notice-item">
-      <a href="/post.html?id=${d.id}">${p.title}</a>
+      <a href="/post/?id=${d.id}">${p.title}</a>
       <span class="text-muted ms-2 small">${date}</span>
     </div>`;
   }).join("");
@@ -52,7 +52,7 @@ function renderCalendar(events) {
       title: e.title,
       start: e.eventDate.toDate()
     })),
-    eventClick: (info) => { location.href = `/post.html?id=${info.event.id}`; }
+    eventClick: (info) => { location.href = `/post/?id=${info.event.id}`; }
   });
   calendar.render();
 }
@@ -69,7 +69,7 @@ function renderList(events) {
     const badge = cnt >= e.maxAttendees
       ? `<span class="badge-full">${cnt}/${e.maxAttendees} 마감</span>`
       : `<span class="badge-open">${cnt}/${e.maxAttendees}</span>`;
-    return `<tr class="event-row" onclick="location.href='/post.html?id=${e.id}'">
+    return `<tr class="event-row" onclick="location.href='/post/?id=${e.id}'">
       <td>${date}</td><td>${e.title}</td><td>${badge}</td>
     </tr>`;
   }).join("");

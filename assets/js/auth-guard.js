@@ -9,18 +9,18 @@ export async function getUserDoc(uid) {
 
 export function requireApproved(callback) {
   onAuthStateChanged(auth, async (user) => {
-    if (!user) { location.href = "/login.html"; return; }
+    if (!user) { location.href = "/login/"; return; }
     const data = await getUserDoc(user.uid);
-    if (!data || data.status !== "approved") { location.href = "/login.html"; return; }
+    if (!data || data.status !== "approved") { location.href = "/login/"; return; }
     callback(user, data);
   });
 }
 
 export function requireAdmin(callback) {
   onAuthStateChanged(auth, async (user) => {
-    if (!user) { location.href = "/login.html"; return; }
+    if (!user) { location.href = "/login/"; return; }
     const data = await getUserDoc(user.uid);
-    if (!data || !data.isAdmin) { location.href = "/board.html"; return; }
+    if (!data || !data.isAdmin) { location.href = "/board/"; return; }
     callback(user, data);
   });
 }
