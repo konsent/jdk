@@ -1,0 +1,71 @@
+import { db } from "./firebase-init.js";
+import { requireAdmin } from "./auth-guard.js";
+import {
+  collection, query, where, getDocs,
+  doc, updateDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+requireAdmin(async () => {
+  await loadPending();
+  await loadMembers();
+  setupTabs();
+});
+
+async function loadPending() {
+  const q = query(collection(db, "users"), where("status", "==", "pending"));
+  const snap = await getDocs(q);
+  const el = document.getElementById("list-pending");
+  if (snap.empty) { el.innerHTML = "<p class='text-muted'>대기 중인 신청이 없습니다.</p>"; return; }
+
+  el.innerHTML = snap.docs.map(d => {
+    const u = d.data();
+    return `
+      <div class="card mb-2 p-3 d-flex flex-row justify-content-between align-items-center">
+        <div>
+          <strong>${u.nickname}</strong>
+          <span class="text-muted ms-2">${u.displayName}</span>
+          <span class="text-muted ms-2">${u.email}</span>
+        </div>
+        <div>
+          <button class="btn btn-sm btn-success me-1" onclick="setStatus('${d.id}','approved')">승인</button>
+          <button class="btn btn-sm btn-danger" onclick="setStatus('${d.id}','rejected')">거절</button>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+async function loadMembers() {
+  const q = query(collection(db, "users"), where("status", "==", "approved"));
+  const snap = await getDocs(q);
+  const el = document.getElementById("list-members");
+  if (snap.empty) { el.innerHTML = "<p class='text-muted'>승인된 회원이 없습니다.</p>"; return; }
+
+  el.innerHTML = snap.docs.map(d => {
+    const u = d.data();
+    return `
+      <div class="card mb-2 p-3 d-flex flex-row justify-content-between align-items-center">
+        <div>
+          <strong>${u.nickname}</strong>
+          <span class="text-muted ms-2">${u.email}</span>
+        </div>
+        <button class="btn btn-sm btn-outline-danger" onclick="setStatus('${d.id}','rejected')">강제 탈퇴</button>
+      </div>`;
+  }).join("");
+}
+
+window.setStatus = async (uid, status) => {
+  await updateDoc(doc(db, "users", uid), { status });
+  await loadPending();
+  await loadMembers();
+};
+
+function setupTabs() {
+  document.querySelectorAll("[data-tab]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-tab]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("tab-pending").style.display = btn.dataset.tab === "pending" ? "block" : "none";
+      document.getElementById("tab-members").style.display = btn.dataset.tab === "members" ? "block" : "none";
+    });
+  });
+}

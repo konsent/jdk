@@ -1,0 +1,27 @@
+---
+layout: default
+title: 운영자 관리
+---
+<div class="mt-4">
+  <h2>운영자 관리</h2>
+  <ul class="nav nav-tabs mb-4" id="admin-tabs">
+    <li class="nav-item">
+      <button class="nav-link active" data-tab="pending">승인 대기</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-tab="members">전체 회원</button>
+    </li>
+  </ul>
+
+  <div id="tab-pending">
+    <h5>승인 대기 목록</h5>
+    <div id="list-pending" class="mt-3">불러오는 중...</div>
+  </div>
+
+  <div id="tab-members" style="display:none">
+    <h5>전체 회원</h5>
+    <div id="list-members" class="mt-3">불러오는 중...</div>
+  </div>
+</div>
+
+<script type="module" src="/assets/js/admin.js"></script>

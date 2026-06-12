@@ -1,0 +1,33 @@
+---
+layout: default
+title: 로그인
+---
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5">
+    <h2 class="mb-4">로그인</h2>
+
+    <button id="btn-google" class="btn btn-outline-dark w-100 mb-3">
+      Google 계정으로 로그인
+    </button>
+
+    <hr>
+
+    <form id="form-email" novalidate>
+      <div class="mb-3">
+        <label class="form-label">이메일</label>
+        <input type="email" id="input-email" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">비밀번호</label>
+        <input type="password" id="input-password" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">이메일로 로그인</button>
+    </form>
+
+    <p id="msg-error" class="text-danger mt-3" style="display:none"></p>
+    <p id="msg-pending" class="text-warning mt-3" style="display:none">승인 대기 중입니다. 운영자 승인 후 이용 가능합니다.</p>
+    <p id="msg-rejected" class="text-danger mt-3" style="display:none">가입이 거절되었습니다. 운영자에게 문의하세요.</p>
+  </div>
+</div>
+
+<script type="module" src="/assets/js/login.js"></script>

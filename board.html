@@ -1,0 +1,40 @@
+---
+layout: default
+title: 게시판
+---
+<link rel="stylesheet" href="/assets/css/board.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css">
+
+<div class="mt-4">
+  <!-- 공지 섹션 -->
+  <div class="mb-4">
+    <h5>공지사항</h5>
+    <div id="notice-list">불러오는 중...</div>
+  </div>
+
+  <hr>
+
+  <!-- 일정 게시판 -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">일정 게시판</h5>
+    <div>
+      <button class="btn btn-sm btn-outline-secondary me-2" id="btn-calendar-view">캘린더</button>
+      <button class="btn btn-sm btn-outline-secondary me-2" id="btn-list-view">목록</button>
+      <a href="/write.html" class="btn btn-sm btn-primary">일정 등록</a>
+    </div>
+  </div>
+
+  <div id="calendar-view">
+    <div id="calendar"></div>
+  </div>
+
+  <div id="list-view" style="display:none">
+    <table class="table table-hover">
+      <thead><tr><th>날짜</th><th>제목</th><th>참석</th></tr></thead>
+      <tbody id="event-list">불러오는 중...</tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script type="module" src="/assets/js/board.js"></script>

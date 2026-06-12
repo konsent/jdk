@@ -24,11 +24,13 @@ navigation:
     # - title: 소개
     #   url: /index.html /about /contact
     - title: 회칙
-      url: /rules 
+      url: /rules
     - title: 명예의 전당
       url: /honor
     - title: 콩툰
       url: /toon
+    - title: 게시판
+      url: /board
     # - title: 공식 이벤트
     #   url: /event
 

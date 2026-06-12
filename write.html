@@ -1,0 +1,47 @@
+---
+layout: default
+title: 글 작성
+---
+<div class="row justify-content-center mt-4">
+  <div class="col-md-8">
+    <h2 class="mb-4">글 작성</h2>
+
+    <form id="form-write" novalidate>
+      <div id="section-type" class="mb-3" style="display:none">
+        <label class="form-label">글 유형</label>
+        <select id="select-type" class="form-select">
+          <option value="event">일정</option>
+          <option value="notice">공지</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">제목 <span class="text-danger">*</span></label>
+        <input type="text" id="input-title" class="form-control" required>
+      </div>
+
+      <div id="section-event-fields">
+        <div class="mb-3">
+          <label class="form-label">일정 날짜 <span class="text-danger">*</span></label>
+          <input type="date" id="input-date" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">최대 참석 인원 (본인 포함) <span class="text-danger">*</span></label>
+          <input type="number" id="input-max" class="form-control" min="1" max="20" value="5" required>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">내용 <span class="text-danger">*</span></label>
+        <textarea id="input-content" class="form-control" rows="8" required></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">등록</button>
+      <a href="/board.html" class="btn btn-outline-secondary ms-2">취소</a>
+    </form>
+
+    <p id="msg-error" class="text-danger mt-3" style="display:none"></p>
+  </div>
+</div>
+
+<script type="module" src="/assets/js/write.js"></script>
