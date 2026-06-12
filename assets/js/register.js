@@ -12,14 +12,12 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) return;
   currentUser = user;
 
-  // 이미 approved면 게시판으로
   const snap = await getDoc(doc(db, "users", user.uid));
   if (snap.exists() && snap.data().status === "approved") {
     location.href = "/board/";
     return;
   }
 
-  // 구글 로그인으로 온 경우 이메일 필드 숨김
   if (user.providerData[0]?.providerId === "google.com") {
     document.getElementById("section-email-fields").style.display = "none";
     document.getElementById("section-google-done").style.display = "block";
@@ -31,14 +29,10 @@ document.getElementById("form-register").addEventListener("submit", async (e) =>
   const nickname = document.getElementById("input-nickname").value.trim();
   if (!nickname) { showError("닉네임을 입력해주세요."); return; }
 
-  // 닉네임 중복 확인
-  const dupSnap = await getDocs(query(collection(db, "users"), where("nickname", "==", nickname)));
-  if (!dupSnap.empty) { showError("이미 사용 중인 닉네임입니다."); return; }
-
   try {
     let user = currentUser;
 
-    // 이메일 가입: 로그인 안 된 상태에서 계정 생성
+    // 이메일 가입: 먼저 Firebase Auth 계정 생성 (이후 로그인 상태가 되어 Firestore 쿼리 가능)
     if (!user || user.providerData[0]?.providerId !== "google.com") {
       const email = document.getElementById("input-email").value.trim();
       const password = document.getElementById("input-password").value;
@@ -46,6 +40,10 @@ document.getElementById("form-register").addEventListener("submit", async (e) =>
       const result = await createUserWithEmailAndPassword(auth, email, password);
       user = result.user;
     }
+
+    // 로그인 상태가 된 후 닉네임 중복 확인
+    const dupSnap = await getDocs(query(collection(db, "users"), where("nickname", "==", nickname)));
+    if (!dupSnap.empty) { showError("이미 사용 중인 닉네임입니다."); return; }
 
     await setDoc(doc(db, "users", user.uid), {
       status: "pending",
