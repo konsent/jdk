@@ -35,13 +35,29 @@ async function loadPost() {
     eventInfo = `<p class="text-muted">📅 일정 날짜: <strong>${eventDate}</strong></p>`;
   }
 
+  const canDelete = currentUser.uid === postData.authorUid || currentUserData.isAdmin;
+  const deleteBtn = canDelete
+    ? `<button class="btn btn-sm btn-outline-danger ms-2" id="btn-delete-post">삭제</button>`
+    : "";
+
   document.getElementById("post-content").innerHTML = `
-    <h2>${postData.title}</h2>
+    <div class="d-flex justify-content-between align-items-start">
+      <h2>${postData.title}</h2>
+      <div>${deleteBtn}</div>
+    </div>
     <p class="text-muted small">${authorName} · ${date}</p>
     ${eventInfo}
     <hr>
     <div style="white-space:pre-wrap">${postData.content}</div>
   `;
+
+  if (canDelete) {
+    document.getElementById("btn-delete-post").addEventListener("click", async () => {
+      if (!confirm("게시글을 삭제하시겠습니까?")) return;
+      await deleteDoc(doc(db, "posts", postId));
+      location.href = "/board/";
+    });
+  }
 
   if (postData.type === "event") {
     await loadAttendees();
