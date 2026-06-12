@@ -4,42 +4,55 @@ import {
   collection, query, where, orderBy, limit, getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+// 버튼 이벤트는 DOM 로드 즉시 등록 (requireApproved 밖)
+document.getElementById("btn-calendar-view").addEventListener("click", () => {
+  document.getElementById("calendar-view").style.display = "block";
+  document.getElementById("list-view").style.display = "none";
+});
+document.getElementById("btn-list-view").addEventListener("click", () => {
+  document.getElementById("calendar-view").style.display = "none";
+  document.getElementById("list-view").style.display = "block";
+});
+
 requireApproved(async () => {
   await loadNotices();
   const events = await loadEvents();
   renderCalendar(events);
   renderList(events);
-  setupViewToggle();
 });
 
 async function loadNotices() {
-  const q = query(
-    collection(db, "posts"),
-    where("type", "==", "notice"),
-    orderBy("createdAt", "desc"),
-    limit(3)
-  );
-  const snap = await getDocs(q);
   const el = document.getElementById("notice-list");
-  if (snap.empty) { el.innerHTML = "<p class='text-muted'>공지사항이 없습니다.</p>"; return; }
-  el.innerHTML = snap.docs.map(d => {
-    const p = d.data();
-    const date = p.createdAt?.toDate().toLocaleDateString("ko-KR") || "";
-    return `<div class="notice-item">
-      <a href="/post/?id=${d.id}">${p.title}</a>
-      <span class="text-muted ms-2 small">${date}</span>
-    </div>`;
-  }).join("");
+  try {
+    // orderBy 없이 where만 사용해 복합 인덱스 불필요
+    const snap = await getDocs(query(
+      collection(db, "posts"),
+      where("type", "==", "notice"),
+      limit(3)
+    ));
+    if (snap.empty) { el.innerHTML = "<p class='text-muted'>공지사항이 없습니다.</p>"; return; }
+    el.innerHTML = snap.docs.map(d => {
+      const p = d.data();
+      return `<div class="notice-item">
+        <a href="/post/?id=${d.id}">${p.title}</a>
+      </div>`;
+    }).join("");
+  } catch (e) {
+    el.innerHTML = "<p class='text-muted'>공지사항이 없습니다.</p>";
+  }
 }
 
 async function loadEvents() {
-  const q = query(
-    collection(db, "posts"),
-    where("type", "==", "event"),
-    orderBy("eventDate", "asc")
-  );
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  try {
+    const snap = await getDocs(query(
+      collection(db, "posts"),
+      where("type", "==", "event"),
+      orderBy("eventDate", "asc")
+    ));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) {
+    return [];
+  }
 }
 
 function renderCalendar(events) {
@@ -73,15 +86,4 @@ function renderList(events) {
       <td>${date}</td><td>${e.title}</td><td>${badge}</td>
     </tr>`;
   }).join("");
-}
-
-function setupViewToggle() {
-  document.getElementById("btn-calendar-view").addEventListener("click", () => {
-    document.getElementById("calendar-view").style.display = "block";
-    document.getElementById("list-view").style.display = "none";
-  });
-  document.getElementById("btn-list-view").addEventListener("click", () => {
-    document.getElementById("calendar-view").style.display = "none";
-    document.getElementById("list-view").style.display = "block";
-  });
 }
