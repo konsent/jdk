@@ -127,6 +127,7 @@ function renderCalendar(events) {
 
 function renderList(events) {
   const el = document.getElementById("event-list");
+  el.innerHTML = ""; // 불러오는 중... 제거
   if (!events.length) {
     el.innerHTML = `<tr><td colspan="3" class="text-muted">등록된 일정이 없습니다.</td></tr>`;
     return;
