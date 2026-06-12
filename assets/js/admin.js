@@ -1,11 +1,16 @@
-import { db } from "./firebase-init.js";
+import { auth, db } from "./firebase-init.js";
 import { requireAdmin } from "./auth-guard.js";
 import {
   collection, query, where, getDocs,
-  doc, updateDoc
+  doc, updateDoc, addDoc, serverTimestamp, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-requireAdmin(async () => {
+let adminUser = null;
+let adminData = null;
+
+requireAdmin(async (user, userData) => {
+  adminUser = user;
+  adminData = userData;
   await loadPending();
   await loadMembers();
   setupTabs();
@@ -27,8 +32,8 @@ async function loadPending() {
           <span class="text-muted ms-2">${u.email}</span>
         </div>
         <div>
-          <button class="btn btn-sm btn-success me-1" onclick="setStatus('${d.id}','approved')">승인</button>
-          <button class="btn btn-sm btn-danger" onclick="setStatus('${d.id}','rejected')">거절</button>
+          <button class="btn btn-sm btn-success me-1" onclick="setStatus('${d.id}','approved','${u.nickname}')">승인</button>
+          <button class="btn btn-sm btn-danger" onclick="setStatus('${d.id}','rejected','${u.nickname}')">거절</button>
         </div>
       </div>`;
   }).join("");
@@ -48,13 +53,25 @@ async function loadMembers() {
           <strong>${u.nickname}</strong>
           <span class="text-muted ms-2">${u.email}</span>
         </div>
-        <button class="btn btn-sm btn-outline-danger" onclick="setStatus('${d.id}','rejected')">강제 탈퇴</button>
+        <button class="btn btn-sm btn-outline-danger" onclick="setStatus('${d.id}','rejected','${u.nickname}')">강제 탈퇴</button>
       </div>`;
   }).join("");
 }
 
-window.setStatus = async (uid, status) => {
-  await updateDoc(doc(db, "users", uid), { status });
+window.setStatus = async (targetUid, status, targetNickname) => {
+  await updateDoc(doc(db, "users", targetUid), { status });
+
+  // 로그 기록
+  const actionMap = { approved: "승인", rejected: "거절/강제탈퇴" };
+  await addDoc(collection(db, "admin_logs"), {
+    action: actionMap[status] || status,
+    targetUid,
+    targetNickname,
+    adminUid: adminUser.uid,
+    adminNickname: adminData.nickname,
+    createdAt: serverTimestamp()
+  });
+
   await loadPending();
   await loadMembers();
 };
