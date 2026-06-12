@@ -37,5 +37,17 @@ permalink: /board/
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-<script type="module" src="/assets/js/board.js"></script>
+<script>
+// FullCalendar을 동적으로 로드한 후 board.js 실행
+(function() {
+  var script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js';
+  script.onload = function() {
+    var mod = document.createElement('script');
+    mod.type = 'module';
+    mod.src = '/assets/js/board.js';
+    document.body.appendChild(mod);
+  };
+  document.body.appendChild(script);
+})();
+</script>
