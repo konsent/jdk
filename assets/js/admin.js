@@ -5,6 +5,7 @@ import {
   doc, updateDoc, addDoc, serverTimestamp, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+
 let adminUser = null;
 let adminData = null;
 let pendingAction = null;
@@ -15,6 +16,19 @@ requireAdmin(async (user, userData) => {
   await loadPending();
   await loadMembers();
   setupTabs();
+
+  window.toggleAnnual = async (targetUid, current, targetNickname) => {
+    const next = !current;
+    await updateDoc(doc(db, "users", targetUid), { annualMember: next });
+    await addDoc(collection(db, "admin_logs"), {
+      action: next ? "연회원 지정" : "연회원 해제",
+      targetUid, targetNickname,
+      adminUid: adminUser.uid,
+      adminNickname: adminData.nickname,
+      createdAt: serverTimestamp()
+    });
+    await loadMembers();
+  };
 });
 
 async function loadPending() {
@@ -52,13 +66,22 @@ async function loadMembers() {
     const adminTag = u.isAdmin
       ? `<span style="font-size:0.7rem;font-weight:600;background:#1a1a1a;color:#fff;border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle">관리자</span>`
       : "";
+    const annualTag = u.annualMember
+      ? `<span style="font-size:0.7rem;font-weight:600;background:#2e7d32;color:#fff;border-radius:4px;padding:2px 7px;margin-left:4px;vertical-align:middle">연회원</span>`
+      : "";
+    const annualBtn = u.annualMember
+      ? `<button class="btn btn-sm btn-outline-secondary me-1" onclick="toggleAnnual('${d.id}',true,'${u.nickname}')">연회원 해제</button>`
+      : `<button class="btn btn-sm btn-outline-success me-1" onclick="toggleAnnual('${d.id}',false,'${u.nickname}')">연회원 지정</button>`;
     return `
-      <div class="card mb-2 p-3 d-flex flex-row justify-content-between align-items-center">
+      <div class="card mb-2 p-3 d-flex flex-row justify-content-between align-items-center flex-wrap gap-2">
         <div>
-          <strong>${u.nickname}</strong>${adminTag}
-          <span class="text-muted ms-2">${u.email}</span>
+          <strong>${u.nickname}</strong>${adminTag}${annualTag}
+          <span class="text-muted ms-2" style="font-size:0.85rem">${u.email}</span>
         </div>
-        ${d.id !== adminUser.uid ? `<button class="btn btn-sm btn-outline-danger" onclick="confirmAction('force-remove','${d.id}','${u.nickname}')">강제 탈퇴</button>` : ""}
+        <div>
+          ${annualBtn}
+          ${d.id !== adminUser.uid ? `<button class="btn btn-sm btn-outline-danger" onclick="confirmAction('force-remove','${d.id}','${u.nickname}')">강제 탈퇴</button>` : ""}
+        </div>
       </div>`;
   }).join("");
 }

@@ -16,6 +16,16 @@ requireApproved(async (user, userData) => {
   document.getElementById("info-email").textContent = user.email || "-";
   document.getElementById("info-status").textContent = "승인된 회원";
 
+  // 태그 렌더링
+  const tags = [];
+  if (userData.isAdmin) {
+    tags.push(`<span style="font-size:0.7rem;font-weight:600;background:#1a1a1a;color:#fff;border-radius:4px;padding:2px 8px">관리자</span>`);
+  }
+  if (userData.annualMember) {
+    tags.push(`<span style="font-size:0.7rem;font-weight:600;background:#2e7d32;color:#fff;border-radius:4px;padding:2px 8px">연회원</span>`);
+  }
+  document.getElementById("info-tags").innerHTML = tags.join(" ");
+
   document.getElementById("btn-withdraw").addEventListener("click", () => {
     document.getElementById("confirm-modal").style.display = "flex";
   });
@@ -33,21 +43,16 @@ requireApproved(async (user, userData) => {
   document.getElementById("modal-confirm").addEventListener("click", async () => {
     document.getElementById("confirm-modal").style.display = "none";
     document.getElementById("modal-confirm").disabled = true;
-    await withdraw(user, userData);
+    await withdraw(user);
   });
 });
 
-async function withdraw(user, userData) {
+async function withdraw(user) {
   try {
-    // 1. users 문서 삭제
     await deleteDoc(doc(db, "users", user.uid));
-
-    // 3. Firebase Auth 계정 삭제
     await deleteUser(user);
-
     location.href = "/";
   } catch (err) {
-    // 재인증이 필요한 경우 (구글 로그인은 최근 로그인이 오래된 경우 발생)
     if (err.code === "auth/requires-recent-login") {
       showError("보안을 위해 로그아웃 후 다시 로그인하고 탈퇴를 진행해 주세요.");
     } else {
