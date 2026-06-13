@@ -2,8 +2,7 @@ import { auth, db } from "./firebase-init.js";
 import { requireApproved } from "./auth-guard.js";
 import { deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  doc, getDoc, deleteDoc, getDocs,
-  collection, query, where
+  doc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 let currentUser = null;
@@ -40,14 +39,7 @@ requireApproved(async (user, userData) => {
 
 async function withdraw(user, userData) {
   try {
-    // 1. 댓글 삭제
-    const commentSnap = await getDocs(query(
-      collection(db, "comments"),
-      where("authorUid", "==", user.uid)
-    ));
-    await Promise.all(commentSnap.docs.map(d => deleteDoc(doc(db, "comments", d.id))));
-
-    // 2. users 문서 삭제
+    // 1. users 문서 삭제
     await deleteDoc(doc(db, "users", user.uid));
 
     // 3. Firebase Auth 계정 삭제
