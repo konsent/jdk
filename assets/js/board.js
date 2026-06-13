@@ -49,7 +49,7 @@ async function loadEvents() {
       where("type", "==", "event"),
       orderBy("eventDate", "asc")
     ));
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(e => !e.isAnniversary);
   } catch (e) {
     console.error("이벤트 로드 실패:", e);
     return [];
