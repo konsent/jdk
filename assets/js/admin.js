@@ -49,7 +49,6 @@ async function loadMembers() {
 
   el.innerHTML = snap.docs.map(d => {
     const u = d.data();
-    if (d.id === adminUser.uid) return ""; // 본인 제외
     const adminTag = u.isAdmin
       ? `<span style="font-size:0.7rem;font-weight:600;background:#1a1a1a;color:#fff;border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle">관리자</span>`
       : "";
