@@ -58,7 +58,7 @@ async function loadMembers() {
           <strong>${u.nickname}</strong>${adminTag}
           <span class="text-muted ms-2">${u.email}</span>
         </div>
-        <button class="btn btn-sm btn-outline-danger" onclick="confirmAction('force-remove','${d.id}','${u.nickname}')">강제 탈퇴</button>
+        ${d.id !== adminUser.uid ? `<button class="btn btn-sm btn-outline-danger" onclick="confirmAction('force-remove','${d.id}','${u.nickname}')">강제 탈퇴</button>` : ""}
       </div>`;
   }).join("");
 }
