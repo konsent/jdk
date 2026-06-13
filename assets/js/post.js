@@ -9,6 +9,14 @@ import {
 
 const postId = new URLSearchParams(location.search).get("id");
 let currentUser = null;
+
+function formatEventDate(ts) {
+  if (!ts) return "";
+  const d = ts.toDate();
+  const date = d.toLocaleDateString("ko-KR");
+  const h = d.getHours(), m = d.getMinutes();
+  return (h || m) ? `${date} ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}` : date;
+}
 let currentUserData = null;
 let postData = null;
 
@@ -36,8 +44,11 @@ async function loadPost() {
     eventInfo = `<p class="text-muted">📅 일정 날짜: <strong>${eventDate}</strong></p>`;
   }
 
-  const canDelete = currentUser.uid === postData.authorUid || currentUserData.isAdmin;
-  const deleteBtn = canDelete
+  const canEdit = currentUser.uid === postData.authorUid || currentUserData.isAdmin;
+  const editBtn = canEdit
+    ? `<a href="/write/?edit=${postId}" style="background:none;border:1px solid #bbb;color:#555;border-radius:4px;font-size:0.78rem;padding:4px 10px;cursor:pointer;text-decoration:none;display:inline-block">수정</a>`
+    : "";
+  const deleteBtn = canEdit
     ? `<button style="background:none;border:1px solid var(--danger);color:var(--danger);border-radius:4px;font-size:0.78rem;padding:4px 10px;cursor:pointer;" id="btn-delete-post">삭제</button>`
     : "";
 
@@ -46,12 +57,12 @@ async function loadPost() {
       <span class="post-type-badge">${postData.type === "event" ? "일정" : "공지"}</span>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
         <h2 class="post-title">${postData.title}</h2>
-        <div style="flex-shrink:0">${deleteBtn}</div>
+        <div style="flex-shrink:0;display:flex;gap:6px">${editBtn}${deleteBtn}</div>
       </div>
       <div class="post-meta">
         <span>${authorName}</span>
         <span>${date}</span>
-        ${postData.type === "event" ? `<span>📅 ${postData.eventDate?.toDate().toLocaleDateString("ko-KR") || ""}</span>` : ""}
+        ${postData.type === "event" ? `<span>📅 ${formatEventDate(postData.eventDate)}</span>` : ""}
       </div>
     </div>
     <div class="post-body">${postData.content}</div>

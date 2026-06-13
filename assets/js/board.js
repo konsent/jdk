@@ -129,15 +129,23 @@ function renderCalendar(events) {
   buildCalendar();
 }
 
+function formatEventDate(ts) {
+  if (!ts) return "";
+  const d = ts.toDate();
+  const date = d.toLocaleDateString("ko-KR");
+  const h = d.getHours(), m = d.getMinutes();
+  return (h || m) ? `${date} ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}` : date;
+}
+
 function renderList(events) {
   const el = document.getElementById("event-list");
-  el.innerHTML = ""; // 불러오는 중... 제거
+  el.innerHTML = "";
   if (!events.length) {
     el.innerHTML = `<tr><td colspan="3" class="text-muted">등록된 일정이 없습니다.</td></tr>`;
     return;
   }
   el.innerHTML = events.map(e => {
-    const date = e.eventDate?.toDate().toLocaleDateString("ko-KR") || "";
+    const date = formatEventDate(e.eventDate);
     const cnt = e.attendees?.length || 0;
     const badge = cnt >= e.maxAttendees
       ? `<span class="badge-full">${cnt}/${e.maxAttendees} 마감</span>`
