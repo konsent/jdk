@@ -29,7 +29,7 @@ navigation:
       url: /honor
     - title: 콩툰
       url: /toon
-    - title: 게시판
+    - title: 게임 일정
       url: /board
     # - title: 공식 이벤트
     #   url: /event
