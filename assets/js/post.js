@@ -144,20 +144,67 @@ async function loadComments() {
   const el = document.getElementById("comment-list");
   if (snap.empty) { el.innerHTML = "<p class='text-muted small'>댓글이 없습니다.</p>"; return; }
 
-  const rows = await Promise.all(snap.docs.map(async (d) => {
-    const c = d.data();
-    const u = await getUserDoc(c.authorUid);
-    const name = u?.nickname || "알 수 없음";
+  const allComments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const roots = allComments.filter(c => !c.parentId);
+  const replies = allComments.filter(c => !!c.parentId);
+
+  const nicknameCache = {};
+  async function getNickname(uid) {
+    if (!nicknameCache[uid]) {
+      const u = await getUserDoc(uid);
+      nicknameCache[uid] = u?.nickname || "알 수 없음";
+    }
+    return nicknameCache[uid];
+  }
+
+  const rows = await Promise.all(roots.map(async (c) => {
+    const name = await getNickname(c.authorUid);
     const date = c.createdAt?.toDate().toLocaleString("ko-KR") || "";
-    const deleteBtn = (c.authorUid === currentUser.uid || currentUserData.isAdmin)
-      ? `<button style="background:none;border:none;color:var(--danger);font-size:0.75rem;cursor:pointer;padding:0 0 0 8px;" onclick="deleteComment('${d.id}')">삭제</button>`
+    const canDelete = c.authorUid === currentUser.uid || currentUserData.isAdmin;
+    const deleteBtn = canDelete
+      ? `<button style="background:none;border:none;color:var(--danger);font-size:0.75rem;cursor:pointer;padding:0;" onclick="deleteComment('${c.id}')">삭제</button>`
       : "";
+    const replyBtn = `<button style="background:none;border:none;color:var(--text-muted);font-size:0.75rem;cursor:pointer;padding:0;" onclick="toggleReplyForm('${c.id}')">답글</button>`;
+
+    const childReplies = replies.filter(r => r.parentId === c.id);
+    const replyRows = await Promise.all(childReplies.map(async (r) => {
+      const rName = await getNickname(r.authorUid);
+      const rDate = r.createdAt?.toDate().toLocaleString("ko-KR") || "";
+      const rCanDelete = r.authorUid === currentUser.uid || currentUserData.isAdmin;
+      const rDeleteBtn = rCanDelete
+        ? `<button style="background:none;border:none;color:var(--danger);font-size:0.75rem;cursor:pointer;padding:0;" onclick="deleteComment('${r.id}')">삭제</button>`
+        : "";
+      return `<div class="comment-item comment-reply">
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="color:var(--text-muted);font-size:0.8rem">↳</span>
+          <span class="comment-author">${rName}</span>
+          ${rDeleteBtn}
+        </div>
+        <div class="comment-text">${r.content}</div>
+        <div class="comment-time">${rDate}</div>
+      </div>`;
+    }));
+
     return `<div class="comment-item">
-      <div><span class="comment-author">${name}</span>${deleteBtn}</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="comment-author">${name}</span>
+        ${replyBtn}
+        ${deleteBtn}
+      </div>
       <div class="comment-text">${c.content}</div>
       <div class="comment-time">${date}</div>
+    </div>
+    ${replyRows.join("")}
+    <div id="reply-form-${c.id}" style="display:none;margin-left:20px;margin-bottom:8px">
+      <form onsubmit="submitReply(event, '${c.id}')">
+        <div class="comment-input-row">
+          <input type="text" placeholder="답글을 입력하세요" maxlength="200" id="reply-input-${c.id}">
+          <button type="submit">등록</button>
+        </div>
+      </form>
     </div>`;
   }));
+
   el.innerHTML = rows.join("");
 }
 
@@ -175,8 +222,35 @@ function setupCommentForm() {
   });
 }
 
+window.toggleReplyForm = (commentId) => {
+  const el = document.getElementById(`reply-form-${commentId}`);
+  if (!el) return;
+  const isHidden = el.style.display === "none";
+  el.style.display = isHidden ? "block" : "none";
+  if (isHidden) document.getElementById(`reply-input-${commentId}`)?.focus();
+};
+
+window.submitReply = async (e, parentId) => {
+  e.preventDefault();
+  const input = document.getElementById(`reply-input-${parentId}`);
+  const content = input?.value.trim();
+  if (!content) return;
+  await addDoc(collection(db, "comments"), {
+    postId, content, parentId,
+    authorUid: currentUser.uid,
+    createdAt: serverTimestamp()
+  });
+  location.reload();
+};
+
 window.deleteComment = async (commentId) => {
-  if (!confirm("댓글을 삭제하시겠습니까?")) return;
+  if (!confirm("삭제하시겠습니까?")) return;
+  // 댓글 삭제 시 해당 댓글의 대댓글도 함께 삭제
+  const snap = await getDocs(query(
+    collection(db, "comments"),
+    where("parentId", "==", commentId)
+  ));
+  await Promise.all(snap.docs.map(d => deleteDoc(doc(db, "comments", d.id))));
   await deleteDoc(doc(db, "comments", commentId));
   location.reload();
 };
