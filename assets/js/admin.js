@@ -45,6 +45,7 @@ async function loadMembers() {
   const snap = await getDocs(q);
   const el = document.getElementById("list-members");
   if (snap.empty) { el.innerHTML = "<p class='text-muted'>승인된 회원이 없습니다.</p>"; return; }
+  document.getElementById("member-count").textContent = `전체 ${snap.size}명`;
 
   el.innerHTML = snap.docs.map(d => {
     const u = d.data();
