@@ -1,3 +1,7 @@
+ <style>
+   .nav-hidden { display: none !important; }
+ </style>
+
  <div class="header {% if site.header == 'large' %}header--large{% endif %}">
      <div class="container">
          <h1 class="logo"><a href="{{ '/' | relative_url }}">{{ site.title }}</a></h1>
@@ -11,10 +15,10 @@
                  <!-- <li> <a href="https://www.threads.net/@jdkgameclub" target="_blank">SNS</a></li>
                  <li> <a href="https://bit.ly/jangdankong_schedule" target="_blank">아지트 일정</a></li> -->
                  <li> <a href="https://open.kakao.com/o/g1cdFCcg" target="_blank">오픈 채팅방</a></li>
-                 <li id="nav-admin" style="display:none"><a href="/admin/">관리</a></li>
-                 <li id="nav-login" style="display:none"><a href="/login/">로그인</a></li>
-                 <li id="nav-register" style="display:none"><a href="/register/">회원가입</a></li>
-                 <li id="nav-logout" style="display:none"><a href="#" id="btn-logout">로그아웃</a></li>
+                 <li id="nav-admin" class="nav-hidden"><a href="/admin/">관리</a></li>
+                 <li id="nav-login" class="nav-hidden"><a href="/login/">로그인</a></li>
+                 <li id="nav-register" class="nav-hidden"><a href="/register/">회원가입</a></li>
+                 <li id="nav-logout" class="nav-hidden"><a href="#" id="btn-logout">로그아웃</a></li>
              </ul>
          </nav>
      </div>
@@ -24,18 +28,28 @@
    import { auth, db } from "/assets/js/firebase-init.js";
    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+   function showNav(id) { document.getElementById(id)?.classList.remove("nav-hidden"); }
+   function hideNav(id) { document.getElementById(id)?.classList.add("nav-hidden"); }
+
    onAuthStateChanged(auth, async (user) => {
-     document.getElementById("nav-login").style.display = user ? "none" : "inline";
-     document.getElementById("nav-register").style.display = user ? "none" : "inline";
-     document.getElementById("nav-logout").style.display = user ? "inline" : "none";
      if (user) {
+       hideNav("nav-login");
+       hideNav("nav-register");
+       showNav("nav-logout");
        const snap = await getDoc(doc(db, "users", user.uid));
        const isAdmin = snap.exists() && snap.data().isAdmin === true;
-       document.getElementById("nav-admin").style.display = isAdmin ? "inline" : "none";
+       if (isAdmin) showNav("nav-admin"); else hideNav("nav-admin");
      } else {
-       document.getElementById("nav-admin").style.display = "none";
+       showNav("nav-login");
+       showNav("nav-register");
+       hideNav("nav-logout");
+       hideNav("nav-admin");
      }
+     // responsive-nav이 이미 높이를 계산한 뒤 항목이 표시되므로 resize 이벤트로 재계산
+     window.dispatchEvent(new Event("resize"));
    });
+
    document.getElementById("btn-logout")?.addEventListener("click", async (e) => {
      e.preventDefault();
      await signOut(auth);
