@@ -39,7 +39,9 @@ async function loadAllEvents() {
     where("type", "==", "event"),
     orderBy("eventDate", "asc")
   ));
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(e => !e.isAnniversary);
 }
 
 function getTop10(members, key) {
