@@ -43,8 +43,13 @@ document.getElementById("form-register").addEventListener("submit", async (e) =>
       } catch (err) {
         if (err.code === "auth/email-already-in-use") {
           // 이미 Auth 계정 있음 — 로그인 후 Firestore 재신청
-          const result = await signInWithEmailAndPassword(auth, email, password);
-          user = result.user;
+          try {
+            const result = await signInWithEmailAndPassword(auth, email, password);
+            user = result.user;
+          } catch (loginErr) {
+            showError("이미 가입된 이메일입니다. 비밀번호를 확인하거나 운영자에게 문의하세요.");
+            return;
+          }
           const snap = await getDoc(doc(db, "users", user.uid));
           if (snap.exists() && snap.data().status === "pending") {
             showError("이미 가입 신청 중입니다. 운영자 승인을 기다려주세요.");
