@@ -50,10 +50,13 @@ async function loadMembers() {
   el.innerHTML = snap.docs.map(d => {
     const u = d.data();
     if (d.id === adminUser.uid) return ""; // 본인 제외
+    const adminTag = u.isAdmin
+      ? `<span style="font-size:0.7rem;font-weight:600;background:#1a1a1a;color:#fff;border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle">관리자</span>`
+      : "";
     return `
       <div class="card mb-2 p-3 d-flex flex-row justify-content-between align-items-center">
         <div>
-          <strong>${u.nickname}</strong>
+          <strong>${u.nickname}</strong>${adminTag}
           <span class="text-muted ms-2">${u.email}</span>
         </div>
         <button class="btn btn-sm btn-outline-danger" onclick="confirmAction('force-remove','${d.id}','${u.nickname}')">강제 탈퇴</button>
