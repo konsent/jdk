@@ -146,7 +146,7 @@ function renderBarChart(canvasId, data, color, existingChart, setChart) {
         data: data.map(d => d.value),
         backgroundColor: data.map((_, i) => i === 0 ? "#c62828" : color),
         borderRadius: 3,
-        barThickness: 14
+        maxBarThickness: 12
       }]
     },
     options: {
