@@ -145,15 +145,16 @@ function renderBarChart(canvasId, data, color, existingChart, setChart) {
       datasets: [{
         data: data.map(d => d.value),
         backgroundColor: data.map((_, i) => i === 0 ? "#c62828" : color),
-        borderRadius: 4
+        borderRadius: 3,
+        barThickness: 14
       }]
     },
     options: {
       indexAxis: "y",
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { stepSize: 1 }, beginAtZero: true },
-        y: { ticks: { font: { size: 13 } } }
+        x: { ticks: { stepSize: 1, font: { size: 11 } }, beginAtZero: true },
+        y: { ticks: { font: { size: 12 } } }
       }
     }
   });
