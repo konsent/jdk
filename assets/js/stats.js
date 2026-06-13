@@ -124,13 +124,18 @@ function renderBarChart(canvasId, data, color, existingChart, setChart) {
   if (!canvas) return;
 
   if (!data.length) {
-    canvas.parentElement.querySelector("canvas")?.remove();
-    const msg = document.createElement("p");
-    msg.className = "text-muted small";
-    msg.textContent = "데이터가 없습니다.";
-    canvas.parentElement.appendChild(msg);
+    const parent = canvas.parentElement;
+    canvas.style.display = "none";
+    if (!parent.querySelector(".no-data-msg")) {
+      const msg = document.createElement("p");
+      msg.className = "text-muted small no-data-msg";
+      msg.textContent = "데이터가 없습니다.";
+      parent.appendChild(msg);
+    }
     return;
   }
+  canvas.style.display = "block";
+  canvas.parentElement.querySelector(".no-data-msg")?.remove();
 
   const ctx = canvas.getContext("2d");
   const chart = new Chart(ctx, {
