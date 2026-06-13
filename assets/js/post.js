@@ -68,7 +68,7 @@ async function loadPost() {
     <div class="post-body">${postData.content}</div>
   `;
 
-  if (canDelete) {
+  if (canEdit) {
     document.getElementById("btn-delete-post").addEventListener("click", async () => {
       if (!confirm("게시글을 삭제하시겠습니까?")) return;
       await deleteDoc(doc(db, "posts", postId));
