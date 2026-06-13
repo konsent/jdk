@@ -3,6 +3,20 @@ layout: default
 title: 운영자 관리
 permalink: /admin/
 ---
+<link rel="stylesheet" href="/assets/css/pages.css">
+
+<!-- 확인 모달 -->
+<div id="confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:10px;padding:28px 28px 20px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
+    <p style="font-weight:700;font-size:1rem;margin:0 0 6px" id="modal-title"></p>
+    <p style="font-size:0.88rem;color:#555;margin:0 0 20px" id="modal-desc"></p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="closeModal()" style="border:1px solid #ddd;background:#fff;border-radius:6px;padding:8px 18px;cursor:pointer;font-size:0.88rem">취소</button>
+      <button id="modal-confirm-btn" style="border:none;background:#c62828;color:#fff;border-radius:6px;padding:8px 18px;cursor:pointer;font-size:0.88rem;font-weight:600">확인</button>
+    </div>
+  </div>
+</div>
+
 <div class="mt-4">
   <h2>운영자 관리</h2>
   <ul class="nav nav-tabs mb-4" id="admin-tabs">
@@ -11,6 +25,9 @@ permalink: /admin/
     </li>
     <li class="nav-item">
       <button class="nav-link" data-tab="members">전체 회원</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-tab="logs">관리 로그</button>
     </li>
   </ul>
 
@@ -22,6 +39,11 @@ permalink: /admin/
   <div id="tab-members" style="display:none">
     <h5>전체 회원</h5>
     <div id="list-members" class="mt-3">불러오는 중...</div>
+  </div>
+
+  <div id="tab-logs" style="display:none">
+    <h5>관리 로그</h5>
+    <div id="list-logs" class="mt-3">불러오는 중...</div>
   </div>
 </div>
 

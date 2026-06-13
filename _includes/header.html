@@ -16,6 +16,7 @@
                  <li> <a href="https://bit.ly/jangdankong_schedule" target="_blank">아지트 일정</a></li> -->
                  <li> <a href="https://open.kakao.com/o/g1cdFCcg" target="_blank">오픈 채팅방</a></li>
                  <li id="nav-admin" class="nav-hidden"><a href="/admin/">관리</a></li>
+                 <li id="nav-mypage" class="nav-hidden"><a href="/mypage/">내 정보</a></li>
                  <li id="nav-login" class="nav-hidden"><a href="/login/">로그인</a></li>
                  <li id="nav-register" class="nav-hidden"><a href="/register/">회원가입</a></li>
                  <li id="nav-logout" class="nav-hidden"><a href="#" id="btn-logout">로그아웃</a></li>
@@ -37,6 +38,7 @@
        hideNav("nav-login");
        hideNav("nav-register");
        showNav("nav-logout");
+       showNav("nav-mypage");
        const snap = await getDoc(doc(db, "users", user.uid));
        const isAdmin = snap.exists() && snap.data().isAdmin === true;
        if (isAdmin) showNav("nav-admin"); else hideNav("nav-admin");
@@ -45,6 +47,7 @@
        showNav("nav-register");
        hideNav("nav-logout");
        hideNav("nav-admin");
+       hideNav("nav-mypage");
      }
      // responsive-nav이 이미 높이를 계산한 뒤 항목이 표시되므로 resize 이벤트로 재계산
      window.dispatchEvent(new Event("resize"));

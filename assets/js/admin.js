@@ -1,12 +1,13 @@
 import { auth, db } from "./firebase-init.js";
 import { requireAdmin } from "./auth-guard.js";
 import {
-  collection, query, where, getDocs,
+  collection, query, where, getDocs, orderBy, limit,
   doc, updateDoc, addDoc, serverTimestamp, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 let adminUser = null;
 let adminData = null;
+let pendingAction = null;
 
 requireAdmin(async (user, userData) => {
   adminUser = user;
@@ -32,8 +33,8 @@ async function loadPending() {
           <span class="text-muted ms-2">${u.email}</span>
         </div>
         <div>
-          <button class="btn btn-sm btn-success me-1" onclick="setStatus('${d.id}','approved','${u.nickname}')">승인</button>
-          <button class="btn btn-sm btn-danger" onclick="setStatus('${d.id}','rejected','${u.nickname}')">거절</button>
+          <button class="btn btn-sm btn-success me-1" onclick="confirmAction('approve','${d.id}','${u.nickname}')">승인</button>
+          <button class="btn btn-sm btn-danger" onclick="confirmAction('reject','${d.id}','${u.nickname}')">거절</button>
         </div>
       </div>`;
   }).join("");
@@ -47,24 +48,81 @@ async function loadMembers() {
 
   el.innerHTML = snap.docs.map(d => {
     const u = d.data();
+    if (d.id === adminUser.uid) return ""; // 본인 제외
     return `
       <div class="card mb-2 p-3 d-flex flex-row justify-content-between align-items-center">
         <div>
           <strong>${u.nickname}</strong>
           <span class="text-muted ms-2">${u.email}</span>
         </div>
-        <button class="btn btn-sm btn-outline-danger" onclick="setStatus('${d.id}','rejected','${u.nickname}')">강제 탈퇴</button>
+        <button class="btn btn-sm btn-outline-danger" onclick="confirmAction('force-remove','${d.id}','${u.nickname}')">강제 탈퇴</button>
       </div>`;
   }).join("");
 }
 
-window.setStatus = async (targetUid, status, targetNickname) => {
-  await updateDoc(doc(db, "users", targetUid), { status });
+async function loadLogs() {
+  const el = document.getElementById("list-logs");
+  try {
+    const snap = await getDocs(query(
+      collection(db, "admin_logs"),
+      orderBy("createdAt", "desc"),
+      limit(50)
+    ));
+    if (snap.empty) { el.innerHTML = "<p class='text-muted'>로그가 없습니다.</p>"; return; }
+    el.innerHTML = snap.docs.map(d => {
+      const l = d.data();
+      const date = l.createdAt?.toDate().toLocaleString("ko-KR") || "";
+      return `<div class="card mb-1 p-2 px-3" style="font-size:0.85rem">
+        <span class="text-muted">${date}</span>
+        <span class="ms-2"><strong>${l.adminNickname}</strong> → <strong>${l.targetNickname}</strong>: ${l.action}</span>
+      </div>`;
+    }).join("");
+  } catch (e) {
+    el.innerHTML = "<p class='text-muted'>로그를 불러올 수 없습니다.</p>";
+  }
+}
 
-  // 로그 기록
-  const actionMap = { approved: "승인", rejected: "거절/강제탈퇴" };
+// 모달 표시
+window.confirmAction = (type, targetUid, targetNickname) => {
+  const configs = {
+    approve:      { title: "승인 확인",      desc: `${targetNickname} 님을 승인하시겠습니까?`,      btnText: "승인", btnColor: "#2e7d32" },
+    reject:       { title: "거절 확인",      desc: `${targetNickname} 님의 신청을 거절하시겠습니까?`, btnText: "거절", btnColor: "#c62828" },
+    "force-remove": { title: "강제 탈퇴 확인", desc: `${targetNickname} 님을 강제 탈퇴시키겠습니까?\n이 작업은 되돌릴 수 없습니다.`, btnText: "강제 탈퇴", btnColor: "#c62828" }
+  };
+  const cfg = configs[type];
+  document.getElementById("modal-title").textContent = cfg.title;
+  document.getElementById("modal-desc").textContent = cfg.desc;
+  const btn = document.getElementById("modal-confirm-btn");
+  btn.textContent = cfg.btnText;
+  btn.style.background = cfg.btnColor;
+
+  pendingAction = { type, targetUid, targetNickname };
+  const modal = document.getElementById("confirm-modal");
+  modal.style.display = "flex";
+
+  btn.onclick = async () => {
+    closeModal();
+    await executeAction(pendingAction);
+  };
+};
+
+window.closeModal = () => {
+  document.getElementById("confirm-modal").style.display = "none";
+  pendingAction = null;
+};
+
+// 모달 바깥 클릭 시 닫기
+document.getElementById("confirm-modal").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+async function executeAction({ type, targetUid, targetNickname }) {
+  const statusMap = { approve: "approved", reject: "rejected", "force-remove": "rejected" };
+  const actionMap = { approve: "승인", reject: "거절", "force-remove": "강제탈퇴" };
+
+  await updateDoc(doc(db, "users", targetUid), { status: statusMap[type] });
   await addDoc(collection(db, "admin_logs"), {
-    action: actionMap[status] || status,
+    action: actionMap[type],
     targetUid,
     targetNickname,
     adminUid: adminUser.uid,
@@ -74,15 +132,21 @@ window.setStatus = async (targetUid, status, targetNickname) => {
 
   await loadPending();
   await loadMembers();
-};
+}
 
 function setupTabs() {
+  let logsLoaded = false;
   document.querySelectorAll("[data-tab]").forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       document.querySelectorAll("[data-tab]").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       document.getElementById("tab-pending").style.display = btn.dataset.tab === "pending" ? "block" : "none";
       document.getElementById("tab-members").style.display = btn.dataset.tab === "members" ? "block" : "none";
+      document.getElementById("tab-logs").style.display   = btn.dataset.tab === "logs"    ? "block" : "none";
+      if (btn.dataset.tab === "logs" && !logsLoaded) {
+        logsLoaded = true;
+        await loadLogs();
+      }
     });
   });
 }

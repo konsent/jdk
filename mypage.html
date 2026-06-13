@@ -1,0 +1,60 @@
+---
+layout: default
+title: 내 정보
+permalink: /mypage/
+---
+<link rel="stylesheet" href="/assets/css/pages.css">
+
+<!-- 탈퇴 확인 모달 -->
+<div id="confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:10px;padding:28px 28px 20px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
+    <p style="font-weight:700;font-size:1rem;margin:0 0 6px">회원 탈퇴 확인</p>
+    <p style="font-size:0.88rem;color:#555;margin:0 0 6px">탈퇴하면 다음 데이터가 즉시 삭제됩니다:</p>
+    <ul style="font-size:0.85rem;color:#555;margin:0 0 16px;padding-left:18px">
+      <li>회원 정보 (닉네임, 이메일)</li>
+      <li>작성한 댓글</li>
+      <li>로그인 계정</li>
+    </ul>
+    <p style="font-size:0.85rem;color:#c62828;font-weight:600;margin:0 0 20px">이 작업은 되돌릴 수 없습니다.</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button id="modal-cancel" style="border:1px solid #ddd;background:#fff;border-radius:6px;padding:8px 18px;cursor:pointer;font-size:0.88rem">취소</button>
+      <button id="modal-confirm" style="border:none;background:#c62828;color:#fff;border-radius:6px;padding:8px 18px;cursor:pointer;font-size:0.88rem;font-weight:600">탈퇴하기</button>
+    </div>
+  </div>
+</div>
+
+<div class="page-wrapper">
+  <div class="page-card">
+    <h1 class="page-card__title">내 정보</h1>
+
+    <div id="info-loading" style="color:var(--text-muted);font-size:0.9rem">불러오는 중...</div>
+
+    <div id="info-content" style="display:none">
+      <div class="mb-3">
+        <div style="font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:4px">닉네임</div>
+        <div id="info-nickname" style="font-size:1.05rem;font-weight:700"></div>
+      </div>
+      <div class="mb-3">
+        <div style="font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:4px">이메일</div>
+        <div id="info-email" style="font-size:0.92rem;color:var(--text-secondary)"></div>
+      </div>
+      <div class="mb-4">
+        <div style="font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:4px">상태</div>
+        <div id="info-status" style="font-size:0.92rem"></div>
+      </div>
+
+      <hr style="margin:24px 0">
+
+      <div>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px">탈퇴하면 모든 개인정보와 댓글이 삭제됩니다. 작성한 일정 게시글은 유지됩니다.</p>
+        <button id="btn-withdraw" style="border:1px solid var(--danger);background:transparent;color:var(--danger);border-radius:6px;padding:9px 20px;cursor:pointer;font-size:0.88rem;font-weight:600;transition:background 0.15s">
+          회원 탈퇴
+        </button>
+      </div>
+
+      <div id="msg-error" class="page-msg page-msg--error mt-3" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/assets/js/mypage.js"></script>
