@@ -2,7 +2,7 @@ import { auth, db } from "./firebase-init.js";
 import { requireAdmin } from "./auth-guard.js";
 import {
   collection, query, where, getDocs, orderBy, limit, startAfter,
-  doc, updateDoc, addDoc, serverTimestamp, getDoc
+  doc, updateDoc, addDoc, deleteDoc, serverTimestamp, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
@@ -173,10 +173,14 @@ document.getElementById("confirm-modal").addEventListener("click", (e) => {
 });
 
 async function executeAction({ type, targetUid, targetNickname }) {
-  const statusMap = { approve: "approved", reject: "rejected", "force-remove": "rejected" };
+  const statusMap = { approve: "approved", reject: "rejected" };
   const actionMap = { approve: "승인", reject: "거절", "force-remove": "강제탈퇴" };
 
-  await updateDoc(doc(db, "users", targetUid), { status: statusMap[type] });
+  if (type === "force-remove") {
+    await deleteDoc(doc(db, "users", targetUid));
+  } else {
+    await updateDoc(doc(db, "users", targetUid), { status: statusMap[type] });
+  }
   await addDoc(collection(db, "admin_logs"), {
     action: actionMap[type],
     targetUid,
