@@ -10,6 +10,12 @@ let adminUser = null;
 let adminData = null;
 let pendingAction = null;
 
+function maskEmail(email) {
+  const [local, domain] = email.split("@");
+  const masked = local.slice(0, 3) + "*".repeat(Math.max(local.length - 3, 1));
+  return `${masked}@${domain}`;
+}
+
 requireAdmin(async (user, userData) => {
   adminUser = user;
   adminData = userData;
@@ -44,7 +50,7 @@ async function loadPending() {
         <div>
           <strong>${u.nickname}</strong>
           <span class="text-muted ms-2">${u.displayName}</span>
-          <span class="text-muted ms-2">${u.email}</span>
+          <span class="text-muted ms-2">${maskEmail(u.email)}</span>
         </div>
         <div>
           <button class="btn btn-sm btn-success me-1" onclick="confirmAction('approve','${d.id}','${u.nickname}')">승인</button>
@@ -76,7 +82,7 @@ async function loadMembers() {
       <div class="card mb-2 p-3 d-flex flex-row justify-content-between align-items-center flex-wrap gap-2">
         <div>
           <strong>${u.nickname}</strong>${adminTag}${annualTag}
-          <span class="text-muted ms-2" style="font-size:0.85rem">${u.email}</span>
+          <span class="text-muted ms-2" style="font-size:0.85rem">${maskEmail(u.email)}</span>
         </div>
         <div>
           ${annualBtn}
