@@ -28,6 +28,7 @@ document.getElementById("form-register").addEventListener("submit", async (e) =>
   e.preventDefault();
   const nickname = document.getElementById("input-nickname").value.trim();
   if (!nickname) { showError("닉네임을 입력해주세요."); return; }
+  if (!document.getElementById("checkbox-privacy").checked) { showError("개인정보 수집 및 이용에 동의해주세요."); return; }
 
   try {
     let user = currentUser;
