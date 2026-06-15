@@ -1,7 +1,7 @@
 import { auth, db } from "./firebase-init.js";
 import { requireAdmin } from "./auth-guard.js";
 import {
-  collection, query, where, getDocs, orderBy, limit,
+  collection, query, where, getDocs, orderBy, limit, startAfter,
   doc, updateDoc, addDoc, serverTimestamp, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -92,16 +92,27 @@ async function loadMembers() {
   }).join("");
 }
 
-async function loadLogs() {
+const LOG_PAGE_SIZE = 20;
+let logCursors = [null]; // index 0 = 첫 페이지 커서(null), 이후는 각 페이지 마지막 doc
+let logCurrentPage = 0;
+
+async function loadLogs(page = 0) {
   const el = document.getElementById("list-logs");
   try {
-    const snap = await getDocs(query(
-      collection(db, "admin_logs"),
-      orderBy("createdAt", "desc"),
-      limit(50)
-    ));
-    if (snap.empty) { el.innerHTML = "<p class='text-muted'>로그가 없습니다.</p>"; return; }
-    el.innerHTML = snap.docs.map(d => {
+    const cursor = logCursors[page];
+    const q = cursor
+      ? query(collection(db, "admin_logs"), orderBy("createdAt", "desc"), startAfter(cursor), limit(LOG_PAGE_SIZE))
+      : query(collection(db, "admin_logs"), orderBy("createdAt", "desc"), limit(LOG_PAGE_SIZE));
+
+    const snap = await getDocs(q);
+    if (snap.empty && page === 0) { el.innerHTML = "<p class='text-muted'>로그가 없습니다.</p>"; return; }
+
+    logCurrentPage = page;
+    if (snap.docs.length === LOG_PAGE_SIZE && !logCursors[page + 1]) {
+      logCursors[page + 1] = snap.docs[snap.docs.length - 1];
+    }
+
+    const rows = snap.docs.map(d => {
       const l = d.data();
       const date = l.createdAt?.toDate().toLocaleString("ko-KR") || "";
       return `<div class="card mb-1 p-2 px-3" style="font-size:0.85rem">
@@ -109,10 +120,23 @@ async function loadLogs() {
         <span class="ms-2"><strong>${l.adminNickname}</strong> → <strong>${l.targetNickname}</strong>: ${l.action}</span>
       </div>`;
     }).join("");
+
+    const hasPrev = page > 0;
+    const hasNext = snap.docs.length === LOG_PAGE_SIZE;
+    const pagination = `
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+        <button class="btn btn-sm btn-outline-secondary" onclick="goLogPage(${page - 1})" ${hasPrev ? "" : "disabled"}>이전</button>
+        <span style="line-height:2rem;font-size:0.85rem;color:#666">${page + 1}페이지</span>
+        <button class="btn btn-sm btn-outline-secondary" onclick="goLogPage(${page + 1})" ${hasNext ? "" : "disabled"}>다음</button>
+      </div>`;
+
+    el.innerHTML = rows + pagination;
   } catch (e) {
     el.innerHTML = "<p class='text-muted'>로그를 불러올 수 없습니다.</p>";
   }
 }
+
+window.goLogPage = (page) => loadLogs(page);
 
 // 모달 표시
 window.confirmAction = (type, targetUid, targetNickname) => {
