@@ -84,11 +84,15 @@ document.getElementById("form-register").addEventListener("submit", async (e) =>
     document.getElementById("form-register").style.display = "none";
     document.getElementById("msg-success").style.display = "block";
   } catch (err) {
-    if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
-      showError("비밀번호가 올바르지 않습니다.");
-    } else {
-      showError(err.message);
-    }
+    const errorMessages = {
+      "auth/wrong-password": "비밀번호가 올바르지 않습니다.",
+      "auth/invalid-credential": "비밀번호가 올바르지 않습니다.",
+      "auth/weak-password": "비밀번호는 6자 이상이어야 합니다.",
+      "auth/invalid-email": "이메일 형식이 올바르지 않습니다.",
+      "auth/missing-password": "비밀번호를 입력해주세요.",
+      "auth/missing-email": "이메일을 입력해주세요.",
+    };
+    showError(errorMessages[err.code] || "오류가 발생했습니다. 다시 시도해주세요.");
   }
 });
 

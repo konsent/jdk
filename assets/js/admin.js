@@ -157,8 +157,9 @@ window.confirmAction = (type, targetUid, targetNickname) => {
   modal.style.display = "flex";
 
   btn.onclick = async () => {
+    const action = pendingAction;
     closeModal();
-    await executeAction(pendingAction);
+    await executeAction(action);
   };
 };
 
