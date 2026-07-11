@@ -5,6 +5,20 @@ permalink: /login/
 ---
 <link rel="stylesheet" href="/assets/css/pages.css">
 
+<!-- 비밀번호 재설정 모달 -->
+<div id="reset-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:10px;padding:28px 28px 20px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
+    <p style="font-weight:700;font-size:1rem;margin:0 0 6px">비밀번호 재설정</p>
+    <p style="font-size:0.88rem;color:#555;margin:0 0 14px">가입 시 사용한 이메일을 입력하면 재설정 링크를 보내드립니다.</p>
+    <input type="email" id="input-reset-email" class="form-control" placeholder="이메일 주소" style="margin-bottom:12px">
+    <p id="reset-modal-msg" style="font-size:0.85rem;margin:0 0 14px;display:none"></p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button id="reset-modal-cancel-btn" style="border:1px solid #ddd;background:#fff;border-radius:6px;padding:8px 18px;cursor:pointer;font-size:0.88rem">취소</button>
+      <button id="reset-modal-send-btn" style="border:none;background:#1a1a1a;color:#fff;border-radius:6px;padding:8px 18px;cursor:pointer;font-size:0.88rem;font-weight:600">재설정 링크 보내기</button>
+    </div>
+  </div>
+</div>
+
 <div class="page-wrapper">
   <div class="page-card">
     <h1 class="page-card__title">로그인</h1>
@@ -32,6 +46,9 @@ permalink: /login/
         <input type="password" id="input-password" class="form-control" placeholder="비밀번호" required>
       </div>
       <button type="submit" class="btn-page-primary">이메일로 로그인</button>
+      <div style="text-align:center;margin-top:10px">
+        <a href="#" id="link-forgot-password" style="font-size:0.85rem;color:#666;text-decoration:underline">비밀번호를 잊으셨나요?</a>
+      </div>
     </form>
 
     <div id="msg-error" class="page-msg page-msg--error" style="display:none"></div>
