@@ -15,7 +15,7 @@ function shouldNotify(beforeData, afterData) {
 }
 
 function buildMessage(afterData) {
-  return `새 가입 신청: ${afterData.nickname} (${afterData.email})\n${ADMIN_URL}`;
+  return `새 가입 신청이 도착했습니다.\n\n가입자 닉네임: ${afterData.nickname}\n가입자 이메일: ${afterData.email}\n\n사이트 바로가기: ${ADMIN_URL}`;
 }
 
 async function sendTelegramMessage(token, chatId, text) {
