@@ -36,7 +36,9 @@ document.getElementById("form-register").addEventListener("submit", async (e) =>
     if (!user || user.providerData[0]?.providerId !== "google.com") {
       const email = document.getElementById("input-email").value.trim();
       const password = document.getElementById("input-password").value;
+      const passwordConfirm = document.getElementById("input-password-confirm").value;
       if (!email || !password) { showError("이메일과 비밀번호를 입력해주세요."); return; }
+      if (password !== passwordConfirm) { showError("비밀번호가 일치하지 않습니다."); return; }
 
       try {
         const result = await createUserWithEmailAndPassword(auth, email, password);
