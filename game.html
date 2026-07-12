@@ -1,0 +1,41 @@
+---
+layout: default
+title: 2048
+permalink: /game/
+---
+<link rel="stylesheet" href="/assets/css/pages.css">
+<link rel="stylesheet" href="/assets/css/game.css">
+
+<div class="page-wrapper">
+  <div class="page-card page-card--wide">
+    <p class="page-card__title">2048</p>
+    <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:24px">
+      화살표 키 또는 스와이프로 타일을 움직여 2048을 만들어보세요.
+    </p>
+
+    <div class="game-header">
+      <div id="my-rank" style="font-size:0.85rem;color:var(--text-secondary)"></div>
+      <div class="game-score-box">
+        <div class="label">SCORE</div>
+        <div class="value" id="game-score">0</div>
+      </div>
+    </div>
+
+    <div class="game-board" id="game-grid"></div>
+
+    <div id="game-over-msg" style="display:none">
+      게임 종료! <button id="btn-restart" class="btn-write" style="border:none;cursor:pointer">다시 시작</button>
+    </div>
+
+    <div style="text-align:center;margin-top:12px" id="restart-wrap">
+      <button id="btn-restart-top" class="btn-view">다시 시작</button>
+    </div>
+
+    <div class="section-divider" style="margin:32px 0"></div>
+
+    <p class="board-section-title">랭킹보드 TOP 10</p>
+    <div id="leaderboard-list">불러오는 중...</div>
+  </div>
+</div>
+
+<script type="module" src="/assets/js/game.js"></script>

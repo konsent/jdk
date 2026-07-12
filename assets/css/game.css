@@ -1,0 +1,89 @@
+/* =========================================
+   game.css - 2048 게임 페이지
+   pages.css의 CSS 변수 재사용
+   ========================================= */
+
+.game-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 10px;
+  width: min(100%, 400px);
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  padding: 10px;
+  background: var(--input-border);
+  border-radius: var(--radius);
+  touch-action: none;
+}
+
+.game-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 1.4rem;
+  background: var(--card-bg);
+  color: var(--text-primary);
+}
+
+.game-tile[data-value="0"] { background: rgba(255,255,255,0.4); }
+.game-tile[data-value="2"] { background: #eee4da; }
+.game-tile[data-value="4"] { background: #ede0c8; }
+.game-tile[data-value="8"] { background: #f2b179; color: #fff; }
+.game-tile[data-value="16"] { background: #f59563; color: #fff; }
+.game-tile[data-value="32"] { background: #f67c5f; color: #fff; }
+.game-tile[data-value="64"] { background: #f65e3b; color: #fff; }
+.game-tile[data-value="128"] { background: #edcf72; color: #fff; font-size: 1.2rem; }
+.game-tile[data-value="256"] { background: #edcc61; color: #fff; font-size: 1.2rem; }
+.game-tile[data-value="512"] { background: #edc850; color: #fff; font-size: 1.2rem; }
+.game-tile[data-value="1024"] { background: #edc53f; color: #fff; font-size: 1rem; }
+.game-tile[data-value="2048"] { background: #edc22e; color: #fff; font-size: 1rem; }
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 400px;
+  margin: 0 auto 16px;
+}
+
+.game-score-box {
+  background: var(--text-primary);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  text-align: center;
+  min-width: 80px;
+}
+
+.game-score-box .label { font-size: 0.7rem; opacity: 0.7; }
+.game-score-box .value { font-size: 1.2rem; font-weight: 700; }
+
+#game-over-msg {
+  text-align: center;
+  margin: 16px auto;
+  max-width: 400px;
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.leaderboard-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--divider);
+  font-size: 0.9rem;
+}
+
+.leaderboard-row.is-me {
+  background: var(--accent-light);
+  font-weight: 700;
+}
+
+.leaderboard-rank {
+  color: var(--text-muted);
+  width: 28px;
+  display: inline-block;
+}
