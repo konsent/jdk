@@ -23,6 +23,10 @@ requireApproved(async (user, userData) => {
   }
   if (userData.annualMember) {
     tags.push(`<span style="font-size:0.7rem;font-weight:600;background:#2e7d32;color:#fff;border-radius:4px;padding:2px 8px">연회원</span>`);
+    const img = document.getElementById("info-honor-img");
+    img.src = `/assets/honor/${encodeURIComponent(userData.nickname)}.jpg`;
+    img.onerror = () => { img.style.display = "none"; };
+    img.style.display = "block";
   }
   document.getElementById("info-tags").innerHTML = tags.join(" ");
 
