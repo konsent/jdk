@@ -1,9 +1,11 @@
 import { db } from "./firebase-init.js";
 import { requireApproved } from "./auth-guard.js";
 import {
-  collection, addDoc, getDoc, updateDoc, serverTimestamp, Timestamp,
+  collection, addDoc, getDoc, getDocs, query, where, updateDoc, serverTimestamp, Timestamp,
   doc, setDoc, increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const ROOT_UID = "GNdKNf2KYwgBqOjrX9OmPJO5oEv1";
 
 const params = new URLSearchParams(location.search);
 const editId = params.get("edit"); // 수정 모드: /write/?edit=postId
@@ -19,6 +21,11 @@ requireApproved(async (user, userData) => {
     document.getElementById("section-type").style.display = "block";
   }
 
+  if (user.uid === ROOT_UID) {
+    await loadAuthorOptions();
+    document.getElementById("section-author").style.display = "block";
+  }
+
   function updateEventFields() {
     const type = document.getElementById("select-type").value;
     document.getElementById("section-event-fields").style.display =
@@ -32,6 +39,19 @@ requireApproved(async (user, userData) => {
     await loadForEdit(userData);
   }
 });
+
+async function loadAuthorOptions() {
+  const select = document.getElementById("select-author");
+  const snap = await getDocs(query(collection(db, "users"), where("status", "==", "approved")));
+  snap.docs
+    .filter(d => d.id !== ROOT_UID)
+    .forEach(d => {
+      const opt = document.createElement("option");
+      opt.value = d.id;
+      opt.textContent = d.data().nickname || d.id;
+      select.appendChild(opt);
+    });
+}
 
 async function loadForEdit(userData) {
   const snap = await getDoc(doc(db, "posts", editId));
@@ -106,25 +126,32 @@ document.getElementById("form-write").addEventListener("submit", async (e) => {
       location.href = `/post/?id=${editId}`;
     } else {
       // 신규 등록
+      const assignedUid = currentUser.uid === ROOT_UID
+        ? (document.getElementById("select-author")?.value || currentUser.uid)
+        : currentUser.uid;
+
       const postData = {
         type, title, content,
-        authorUid: currentUser.uid,
+        authorUid: assignedUid,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
       if (type === "event") {
         postData.eventDate = eventDate;
         postData.maxAttendees = parseInt(document.getElementById("input-max").value, 10);
-        postData.attendees = [currentUser.uid];
+        postData.attendees = [assignedUid];
       }
       const ref = await addDoc(collection(db, "posts"), postData);
 
       if (type === "event") {
+        const assignedNickname = assignedUid === currentUser.uid
+          ? currentUserData.nickname
+          : document.getElementById("select-author").selectedOptions[0].textContent;
         await setDoc(doc(db, "stats", "global"), {
           updatedAt: serverTimestamp(),
-          [`members.${currentUser.uid}.nickname`]: currentUserData.nickname,
-          [`members.${currentUser.uid}.postCount`]: increment(1),
-          [`members.${currentUser.uid}.attendCount`]: increment(0)
+          [`members.${assignedUid}.nickname`]: assignedNickname,
+          [`members.${assignedUid}.postCount`]: increment(1),
+          [`members.${assignedUid}.attendCount`]: increment(0)
         }, { merge: true });
       }
 
