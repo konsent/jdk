@@ -27,6 +27,7 @@ let aimX = W / 2;
 let currentUser = null;
 let currentUserData = null;
 let lbTab = "all";
+let dropTimer = null;
 
 requireApproved((user, userData) => {
   currentUser = user;
@@ -37,6 +38,7 @@ requireApproved((user, userData) => {
 });
 
 function startNewGame() {
+  clearTimeout(dropTimer);
   engine = Engine.create();
   Composite.add(engine.world, [
     Bodies.rectangle(W / 2, H + WALL / 2, W + WALL * 2, WALL, { isStatic: true }),
@@ -161,7 +163,7 @@ canvas.addEventListener("pointerup", (e) => {
 function dropBall() {
   canDrop = false;
   Composite.add(engine.world, makeBall(currentTier, clampAimX(aimX, currentTier), DROP_Y));
-  setTimeout(() => {
+  dropTimer = setTimeout(() => {
     currentTier = nextTier;
     nextTier = randomDropTier();
     canDrop = true;
