@@ -1,0 +1,46 @@
+---
+layout: default
+title: 다이스 드랍
+permalink: /suika/
+---
+<link rel="stylesheet" href="/assets/css/pages.css">
+<link rel="stylesheet" href="/assets/css/game.css">
+
+<div class="page-wrapper">
+  <div class="page-card page-card--wide">
+    <p class="page-card__title">다이스 드랍</p>
+    <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:24px">
+      주사위를 떨어뜨려 같은 주사위끼리 합치세요. d4에서 장단콩까지!
+    </p>
+
+    <div class="game-header">
+      <div id="my-rank" style="font-size:0.85rem;color:var(--text-secondary)"></div>
+      <div class="game-score-box">
+        <div class="label">SCORE</div>
+        <div class="value" id="suika-score">0</div>
+      </div>
+    </div>
+
+    <div style="text-align:center;font-size:0.85rem;color:var(--text-secondary);margin-bottom:8px">
+      다음: <span id="suika-next">-</span>
+    </div>
+
+    <canvas id="suika-canvas" class="suika-canvas" width="360" height="540"></canvas>
+
+    <div id="suika-over" style="display:none;text-align:center;margin-top:12px">
+      게임 종료! <button id="btn-suika-restart" class="btn-write" style="border:none;cursor:pointer">다시 시작</button>
+    </div>
+
+    <div class="section-divider" style="margin:32px 0"></div>
+
+    <p class="board-section-title">랭킹보드 TOP 10</p>
+    <div class="lb-tabs">
+      <button id="lb-tab-all" class="lb-tab active">전체</button>
+      <button id="lb-tab-week" class="lb-tab">이번 주</button>
+    </div>
+    <div id="leaderboard-list">불러오는 중...</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+<script type="module" src="/assets/js/suika.js"></script>

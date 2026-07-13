@@ -33,6 +33,8 @@ navigation:
       url: /board
     - title: 2048
       url: /game
+    - title: 다이스 드랍
+      url: /suika
     # - title: 공식 이벤트
     #   url: /event
 

@@ -87,3 +87,39 @@
   width: 28px;
   display: inline-block;
 }
+
+/* =========================================
+   다이스 드랍 (수박게임)
+   ========================================= */
+
+.suika-canvas {
+  display: block;
+  width: min(100%, 400px);
+  margin: 0 auto;
+  background: var(--card-bg);
+  border: 2px solid var(--input-border);
+  border-radius: var(--radius);
+  touch-action: none;
+}
+
+.lb-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.lb-tab {
+  padding: 4px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--input-border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.lb-tab.active {
+  background: var(--input-border);
+  color: var(--text-primary);
+  font-weight: 700;
+}
