@@ -18,6 +18,17 @@ const DROP_COOLDOWN = 600;
 const canvas = document.getElementById("suika-canvas");
 const ctx = canvas.getContext("2d");
 
+const imageCache = new Map();
+function getImage(src) {
+  let img = imageCache.get(src);
+  if (!img) {
+    img = new Image();
+    img.src = `/assets/honor/${src}`;
+    imageCache.set(src, img);
+  }
+  return img;
+}
+
 let engine = null;
 let score = 0;
 let gameOver = false;
@@ -145,15 +156,23 @@ function draw() {
 
 function drawBall(t, x, y, alpha) {
   ctx.globalAlpha = alpha;
-  ctx.fillStyle = t.color;
-  ctx.beginPath();
-  ctx.arc(x, y, t.radius, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = "#fff";
-  ctx.font = `700 ${Math.max(12, Math.round(t.radius * 0.6))}px sans-serif`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(t.label, x, y);
+  const img = getImage(t.image);
+  if (img.complete && img.naturalWidth > 0) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, t.radius, 0, Math.PI * 2);
+    ctx.clip();
+    const size = t.radius * 2;
+    const scale = Math.max(size / img.naturalWidth, size / img.naturalHeight);
+    const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
+    ctx.drawImage(img, x - dw / 2, y - dh / 2, dw, dh);
+    ctx.restore();
+  } else {
+    ctx.fillStyle = t.color;
+    ctx.beginPath();
+    ctx.arc(x, y, t.radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
   ctx.globalAlpha = 1;
 }
 
