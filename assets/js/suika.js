@@ -28,6 +28,12 @@ let currentUser = null;
 let currentUserData = null;
 let lbTab = "all";
 let dropTimer = null;
+let lastTime = 0;
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
 
 requireApproved((user, userData) => {
   currentUser = user;
@@ -99,11 +105,17 @@ function endGame() {
   canDrop = false;
   document.getElementById("suika-over").style.display = "block";
   submitScore(currentUser.uid, currentUserData.nickname, score)
-    .then(loadLeaderboard);
+    .then(loadLeaderboard)
+    .catch((err) => {
+      console.error(err);
+      document.getElementById("leaderboard-list").textContent = "점수 저장에 실패했습니다.";
+    });
 }
 
-function loop() {
-  Engine.update(engine, 1000 / 60);
+function loop(time) {
+  const dt = lastTime ? Math.min(time - lastTime, 33) : 1000 / 60;
+  lastTime = time;
+  Engine.update(engine, dt);
   if (!gameOver && checkGameOver()) endGame();
   draw();
   requestAnimationFrame(loop);
@@ -152,7 +164,10 @@ function canvasX(e) {
   return (e.clientX - rect.left) * (W / rect.width);
 }
 
-canvas.addEventListener("pointerdown", (e) => { aimX = canvasX(e); });
+canvas.addEventListener("pointerdown", (e) => {
+  canvas.setPointerCapture(e.pointerId);
+  aimX = canvasX(e);
+});
 canvas.addEventListener("pointermove", (e) => { aimX = canvasX(e); });
 canvas.addEventListener("pointerup", (e) => {
   if (!canDrop || gameOver) return;
@@ -206,7 +221,7 @@ async function loadLeaderboard() {
   listEl.innerHTML = top10.length
     ? top10.map((e, i) => `
         <div class="leaderboard-row ${currentUser && e.uid === currentUser.uid ? "is-me" : ""}">
-          <span><span class="leaderboard-rank">${i + 1}</span>${e.nickname}</span>
+          <span><span class="leaderboard-rank">${i + 1}</span>${escapeHtml(e.nickname)}</span>
           <span>${e.value}</span>
         </div>`).join("")
     : `<p class="text-muted small">아직 기록이 없습니다.</p>`;

@@ -11,6 +11,11 @@ let gameOver = false;
 let currentUser = null;
 let currentUserData = null;
 
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
 requireApproved((user, userData) => {
   currentUser = user;
   currentUserData = userData;
@@ -112,7 +117,7 @@ async function loadLeaderboard() {
   listEl.innerHTML = top10.length
     ? top10.map((e, i) => `
         <div class="leaderboard-row ${currentUser && e.uid === currentUser.uid ? "is-me" : ""}">
-          <span><span class="leaderboard-rank">${i + 1}</span>${e.nickname}</span>
+          <span><span class="leaderboard-rank">${i + 1}</span>${escapeHtml(e.nickname)}</span>
           <span>${e.bestScore}</span>
         </div>`).join("")
     : `<p class="text-muted small">아직 기록이 없습니다.</p>`;
