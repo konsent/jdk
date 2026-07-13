@@ -1,6 +1,7 @@
 import { db } from "./firebase-init.js";
 import { requireApproved } from "./auth-guard.js";
 import { getTier, randomDropTier, mergeResult, weekKey } from "./suika-logic.js";
+import { showVictory } from "./victory.js";
 import {
   doc, getDoc, setDoc, collection, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -29,6 +30,7 @@ let currentUserData = null;
 let lbTab = "all";
 let dropTimer = null;
 let lastTime = 0;
+let topScore = 0; // 전체 리더보드 1위 점수 (loadLeaderboard에서 갱신)
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c =>
@@ -104,6 +106,7 @@ function endGame() {
   gameOver = true;
   canDrop = false;
   document.getElementById("suika-over").style.display = "block";
+  if (score > topScore && score > 0) showVictory();
   submitScore(currentUser.uid, currentUserData.nickname, score)
     .then(loadLeaderboard)
     .catch((err) => {
@@ -210,6 +213,7 @@ async function submitScore(uid, nickname, finalScore) {
 async function loadLeaderboard() {
   const snap = await getDocs(collection(db, "suika_scores"));
   const all = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+  topScore = all.reduce((m, e) => Math.max(m, e.best || 0), 0);
   const wk = weekKey(new Date());
   const entries = (lbTab === "week"
     ? all.filter(e => e.weekKey === wk).map(e => ({ ...e, value: e.weekBest || 0 }))

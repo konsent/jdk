@@ -150,3 +150,41 @@
 .minigame-item:hover {
   background: var(--accent-light);
 }
+
+/* =========================================
+   1위 등극 연출 (victory.js)
+   ========================================= */
+
+.victory-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 1000;
+  pointer-events: none;
+  animation: victory-pop 2.2s ease-in-out forwards;
+}
+
+.victory-overlay img {
+  width: min(70vw, 420px);
+  height: auto;
+}
+
+.victory-overlay p {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+
+@keyframes victory-pop {
+  0%   { transform: scale(0);   opacity: 0; }
+  12%  { transform: scale(1.1); opacity: 1; }
+  18%  { transform: scale(1); }
+  80%  { transform: scale(1);   opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}

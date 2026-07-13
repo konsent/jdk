@@ -1,6 +1,7 @@
 import { db } from "./firebase-init.js";
 import { requireApproved } from "./auth-guard.js";
 import { createEmptyGrid, addRandomTile, move, isGameOver } from "./game2048.js";
+import { showVictory } from "./victory.js";
 import {
   doc, getDoc, setDoc, collection, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -10,6 +11,7 @@ let score = 0;
 let gameOver = false;
 let currentUser = null;
 let currentUserData = null;
+let topScore = 0; // 전체 리더보드 1위 점수 (loadLeaderboard에서 갱신)
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c =>
@@ -56,6 +58,7 @@ function handleMove(direction) {
   if (isGameOver(grid)) {
     gameOver = true;
     document.getElementById("game-over-msg").style.display = "block";
+    if (score > topScore && score > 0) showVictory();
     submitScore(currentUser.uid, currentUserData.nickname, score)
       .then(loadLeaderboard);
   }
@@ -111,6 +114,7 @@ async function loadLeaderboard() {
   const entries = snap.docs
     .map(d => ({ uid: d.id, ...d.data() }))
     .sort((a, b) => (b.bestScore || 0) - (a.bestScore || 0));
+  topScore = entries.length ? (entries[0].bestScore || 0) : 0;
 
   const top10 = entries.slice(0, 10);
   const listEl = document.getElementById("leaderboard-list");
