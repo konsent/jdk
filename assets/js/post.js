@@ -51,13 +51,16 @@ async function loadPost() {
   const deleteBtn = canEdit
     ? `<button style="background:none;border:1px solid var(--danger);color:var(--danger);border-radius:4px;font-size:0.78rem;padding:4px 10px;cursor:pointer;" id="btn-delete-post">삭제</button>`
     : "";
+  const kakaoBtn = postData.type === "event"
+    ? `<button style="background:#FEE500;border:none;color:#000;border-radius:4px;font-size:0.78rem;padding:4px 10px;cursor:pointer;" id="btn-kakao-share">카톡으로 공유</button>`
+    : "";
 
   document.getElementById("post-content").innerHTML = `
     <div class="post-header">
       <span class="post-type-badge">${postData.type === "event" ? "일정" : "공지"}</span>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
         <h2 class="post-title">${postData.title}</h2>
-        <div style="flex-shrink:0;display:flex;gap:6px">${editBtn}${deleteBtn}</div>
+        <div style="flex-shrink:0;display:flex;gap:6px">${kakaoBtn}${editBtn}${deleteBtn}</div>
       </div>
       <div class="post-meta">
         <span>${authorName}</span>
@@ -67,6 +70,24 @@ async function loadPost() {
     </div>
     <div class="post-body">${postData.content}</div>
   `;
+
+  if (postData.type === "event") {
+    document.getElementById("btn-kakao-share").addEventListener("click", () => {
+      Kakao.Share.sendDefault({
+        objectType: "feed",
+        content: {
+          title: postData.title,
+          description: `📅 ${formatEventDate(postData.eventDate)}`,
+          imageUrl: "https://www.jdkclub.click/assets/img/jdk2.jpeg",
+          link: { webUrl: location.href, mobileWebUrl: location.href }
+        },
+        buttons: [{
+          title: "일정 보기",
+          link: { webUrl: location.href, mobileWebUrl: location.href }
+        }]
+      });
+    });
+  }
 
   if (canEdit) {
     document.getElementById("btn-delete-post").addEventListener("click", async () => {
