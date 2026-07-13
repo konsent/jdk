@@ -128,10 +128,19 @@
    미니게임 허브 (/games/)
    ========================================= */
 
+.minigame-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .minigame-item {
+  flex: 1 1 140px;
   display: block;
-  padding: 16px 20px;
-  margin-bottom: 12px;
+  padding: 28px 16px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
   border: 1px solid var(--input-border);
   border-radius: var(--radius);
   text-decoration: none;
@@ -140,17 +149,4 @@
 
 .minigame-item:hover {
   background: var(--accent-light);
-}
-
-.minigame-item__name {
-  display: block;
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.minigame-item__desc {
-  display: block;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
 }
