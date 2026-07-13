@@ -31,10 +31,8 @@ navigation:
       url: /toon
     - title: 게임 일정
       url: /board
-    - title: 2048
-      url: /game
-    - title: 다이스 드랍
-      url: /suika
+    - title: 미니게임
+      url: /games
     # - title: 공식 이벤트
     #   url: /event
 
