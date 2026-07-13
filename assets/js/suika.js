@@ -173,6 +173,11 @@ function drawBall(t, x, y, alpha) {
     ctx.arc(x, y, t.radius, 0, Math.PI * 2);
     ctx.fill();
   }
+  ctx.lineWidth = Math.max(2, Math.round(t.radius * 0.12));
+  ctx.strokeStyle = t.color;
+  ctx.beginPath();
+  ctx.arc(x, y, t.radius - ctx.lineWidth / 2, 0, Math.PI * 2);
+  ctx.stroke();
   ctx.globalAlpha = 1;
 }
 
