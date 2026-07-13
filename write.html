@@ -36,7 +36,40 @@ permalink: /write/
           <label class="form-label">일정 날짜 <span style="color:var(--danger)">*</span></label>
           <div style="display:flex;gap:8px">
             <input type="date" id="input-date" class="form-control" required>
-            <input type="time" id="input-time" class="form-control" style="max-width:130px" placeholder="시간 (선택)" step="900">
+            <select id="input-time-hour" class="form-select" style="max-width:90px">
+              <option value="">시</option>
+              <option value="00">0시</option>
+              <option value="01">1시</option>
+              <option value="02">2시</option>
+              <option value="03">3시</option>
+              <option value="04">4시</option>
+              <option value="05">5시</option>
+              <option value="06">6시</option>
+              <option value="07">7시</option>
+              <option value="08">8시</option>
+              <option value="09">9시</option>
+              <option value="10">10시</option>
+              <option value="11">11시</option>
+              <option value="12">12시</option>
+              <option value="13">13시</option>
+              <option value="14">14시</option>
+              <option value="15">15시</option>
+              <option value="16">16시</option>
+              <option value="17">17시</option>
+              <option value="18">18시</option>
+              <option value="19">19시</option>
+              <option value="20">20시</option>
+              <option value="21">21시</option>
+              <option value="22">22시</option>
+              <option value="23">23시</option>
+            </select>
+            <select id="input-time-minute" class="form-select" style="max-width:90px">
+              <option value="">분</option>
+              <option value="00">00분</option>
+              <option value="15">15분</option>
+              <option value="30">30분</option>
+              <option value="45">45분</option>
+            </select>
           </div>
           <div class="form-text">시간을 선택하지 않으면 날짜만 표시됩니다.</div>
         </div>

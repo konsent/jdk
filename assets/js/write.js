@@ -87,8 +87,8 @@ async function loadForEdit(userData) {
     const hh = d.getHours();
     const min = d.getMinutes();
     if (hh !== 0 || min !== 0) {
-      document.getElementById("input-time").value =
-        `${String(hh).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
+      document.getElementById("input-time-hour").value = String(hh).padStart(2, "0");
+      document.getElementById("input-time-minute").value = String(min).padStart(2, "0");
     }
     document.getElementById("input-max").value = post.maxAttendees || 5;
   }
@@ -108,8 +108,10 @@ document.getElementById("form-write").addEventListener("submit", async (e) => {
   let eventDate = null;
   if (type === "event") {
     const dateStr = document.getElementById("input-date").value;
-    const timeStr = document.getElementById("input-time").value;
+    const hourStr = document.getElementById("input-time-hour").value;
+    const minuteStr = document.getElementById("input-time-minute").value;
     if (!dateStr) { showError("일정 날짜를 선택해주세요."); return; }
+    const timeStr = (hourStr && minuteStr) ? `${hourStr}:${minuteStr}` : "";
     const combined = timeStr ? `${dateStr}T${timeStr}` : `${dateStr}T00:00`;
     eventDate = Timestamp.fromDate(new Date(combined));
   }
