@@ -74,8 +74,10 @@ function startNewGame() {
   updateHud();
 }
 
+const SEASON = weekKey(new Date());
+
 function makeBall(tier, x, y) {
-  const t = getTier(tier);
+  const t = getTier(tier, SEASON);
   const body = Bodies.circle(x, y, t.radius, { restitution: 0.2, friction: 0.4 });
   body.plugin.tier = tier;
   body.plugin.bornAt = performance.now();
@@ -147,10 +149,10 @@ function draw() {
   ctx.setLineDash([]);
 
   if (canDrop && !gameOver) {
-    drawBall(getTier(currentTier), clampAimX(aimX, currentTier), DROP_Y, 0.5);
+    drawBall(getTier(currentTier, SEASON), clampAimX(aimX, currentTier), DROP_Y, 0.5);
   }
   for (const b of balls()) {
-    drawBall(getTier(b.plugin.tier), b.position.x, b.position.y, 1);
+    drawBall(getTier(b.plugin.tier, SEASON), b.position.x, b.position.y, 1);
   }
 }
 

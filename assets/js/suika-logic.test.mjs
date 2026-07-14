@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { test } from "node:test";
 import {
-  TIERS, getTier, randomDropTier, mergeResult, weekKey
+  TIERS, getTier, randomDropTier, mergeResult, weekKey, seasonImages
 } from "./suika-logic.js";
 
 test("TIERS: 9단계, 반지름 단조 증가", () => {
@@ -35,6 +35,14 @@ test("randomDropTier: 항상 1~5 범위", () => {
     const t = randomDropTier();
     assert.ok(t >= 1 && t <= 5);
   }
+});
+
+test("seasonImages: 9단계 전부 겹치지 않게 배정, 주차별로 달라짐", () => {
+  const a = seasonImages("2026-W29");
+  const values = Object.values(a);
+  assert.strictEqual(new Set(values).size, 9);
+  const b = seasonImages("2026-W30");
+  assert.notDeepStrictEqual(a, b);
 });
 
 test("weekKey: ISO 주차 (연말 경계 포함)", () => {
