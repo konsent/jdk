@@ -5,7 +5,7 @@ import {
   doc, getDoc, updateDoc, arrayUnion, arrayRemove,
   collection, query, where, orderBy, getDocs,
   addDoc, deleteDoc, serverTimestamp, runTransaction,
-  increment, setDoc
+  increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const postId = new URLSearchParams(location.search).get("id");
@@ -390,13 +390,13 @@ async function setupRatingSection() {
         return;
       }
       try {
-        await setDoc(doc(db, "stats", "global"), {
+        await updateDoc(doc(db, "stats", "global"), {
           updatedAt: serverTimestamp(),
           [`members.${targetUid}.ratingSum.manner`]: increment(payload.manner),
           [`members.${targetUid}.ratingSum.skill`]: increment(payload.skill),
           [`members.${targetUid}.ratingSum.again`]: increment(payload.again),
           [`members.${targetUid}.ratingCount`]: increment(1)
-        }, { merge: true });
+        });
       } catch (e) {
         console.error("rating stats update failed", e);
         statsUpdateFailed = true;
@@ -434,12 +434,12 @@ function setupAttendButtons() {
       return;
     }
     try {
-      await setDoc(doc(db, "stats", "global"), {
+      await updateDoc(doc(db, "stats", "global"), {
         updatedAt: serverTimestamp(),
         [`members.${currentUser.uid}.nickname`]: currentUserData.nickname,
         [`members.${currentUser.uid}.attendCount`]: increment(1),
         [`members.${currentUser.uid}.postCount`]: increment(0)
-      }, { merge: true });
+      });
     } catch (e) {
       console.error("stats update failed", e);
     }
@@ -457,12 +457,12 @@ function setupAttendButtons() {
       const statsSnap = await getDoc(doc(db, "stats", "global"));
       const currentCount = statsSnap.data()?.members?.[currentUser.uid]?.attendCount || 0;
       if (currentCount > 0) {
-        await setDoc(doc(db, "stats", "global"), {
+        await updateDoc(doc(db, "stats", "global"), {
           updatedAt: serverTimestamp(),
           [`members.${currentUser.uid}.nickname`]: currentUserData.nickname,
           [`members.${currentUser.uid}.attendCount`]: increment(-1),
           [`members.${currentUser.uid}.postCount`]: increment(0)
-        }, { merge: true });
+        });
       }
     } catch (e) {
       console.error("stats update failed", e);
