@@ -29,6 +29,25 @@
   --radius-sm: 5px;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page-bg: #1a1a1a;
+    --card-bg: #262626;
+    --card-border: #3a3a3a;
+    --card-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    --card-shadow-hover: 0 4px 20px rgba(0,0,0,0.4);
+    --text-primary: #f0f0f0;
+    --text-secondary: #b0b0b0;
+    --text-muted: #808080;
+    --accent-light: #1b3a1e;
+    --danger-light: #3a1f1f;
+    --warning-light: #3a2a1a;
+    --divider: #3a3a3a;
+    --input-bg: #2e2e2e;
+    --input-border: #4a4a4a;
+  }
+}
+
 /* ---- 페이지 래퍼 ---- */
 .page-wrapper {
   min-height: calc(100vh - 120px);
