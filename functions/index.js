@@ -96,3 +96,34 @@ exports.searchBoardGame = onRequest(async (req, res) => {
 
 exports.parseSearchResults = parseSearchResults;
 exports.fetchWithRetry = fetchWithRetry;
+
+function parseGameDetail(xml, bggId) {
+  const itemMatch = /<item[^>]*\bid="[^"]+"[^>]*>([\s\S]*?)<\/item>/.exec(xml);
+  if (!itemMatch) return null;
+  const body = itemMatch[1];
+  const nameMatch = /<name[^>]*\btype="primary"[^>]*\bvalue="([^"]*)"/.exec(body);
+  const yearMatch = /<yearpublished[^>]*\bvalue="([^"]*)"/.exec(body);
+  const thumbMatch = /<thumbnail>([^<]*)<\/thumbnail>/.exec(body);
+  return {
+    bggId,
+    name: nameMatch ? nameMatch[1] : "",
+    yearPublished: yearMatch ? yearMatch[1] : undefined,
+    thumbnail: thumbMatch ? thumbMatch[1] : undefined
+  };
+}
+
+exports.getBoardGameDetail = onRequest(async (req, res) => {
+  const id = (req.query.id || "").trim();
+  if (!id) { res.json(null); return; }
+  try {
+    const xml = await fetchWithRetry(
+      `https://boardgamegeek.com/xmlapi2/thing?id=${encodeURIComponent(id)}`
+    );
+    res.json(xml ? parseGameDetail(xml, id) : null);
+  } catch (err) {
+    logger.error("BGG 상세 조회 실패", err);
+    res.json(null);
+  }
+});
+
+exports.parseGameDetail = parseGameDetail;

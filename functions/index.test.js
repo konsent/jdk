@@ -112,3 +112,45 @@ test("fetchWithRetry: 404처럼 재시도 없는 실패 응답도 null을 반환
   const result = await fetchWithRetry("https://example.com", fakeFetch);
   assert.strictEqual(result, null);
 });
+
+const { parseGameDetail } = require("./index.js");
+
+test("parseGameDetail: thing XML에서 이름/연도/썸네일을 추출한다", () => {
+  const xml = `<?xml version="1.0"?>
+<items termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">
+<item type="boardgame" id="13">
+  <thumbnail>https://cf.geekdo-images.com/thumb/catan.jpg</thumbnail>
+  <image>https://cf.geekdo-images.com/full/catan.jpg</image>
+  <name type="primary" sortindex="1" value="Catan"/>
+  <name type="alternate" sortindex="1" value="Los Colonos de Catan"/>
+  <yearpublished value="1995"/>
+</item>
+</items>`;
+  assert.deepStrictEqual(parseGameDetail(xml, "13"), {
+    bggId: "13",
+    name: "Catan",
+    yearPublished: "1995",
+    thumbnail: "https://cf.geekdo-images.com/thumb/catan.jpg"
+  });
+});
+
+test("parseGameDetail: 아이템이 없으면 null", () => {
+  const xml = `<?xml version="1.0"?><items termsofuse="https://boardgamegeek.com/xmlapi/termsofuse"></items>`;
+  assert.strictEqual(parseGameDetail(xml, "999"), null);
+});
+
+test("parseGameDetail: thumbnail 없으면 thumbnail undefined", () => {
+  const xml = `<?xml version="1.0"?>
+<items termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">
+<item type="boardgame" id="42">
+  <name type="primary" sortindex="1" value="Mystery Game"/>
+  <yearpublished value="2020"/>
+</item>
+</items>`;
+  assert.deepStrictEqual(parseGameDetail(xml, "42"), {
+    bggId: "42",
+    name: "Mystery Game",
+    yearPublished: "2020",
+    thumbnail: undefined
+  });
+});
