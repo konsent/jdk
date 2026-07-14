@@ -26,3 +26,13 @@ export function computeAverages(memberStats) {
     count
   };
 }
+
+export function computeKongzTemp(memberStats) {
+  const count = memberStats?.ratingCount || 0;
+  if (count === 0) return { temp: 36.5, count: 0 };
+  const sum = memberStats.ratingSum || {};
+  const weighted = (sum.manner || 0) * 0.25 + (sum.skill || 0) * 0.25 + (sum.again || 0) * 0.5;
+  const avg = weighted / count;
+  const temp = Math.round((36.5 + (avg - 3) * 13) * 10) / 10;
+  return { temp, count };
+}

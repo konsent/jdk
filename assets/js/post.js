@@ -1,6 +1,6 @@
 import { auth, db } from "./firebase-init.js";
 import { requireApproved, getUserDoc } from "./auth-guard.js";
-import { getRatingTargets, canRateNow, ratingDocId, computeAverages } from "./rating-logic.js";
+import { getRatingTargets, canRateNow, ratingDocId, computeKongzTemp } from "./rating-logic.js";
 import {
   doc, getDoc, updateDoc, arrayUnion, arrayRemove,
   collection, query, where, orderBy, getDocs,
@@ -161,7 +161,7 @@ async function loadAttendees() {
 
   document.querySelectorAll(".attendee-chip[data-uid]").forEach((chip) => {
     const uid = chip.dataset.uid;
-    bindRatingHoverCard(chip, computeAverages(membersStats[uid]));
+    bindRatingHoverCard(chip, computeKongzTemp(membersStats[uid]));
   });
 }
 
@@ -185,18 +185,35 @@ function scheduleHideRatingHoverCard() {
   }, 120);
 }
 
-function bindRatingHoverCard(anchorEl, averages) {
+const TEMP_COLOR_STOPS = [
+  { temp: 10.5, color: [74, 144, 217] },  // 파랑
+  { temp: 36.5, color: [136, 136, 136] }, // 회색
+  { temp: 62.5, color: [231, 76, 60] }    // 빨강
+];
+
+function tempToColor(temp) {
+  const stops = TEMP_COLOR_STOPS;
+  if (temp <= stops[0].temp) return `rgb(${stops[0].color.join(",")})`;
+  if (temp >= stops[stops.length - 1].temp) return `rgb(${stops[stops.length - 1].color.join(",")})`;
+  for (let i = 0; i < stops.length - 1; i++) {
+    const a = stops[i], b = stops[i + 1];
+    if (temp >= a.temp && temp <= b.temp) {
+      const t = (temp - a.temp) / (b.temp - a.temp);
+      const rgb = a.color.map((c, idx) => Math.round(c + (b.color[idx] - c) * t));
+      return `rgb(${rgb.join(",")})`;
+    }
+  }
+  return `rgb(${stops[1].color.join(",")})`;
+}
+
+function bindRatingHoverCard(anchorEl, { temp, count }) {
   anchorEl.addEventListener("mouseenter", () => {
     clearTimeout(ratingHoverHideTimer);
     const card = getRatingHoverCard();
-    card.innerHTML = averages.count === 0
-      ? `<p class="rating-hovercard-empty">아직 평가 없음</p>`
-      : `<div class="rating-hovercard-scores">
-          <span>매너 ${averages.manner}</span>
-          <span>실력 ${averages.skill}</span>
-          <span>또 놀고 싶어요 ${averages.again}</span>
+    card.innerHTML = `<div class="rating-hovercard-scores">
+          <span style="color:${tempToColor(temp)};font-weight:600">콩즈 온도 ${temp}도</span>
         </div>
-        <p class="rating-hovercard-count">${averages.count}회 평가받음</p>`;
+        <p class="rating-hovercard-count">${count}회 평가받음</p>`;
     card.style.display = "block";
     const rect = anchorEl.getBoundingClientRect();
     card.style.left = `${rect.left + window.scrollX}px`;
