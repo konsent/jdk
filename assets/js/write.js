@@ -6,6 +6,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const ROOT_UID = "GNdKNf2KYwgBqOjrX9OmPJO5oEv1";
+const FUNCTIONS_BASE = "https://us-central1-jdk-member-board.cloudfunctions.net";
+let selectedGames = [];
 
 const params = new URLSearchParams(location.search);
 const editId = params.get("edit"); // 수정 모드: /write/?edit=postId
@@ -34,6 +36,7 @@ requireApproved(async (user, userData) => {
 
   document.getElementById("select-type").addEventListener("change", updateEventFields);
   updateEventFields();
+  setupGameSearch();
 
   if (editId) {
     await loadForEdit(userData);
@@ -91,6 +94,8 @@ async function loadForEdit(userData) {
       document.getElementById("input-time-minute").value = String(min).padStart(2, "0");
     }
     document.getElementById("input-max").value = post.maxAttendees || 5;
+    selectedGames = post.games || [];
+    renderSelectedGames();
   }
 }
 
@@ -123,6 +128,7 @@ document.getElementById("form-write").addEventListener("submit", async (e) => {
       if (type === "event") {
         updates.eventDate = eventDate;
         updates.maxAttendees = parseInt(document.getElementById("input-max").value, 10);
+        updates.games = selectedGames;
       }
       await updateDoc(doc(db, "posts", editId), updates);
       location.href = `/post/?id=${editId}`;
@@ -142,6 +148,7 @@ document.getElementById("form-write").addEventListener("submit", async (e) => {
         postData.eventDate = eventDate;
         postData.maxAttendees = parseInt(document.getElementById("input-max").value, 10);
         postData.attendees = [assignedUid];
+        postData.games = selectedGames;
       }
       const ref = await addDoc(collection(db, "posts"), postData);
 
@@ -163,6 +170,80 @@ document.getElementById("form-write").addEventListener("submit", async (e) => {
     showError(editId ? "수정 중 오류가 발생했습니다." : "등록 중 오류가 발생했습니다.");
   }
 });
+
+function renderSelectedGames() {
+  const el = document.getElementById("selected-games");
+  el.innerHTML = selectedGames.map((g, i) => `
+    <span class="game-tag">
+      ${g.thumbnail ? `<img src="${g.thumbnail}" alt="">` : ""}
+      ${escapeGameText(g.name)}${g.yearPublished ? ` (${g.yearPublished})` : ""}
+      <button type="button" data-idx="${i}" class="game-tag-remove">×</button>
+    </span>
+  `).join("");
+  el.querySelectorAll(".game-tag-remove").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      selectedGames.splice(Number(btn.dataset.idx), 1);
+      renderSelectedGames();
+    });
+  });
+}
+
+function escapeGameText(str) {
+  const div = document.createElement("div");
+  div.textContent = str || "";
+  return div.innerHTML;
+}
+
+function renderCandidates(candidates) {
+  const el = document.getElementById("game-candidates");
+  if (!candidates.length) {
+    el.style.display = "none";
+    el.innerHTML = "";
+    return;
+  }
+  el.innerHTML = candidates.map((c) =>
+    `<div class="game-candidate" data-id="${c.bggId}" data-name="${escapeGameText(c.name)}">
+      ${escapeGameText(c.name)}${c.yearPublished ? ` (${c.yearPublished})` : ""}
+    </div>`
+  ).join("");
+  el.style.display = "block";
+  el.querySelectorAll(".game-candidate").forEach((row) => {
+    row.addEventListener("click", async () => {
+      const bggId = row.dataset.id;
+      el.style.display = "none";
+      document.getElementById("input-game-search").value = "";
+      try {
+        const res = await fetch(`${FUNCTIONS_BASE}/getBoardGameDetail?id=${encodeURIComponent(bggId)}`);
+        const detail = await res.json();
+        if (detail) {
+          selectedGames.push(detail);
+          renderSelectedGames();
+        }
+      } catch (e) {
+        console.error("게임 상세 조회 실패:", e);
+      }
+    });
+  });
+}
+
+let searchDebounceTimer = null;
+function setupGameSearch() {
+  const input = document.getElementById("input-game-search");
+  input.addEventListener("input", () => {
+    clearTimeout(searchDebounceTimer);
+    const q = input.value.trim();
+    if (!q) { renderCandidates([]); return; }
+    searchDebounceTimer = setTimeout(async () => {
+      try {
+        const res = await fetch(`${FUNCTIONS_BASE}/searchBoardGame?q=${encodeURIComponent(q)}`);
+        renderCandidates(await res.json());
+      } catch (e) {
+        console.error("게임 검색 실패:", e);
+        renderCandidates([]);
+      }
+    }, 300);
+  });
+}
 
 function showError(msg) {
   const el = document.getElementById("msg-error");
