@@ -1,6 +1,6 @@
 import { auth, db } from "./firebase-init.js";
 import { requireApproved, getUserDoc } from "./auth-guard.js";
-import { getRatingTargets, canRateNow, ratingDocId, computeKongzTemp } from "./rating-logic.js";
+import { getRatingTargets, canRateNow, ratingDocId, computeKongzTemp, tempToColor } from "./rating-logic.js";
 import {
   doc, getDoc, updateDoc, arrayUnion, arrayRemove,
   collection, query, where, orderBy, getDocs,
@@ -183,27 +183,6 @@ function scheduleHideRatingHoverCard() {
   ratingHoverHideTimer = setTimeout(() => {
     if (ratingHoverCardEl) ratingHoverCardEl.style.display = "none";
   }, 120);
-}
-
-const TEMP_COLOR_STOPS = [
-  { temp: 10.5, color: [74, 144, 217] },  // 파랑
-  { temp: 36.5, color: [136, 136, 136] }, // 회색
-  { temp: 62.5, color: [231, 76, 60] }    // 빨강
-];
-
-function tempToColor(temp) {
-  const stops = TEMP_COLOR_STOPS;
-  if (temp <= stops[0].temp) return `rgb(${stops[0].color.join(",")})`;
-  if (temp >= stops[stops.length - 1].temp) return `rgb(${stops[stops.length - 1].color.join(",")})`;
-  for (let i = 0; i < stops.length - 1; i++) {
-    const a = stops[i], b = stops[i + 1];
-    if (temp >= a.temp && temp <= b.temp) {
-      const t = (temp - a.temp) / (b.temp - a.temp);
-      const rgb = a.color.map((c, idx) => Math.round(c + (b.color[idx] - c) * t));
-      return `rgb(${rgb.join(",")})`;
-    }
-  }
-  return `rgb(${stops[1].color.join(",")})`;
 }
 
 function bindRatingHoverCard(anchorEl, { temp, count }) {

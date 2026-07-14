@@ -36,3 +36,24 @@ export function computeKongzTemp(memberStats) {
   const temp = Math.round((36.5 + (avg - 3) * 13) * 10) / 10;
   return { temp, count };
 }
+
+const TEMP_COLOR_STOPS = [
+  { temp: 10.5, color: [74, 144, 217] },  // 파랑
+  { temp: 36.5, color: [136, 136, 136] }, // 회색
+  { temp: 62.5, color: [231, 76, 60] }    // 빨강
+];
+
+export function tempToColor(temp) {
+  const stops = TEMP_COLOR_STOPS;
+  if (temp <= stops[0].temp) return `rgb(${stops[0].color.join(",")})`;
+  if (temp >= stops[stops.length - 1].temp) return `rgb(${stops[stops.length - 1].color.join(",")})`;
+  for (let i = 0; i < stops.length - 1; i++) {
+    const a = stops[i], b = stops[i + 1];
+    if (temp >= a.temp && temp <= b.temp) {
+      const t = (temp - a.temp) / (b.temp - a.temp);
+      const rgb = a.color.map((c, idx) => Math.round(c + (b.color[idx] - c) * t));
+      return `rgb(${rgb.join(",")})`;
+    }
+  }
+  return `rgb(${stops[1].color.join(",")})`;
+}

@@ -4,7 +4,7 @@ import { deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-
 import {
   doc, deleteDoc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { computeAverages } from "./rating-logic.js";
+import { computeAverages, computeKongzTemp, tempToColor } from "./rating-logic.js";
 
 let currentUser = null;
 
@@ -34,6 +34,12 @@ requireApproved(async (user, userData) => {
   try {
     const statsSnap = await getDoc(doc(db, "stats", "global"));
     const myStats = statsSnap.data()?.members?.[user.uid];
+    const { temp } = computeKongzTemp(myStats);
+    const badge = document.getElementById("info-temp-badge");
+    badge.style.display = "flex";
+    badge.style.color = tempToColor(temp);
+    badge.textContent = `${temp}°C`;
+
     const averages = computeAverages(myStats);
     document.getElementById("info-rating").innerHTML = averages.count === 0
       ? `<div style="font-size:0.86rem;color:var(--text-muted)">아직 받은 평가가 없습니다.</div>`
