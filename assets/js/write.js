@@ -175,7 +175,7 @@ function renderSelectedGames() {
   const el = document.getElementById("selected-games");
   el.innerHTML = selectedGames.map((g, i) => `
     <span class="game-tag">
-      ${g.thumbnail ? `<img src="${g.thumbnail}" alt="">` : ""}
+      ${g.thumbnail ? `<img src="${escapeGameText(g.thumbnail)}" alt="">` : ""}
       ${escapeGameText(g.name)}${g.yearPublished ? ` (${g.yearPublished})` : ""}
       <button type="button" data-idx="${i}" class="game-tag-remove">×</button>
     </span>
