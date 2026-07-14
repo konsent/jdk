@@ -191,7 +191,7 @@ function renderSelectedGames() {
 function escapeGameText(str) {
   const div = document.createElement("div");
   div.textContent = str || "";
-  return div.innerHTML;
+  return div.innerHTML.replace(/"/g, "&quot;");
 }
 
 function renderCandidates(candidates) {
@@ -202,7 +202,7 @@ function renderCandidates(candidates) {
     return;
   }
   el.innerHTML = candidates.map((c) =>
-    `<div class="game-candidate" data-id="${c.bggId}" data-name="${escapeGameText(c.name)}">
+    `<div class="game-candidate" data-id="${escapeGameText(c.bggId)}" data-name="${escapeGameText(c.name)}">
       ${escapeGameText(c.name)}${c.yearPublished ? ` (${c.yearPublished})` : ""}
     </div>`
   ).join("");
