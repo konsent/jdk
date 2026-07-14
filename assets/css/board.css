@@ -112,3 +112,45 @@
   color: #1a1a1a;
   display: inline-block;
 }
+
+.cal-weekday.cal-sun { color: #c62828; }
+.cal-weekday.cal-sat { color: #1565c0; }
+.cal-cell.is-sun .cal-day-num { color: #c62828; }
+.cal-cell.is-sat .cal-day-num { color: #1565c0; }
+.cal-cell.is-today { background: #fff8e1; }
+.cal-cell.is-today .cal-day-num {
+  background: #1a1a1a;
+  color: #fff;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.76rem;
+}
+
+.cal-pill {
+  margin-top: 3px;
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #eef2ff;
+  color: #3949ab;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.cal-pill:hover { background: #e0e6fb; }
+.cal-more {
+  margin-top: 3px;
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #f0f0ee;
+  color: #666;
+  cursor: pointer;
+  display: inline-block;
+}
+.cal-more:hover { background: #e5e5e1; }

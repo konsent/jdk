@@ -90,7 +90,8 @@ function renderCalendar(events) {
       <div class="cal-grid">`;
 
     weekdayNames.forEach((wd, i) => {
-      html += `<div class="cal-weekday">${wd}</div>`;
+      const cls = i === 0 ? " cal-sun" : i === 6 ? " cal-sat" : "";
+      html += `<div class="cal-weekday${cls}">${wd}</div>`;
     });
 
     const totalCells = firstDay + daysInMonth;
@@ -103,7 +104,22 @@ function renderCalendar(events) {
         html += `<div class="cal-cell is-empty"></div>`;
       } else {
         const evts = monthEvents[day] || [];
-        html += `<div class="cal-cell" data-day="${day}"><span class="cal-day-num">${day}</span></div>`;
+        const isToday = year === now.getFullYear() && month === now.getMonth() && day === now.getDate();
+        const cellClasses = ["cal-cell"];
+        if (isToday) cellClasses.push("is-today");
+        if (col === 0) cellClasses.push("is-sun");
+        if (col === 6) cellClasses.push("is-sat");
+
+        const shown = evts.slice(0, 2);
+        const rest = evts.length - shown.length;
+        let evtHtml = shown.map(e =>
+          `<div class="cal-pill" onclick="location.href='/post/?id=${e.id}'">${e.title}</div>`
+        ).join("");
+        if (rest > 0) {
+          evtHtml += `<div class="cal-more" data-day="${day}">+${rest}개</div>`;
+        }
+
+        html += `<div class="${cellClasses.join(" ")}" data-day="${day}"><span class="cal-day-num">${day}</span>${evtHtml}</div>`;
         day++;
       }
     }
