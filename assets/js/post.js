@@ -239,7 +239,7 @@ async function setupConfirmAttendance() {
   function showViewMode() {
     listEl.style.display = "none";
     saveBtn.style.display = "none";
-    editBtn.style.display = "inline-block";
+    editBtn.style.display = postData.closedAt ? "none" : "inline-block";
   }
 
   function showEditMode() {
