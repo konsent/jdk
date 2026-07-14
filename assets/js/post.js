@@ -225,14 +225,21 @@ async function setupConfirmAttendance() {
 
   document.getElementById("btn-save-confirmed").addEventListener("click", async () => {
     const checked = [...document.querySelectorAll(".confirm-attendance-checkbox:checked")].map((el) => el.value);
-    await updateDoc(doc(db, "posts", postId), { confirmedAttendees: checked });
+    try {
+      await updateDoc(doc(db, "posts", postId), { confirmedAttendees: checked });
+    } catch (e) {
+      alert("저장 중 오류가 발생했습니다.");
+      return;
+    }
     postData.confirmedAttendees = checked;
     document.getElementById("msg-confirm-saved").style.display = "block";
   });
 }
 
 async function setupRatingSection() {
-  if (!canRateNow(postData.eventDate.toDate())) return;
+  const roster = postData.confirmedAttendees || postData.attendees || [];
+  if (!roster.includes(currentUser.uid)) return;
+  if (!canRateNow(postData.eventDate?.toDate())) return;
   const targets = getRatingTargets(postData, currentUser.uid);
   if (!targets.length) return;
 
