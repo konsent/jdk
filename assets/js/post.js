@@ -28,7 +28,7 @@ function renderGamesSection(games) {
   if (!games || !games.length) return "";
   const cards = games.map((g) => `
     <a class="game-card" href="https://boardgamegeek.com/boardgame/${g.bggId}" target="_blank" rel="noopener">
-      ${g.thumbnail ? `<img src="${g.thumbnail}" alt="${escapeHtml(g.name)}">` : `<div class="game-card-noimg"></div>`}
+      ${g.thumbnail ? `<img src="${escapeHtml(g.thumbnail)}" alt="${escapeHtml(g.name)}">` : `<div class="game-card-noimg"></div>`}
       <span>${escapeHtml(g.name)}${g.yearPublished ? ` (${g.yearPublished})` : ""}</span>
     </a>
   `).join("");
