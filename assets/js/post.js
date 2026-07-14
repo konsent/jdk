@@ -123,6 +123,7 @@ async function loadPost() {
 
   if (postData.type === "event") {
     await loadAttendees();
+    await setupConfirmAttendance();
     setupAttendButtons();
     document.getElementById("section-comments").style.display = "block";
     await loadComments();
@@ -141,6 +142,36 @@ async function loadAttendees() {
   }));
   document.getElementById("attendee-list").innerHTML = names
     .map(n => `<span class="attendee-chip">${n}</span>`).join("");
+}
+
+async function setupConfirmAttendance() {
+  const canConfirm = currentUser.uid === postData.authorUid || currentUserData.isAdmin;
+  if (!canConfirm) return;
+
+  const attendees = postData.attendees || [];
+  if (!attendees.length) return;
+
+  document.getElementById("section-confirm-attendance").style.display = "block";
+  const confirmed = postData.confirmedAttendees || attendees;
+
+  const names = await Promise.all(attendees.map(async (uid) => {
+    const u = await getUserDoc(uid);
+    return { uid, name: u?.nickname || "알 수 없음" };
+  }));
+
+  document.getElementById("confirm-attendance-list").innerHTML = names.map(({ uid, name }) => `
+    <label style="display:flex;align-items:center;gap:6px;margin:4px 0;font-size:0.86rem">
+      <input type="checkbox" class="confirm-attendance-checkbox" value="${escapeHtml(uid)}" ${confirmed.includes(uid) ? "checked" : ""}>
+      ${escapeHtml(name)}
+    </label>
+  `).join("");
+
+  document.getElementById("btn-save-confirmed").addEventListener("click", async () => {
+    const checked = [...document.querySelectorAll(".confirm-attendance-checkbox:checked")].map((el) => el.value);
+    await updateDoc(doc(db, "posts", postId), { confirmedAttendees: checked });
+    postData.confirmedAttendees = checked;
+    document.getElementById("msg-confirm-saved").style.display = "block";
+  });
 }
 
 function setupAttendButtons() {
