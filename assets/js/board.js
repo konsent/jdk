@@ -120,7 +120,7 @@ function renderCalendar(events) {
         const shown = evts.slice(0, 2);
         const rest = evts.length - shown.length;
         let evtHtml = shown.map(e =>
-          `<div class="cal-pill" onclick="location.href='/post/?id=${e.id}'">${e.title}</div>`
+          `<div class="cal-pill" onclick="location.href='/post/?id=${e.id}'">${escapeHtml(e.title)}</div>`
         ).join("");
         if (rest > 0) {
           evtHtml += `<div class="cal-more" data-day="${day}">+${rest}개</div>`;
