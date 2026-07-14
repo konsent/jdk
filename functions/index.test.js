@@ -29,3 +29,40 @@ test("buildMessage: 닉네임과 이메일, admin 링크를 포함한다", () =>
     "새 가입 신청이 도착했습니다.\n\n가입자 닉네임: 홍길동\n가입자 이메일: hong@example.com\n\n사이트 바로가기: https://www.jdkclub.click/admin/"
   );
 });
+
+const { parseSearchResults } = require("./index.js");
+
+test("parseSearchResults: 검색 결과 XML에서 id/name/연도를 추출한다", () => {
+  const xml = `<?xml version="1.0"?>
+<items total="2" termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">
+<item type="boardgame" id="13">
+  <name type="primary" value="CATAN"/>
+  <yearpublished value="1995"/>
+</item>
+<item type="boardgame" id="9209">
+  <name type="primary" value="Catan: Cities and Knights"/>
+  <yearpublished value="1998"/>
+</item>
+</items>`;
+  assert.deepStrictEqual(parseSearchResults(xml), [
+    { bggId: "13", name: "CATAN", yearPublished: "1995" },
+    { bggId: "9209", name: "Catan: Cities and Knights", yearPublished: "1998" }
+  ]);
+});
+
+test("parseSearchResults: 결과 없으면 빈 배열", () => {
+  const xml = `<?xml version="1.0"?><items total="0" termsofuse="https://boardgamegeek.com/xmlapi/termsofuse"></items>`;
+  assert.deepStrictEqual(parseSearchResults(xml), []);
+});
+
+test("parseSearchResults: yearpublished 없는 아이템은 yearPublished undefined", () => {
+  const xml = `<?xml version="1.0"?>
+<items total="1" termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">
+<item type="boardgame" id="42">
+  <name type="primary" value="Mystery Game"/>
+</item>
+</items>`;
+  assert.deepStrictEqual(parseSearchResults(xml), [
+    { bggId: "42", name: "Mystery Game", yearPublished: undefined }
+  ]);
+});

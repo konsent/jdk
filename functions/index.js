@@ -1,4 +1,5 @@
 const { onDocumentWritten } = require("firebase-functions/v2/firestore");
+const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
 
@@ -51,3 +52,47 @@ exports.notifyOnPendingSignup = onDocumentWritten(
 
 exports.shouldNotify = shouldNotify;
 exports.buildMessage = buildMessage;
+
+function parseSearchResults(xml) {
+  const items = [];
+  const itemRegex = /<item[^>]*\bid="([^"]+)"[^>]*>([\s\S]*?)<\/item>/g;
+  let match;
+  while ((match = itemRegex.exec(xml)) !== null) {
+    const [, bggId, body] = match;
+    const nameMatch = /<name[^>]*\bvalue="([^"]*)"/.exec(body);
+    const yearMatch = /<yearpublished[^>]*\bvalue="([^"]*)"/.exec(body);
+    items.push({
+      bggId,
+      name: nameMatch ? nameMatch[1] : "",
+      yearPublished: yearMatch ? yearMatch[1] : undefined
+    });
+  }
+  return items;
+}
+
+async function fetchWithRetry(url) {
+  let res = await fetch(url);
+  if (res.status === 202) {
+    await new Promise((r) => setTimeout(r, 1000));
+    res = await fetch(url);
+  }
+  if (!res.ok) return null;
+  return res.text();
+}
+
+exports.searchBoardGame = onRequest(async (req, res) => {
+  const q = (req.query.q || "").trim();
+  if (!q) { res.json([]); return; }
+  try {
+    const xml = await fetchWithRetry(
+      `https://boardgamegeek.com/xmlapi2/search?type=boardgame&query=${encodeURIComponent(q)}`
+    );
+    res.json(xml ? parseSearchResults(xml) : []);
+  } catch (err) {
+    logger.error("BGG 검색 실패", err);
+    res.json([]);
+  }
+});
+
+exports.parseSearchResults = parseSearchResults;
+exports.fetchWithRetry = fetchWithRetry;
