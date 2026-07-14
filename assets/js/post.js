@@ -209,21 +209,50 @@ async function setupConfirmAttendance() {
   if (!attendees.length) return;
 
   document.getElementById("section-confirm-attendance").style.display = "block";
-  const confirmed = postData.confirmedAttendees || attendees;
 
   const names = await Promise.all(attendees.map(async (uid) => {
     const u = await getUserDoc(uid);
     return { uid, name: u?.nickname || "알 수 없음" };
   }));
 
-  document.getElementById("confirm-attendance-list").innerHTML = names.map(({ uid, name }) => `
-    <label style="display:flex;align-items:center;gap:6px;margin:4px 0;font-size:0.86rem">
-      <input type="checkbox" class="confirm-attendance-checkbox" value="${escapeHtml(uid)}" ${confirmed.includes(uid) ? "checked" : ""}>
-      ${escapeHtml(name)}
-    </label>
-  `).join("");
+  const listEl = document.getElementById("confirm-attendance-list");
+  const saveBtn = document.getElementById("btn-save-confirmed");
+  const editBtn = document.getElementById("btn-edit-confirmed");
 
-  document.getElementById("btn-save-confirmed").addEventListener("click", async () => {
+  function renderList() {
+    const confirmed = postData.confirmedAttendees || attendees;
+    listEl.innerHTML = names.map(({ uid, name }) => `
+      <label style="display:flex;align-items:center;gap:6px;margin:4px 0;font-size:0.86rem">
+        <input type="checkbox" class="confirm-attendance-checkbox" value="${escapeHtml(uid)}" ${confirmed.includes(uid) ? "checked" : ""}>
+        ${escapeHtml(name)}
+      </label>
+    `).join("");
+  }
+
+  function showViewMode() {
+    listEl.style.display = "none";
+    saveBtn.style.display = "none";
+    editBtn.style.display = "inline-block";
+  }
+
+  function showEditMode() {
+    renderList();
+    listEl.style.display = "block";
+    saveBtn.style.display = "inline-block";
+    editBtn.style.display = "none";
+  }
+
+  renderList();
+  if (postData.confirmedAttendees) {
+    showViewMode();
+  }
+
+  editBtn.addEventListener("click", () => {
+    document.getElementById("msg-confirm-saved").style.display = "none";
+    showEditMode();
+  });
+
+  saveBtn.addEventListener("click", async () => {
     const checked = [...document.querySelectorAll(".confirm-attendance-checkbox:checked")].map((el) => el.value);
     try {
       await updateDoc(doc(db, "posts", postId), { confirmedAttendees: checked });
@@ -233,6 +262,7 @@ async function setupConfirmAttendance() {
     }
     postData.confirmedAttendees = checked;
     document.getElementById("msg-confirm-saved").style.display = "block";
+    showViewMode();
   });
 }
 
