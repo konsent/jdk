@@ -328,23 +328,45 @@ async function setupRatingSection() {
         <span class="text-muted" style="font-size:0.8rem">제출 완료</span>
       </div>`;
     }
+    const scoreTrack = (field, label) => `
+        <div class="rating-track-row">
+          <span class="rating-track-label">${label}</span>
+          <div class="rating-track" data-field="${field}">
+            ${[1,2,3,4,5].map(n => `<button type="button" class="rating-track-seg" data-value="${n}">${n}</button>`).join("")}
+          </div>
+        </div>`;
     return `<div class="rating-row" data-uid="${escapeHtml(uid)}">
       <span class="rating-row-name">${escapeHtml(name)}</span>
       <div class="rating-scores">
-        <label>매너 <select class="rating-score" data-field="manner">${[1,2,3,4,5].map(n=>`<option value="${n}">${n}</option>`).join("")}</select></label>
-        <label>실력 <select class="rating-score" data-field="skill">${[1,2,3,4,5].map(n=>`<option value="${n}">${n}</option>`).join("")}</select></label>
-        <label>재만남 <select class="rating-score" data-field="again">${[1,2,3,4,5].map(n=>`<option value="${n}">${n}</option>`).join("")}</select></label>
+        ${scoreTrack("manner", "매너")}
+        ${scoreTrack("skill", "실력")}
+        ${scoreTrack("again", "재만남")}
       </div>
-      <button class="btn-attend-action join btn-submit-rating">제출</button>
+      <button type="button" class="btn-attend-action join btn-submit-rating">제출</button>
     </div>`;
   }).join("");
 
   document.getElementById("rating-list").querySelectorAll(".rating-row[data-uid]").forEach((row) => {
     const targetUid = row.dataset.uid;
+    row.querySelectorAll(".rating-track").forEach((track) => {
+      track.querySelectorAll(".rating-track-seg").forEach((seg) => {
+        seg.addEventListener("click", () => {
+          track.dataset.value = seg.dataset.value;
+          track.querySelectorAll(".rating-track-seg").forEach((s) => {
+            s.classList.toggle("is-selected", Number(s.dataset.value) <= Number(seg.dataset.value));
+          });
+        });
+      });
+    });
     row.querySelector(".btn-submit-rating").addEventListener("click", async () => {
+      const tracks = [...row.querySelectorAll(".rating-track")];
+      if (tracks.some((t) => !t.dataset.value)) {
+        alert("매너, 실력, 재만남 점수를 모두 선택해주세요.");
+        return;
+      }
       const payload = { postId, raterUid: currentUser.uid, targetUid, noShow: false, createdAt: serverTimestamp() };
-      row.querySelectorAll(".rating-score").forEach((sel) => {
-        payload[sel.dataset.field] = Number(sel.value);
+      tracks.forEach((t) => {
+        payload[t.dataset.field] = Number(t.dataset.value);
       });
       const ratingRef = doc(db, "ratings", ratingDocId(postId, currentUser.uid, targetUid));
       try {
