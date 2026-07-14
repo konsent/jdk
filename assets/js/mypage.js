@@ -2,8 +2,9 @@ import { auth, db } from "./firebase-init.js";
 import { requireApproved } from "./auth-guard.js";
 import { deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  doc, deleteDoc
+  doc, deleteDoc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { computeAverages } from "./rating-logic.js";
 
 let currentUser = null;
 
@@ -29,6 +30,13 @@ requireApproved(async (user, userData) => {
     img.style.display = "block";
   }
   document.getElementById("info-tags").innerHTML = tags.join(" ");
+
+  const statsSnap = await getDoc(doc(db, "stats", "global"));
+  const myStats = statsSnap.data()?.members?.[user.uid];
+  const averages = computeAverages(myStats);
+  document.getElementById("info-rating").innerHTML = averages.count === 0
+    ? `<div style="font-size:0.86rem;color:var(--text-muted)">아직 받은 평가가 없습니다.</div>`
+    : `<div style="font-size:0.92rem;color:var(--text-secondary)">매너 ${averages.manner} · 실력 ${averages.skill} · 재만남 ${averages.again} <span style="color:var(--text-muted);font-size:0.78rem">(${averages.count}회 평가받음)</span></div>`;
 
   document.getElementById("btn-withdraw").addEventListener("click", () => {
     document.getElementById("confirm-modal").style.display = "flex";
