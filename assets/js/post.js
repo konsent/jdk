@@ -1,5 +1,6 @@
 import { auth, db } from "./firebase-init.js";
 import { requireApproved, getUserDoc } from "./auth-guard.js";
+import { getRatingTargets, canRateNow, ratingDocId } from "./rating-logic.js";
 import {
   doc, getDoc, updateDoc, arrayUnion, arrayRemove,
   collection, query, where, orderBy, getDocs,
@@ -125,6 +126,7 @@ async function loadPost() {
     await loadAttendees();
     await setupConfirmAttendance();
     setupAttendButtons();
+    await setupRatingSection();
     document.getElementById("section-comments").style.display = "block";
     await loadComments();
     setupCommentForm();
@@ -171,6 +173,88 @@ async function setupConfirmAttendance() {
     await updateDoc(doc(db, "posts", postId), { confirmedAttendees: checked });
     postData.confirmedAttendees = checked;
     document.getElementById("msg-confirm-saved").style.display = "block";
+  });
+}
+
+async function setupRatingSection() {
+  if (!canRateNow(postData.eventDate.toDate())) return;
+  const targets = getRatingTargets(postData, currentUser.uid);
+  if (!targets.length) return;
+
+  document.getElementById("section-rating").style.display = "block";
+
+  const existing = await Promise.all(targets.map(async (targetUid) => {
+    const snap = await getDoc(doc(db, "ratings", ratingDocId(postId, currentUser.uid, targetUid)));
+    return [targetUid, snap.exists()];
+  }));
+  const submittedMap = Object.fromEntries(existing);
+
+  if (targets.every((uid) => submittedMap[uid])) {
+    document.getElementById("msg-rating-done").style.display = "block";
+    return;
+  }
+
+  const names = await Promise.all(targets.map(async (uid) => {
+    const u = await getUserDoc(uid);
+    return { uid, name: u?.nickname || "알 수 없음" };
+  }));
+
+  document.getElementById("rating-list").innerHTML = names.map(({ uid, name }) => {
+    if (submittedMap[uid]) {
+      return `<div class="rating-row rating-row--done">
+        <span class="rating-row-name">${escapeHtml(name)}</span>
+        <span class="text-muted" style="font-size:0.8rem">제출 완료</span>
+      </div>`;
+    }
+    return `<div class="rating-row" data-uid="${escapeHtml(uid)}">
+      <span class="rating-row-name">${escapeHtml(name)}</span>
+      <label class="rating-noshow"><input type="checkbox" class="rating-noshow-check"> 불참</label>
+      <div class="rating-scores">
+        <label>매너 <select class="rating-score" data-field="manner">${[1,2,3,4,5].map(n=>`<option value="${n}">${n}</option>`).join("")}</select></label>
+        <label>실력 <select class="rating-score" data-field="skill">${[1,2,3,4,5].map(n=>`<option value="${n}">${n}</option>`).join("")}</select></label>
+        <label>재만남 <select class="rating-score" data-field="again">${[1,2,3,4,5].map(n=>`<option value="${n}">${n}</option>`).join("")}</select></label>
+      </div>
+      <button class="btn-attend-action join btn-submit-rating">제출</button>
+    </div>`;
+  }).join("");
+
+  document.getElementById("rating-list").querySelectorAll(".rating-row[data-uid]").forEach((row) => {
+    const targetUid = row.dataset.uid;
+    const noShowCheck = row.querySelector(".rating-noshow-check");
+    const scoresEl = row.querySelector(".rating-scores");
+    noShowCheck.addEventListener("change", () => {
+      scoresEl.style.display = noShowCheck.checked ? "none" : "flex";
+    });
+    row.querySelector(".btn-submit-rating").addEventListener("click", async () => {
+      const noShow = noShowCheck.checked;
+      const payload = { postId, raterUid: currentUser.uid, targetUid, noShow, createdAt: serverTimestamp() };
+      if (!noShow) {
+        row.querySelectorAll(".rating-score").forEach((sel) => {
+          payload[sel.dataset.field] = Number(sel.value);
+        });
+      }
+      const ratingRef = doc(db, "ratings", ratingDocId(postId, currentUser.uid, targetUid));
+      try {
+        await runTransaction(db, async (tx) => {
+          const existing = await tx.get(ratingRef);
+          if (existing.exists()) throw new Error("이미 제출됨");
+          tx.set(ratingRef, payload);
+        });
+      } catch (e) {
+        alert("이미 제출된 평가이거나 오류가 발생했습니다.");
+        return;
+      }
+      if (!noShow) {
+        await setDoc(doc(db, "stats", "global"), {
+          updatedAt: serverTimestamp(),
+          [`members.${targetUid}.ratingSum.manner`]: increment(payload.manner),
+          [`members.${targetUid}.ratingSum.skill`]: increment(payload.skill),
+          [`members.${targetUid}.ratingSum.again`]: increment(payload.again),
+          [`members.${targetUid}.ratingCount`]: increment(1)
+        }, { merge: true });
+      }
+      location.reload();
+    });
   });
 }
 

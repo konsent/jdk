@@ -442,6 +442,36 @@
   margin: 4px;
 }
 
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--divider, #f0f0ee);
+}
+.rating-row-name {
+  font-weight: 600;
+  font-size: 0.86rem;
+  min-width: 80px;
+}
+.rating-noshow {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.rating-scores {
+  display: flex;
+  gap: 10px;
+  font-size: 0.8rem;
+}
+.rating-row--done {
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
 .btn-attend-action {
   border: none;
   border-radius: var(--radius-sm);
