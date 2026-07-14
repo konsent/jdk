@@ -313,6 +313,7 @@ async function setupRatingSection() {
 
   if (targets.every((uid) => submittedMap[uid])) {
     document.getElementById("msg-rating-done").style.display = "block";
+    document.getElementById("btn-submit-all-ratings").style.display = "none";
     return;
   }
 
