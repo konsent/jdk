@@ -56,10 +56,17 @@ async function loadEvents() {
   }
 }
 
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 function renderCalendar(events) {
   const now = new Date();
   let year = now.getFullYear();
   let month = now.getMonth(); // 0-indexed
+  let activeOutsideClickHandler = null;
 
   function buildCalendar() {
     const el = document.getElementById("calendar");
@@ -127,15 +134,16 @@ function renderCalendar(events) {
     html += `</div>`;
     el.innerHTML = html;
 
+    function removeActiveOutsideClickHandler() {
+      if (activeOutsideClickHandler) {
+        document.removeEventListener("click", activeOutsideClickHandler);
+        activeOutsideClickHandler = null;
+      }
+    }
     function closePopover() {
       const existing = document.querySelector(".cal-popover");
       if (existing) existing.remove();
-      document.removeEventListener("click", onOutsideClick);
-    }
-    function onOutsideClick(ev) {
-      if (!ev.target.closest(".cal-popover") && !ev.target.closest("[data-day]")) {
-        closePopover();
-      }
+      removeActiveOutsideClickHandler();
     }
     function openPopover(cellEl, day) {
       closePopover();
@@ -144,19 +152,28 @@ function renderCalendar(events) {
       const pop = document.createElement("div");
       pop.className = "cal-popover";
       pop.innerHTML = evts.map(e =>
-        `<div class="cal-popover-item" onclick="location.href='/post/?id=${e.id}'">${e.title}</div>`
+        `<div class="cal-popover-item" onclick="location.href='/post/?id=${e.id}'">${escapeHtml(e.title)}</div>`
       ).join("");
       const rect = cellEl.getBoundingClientRect();
       const gridRect = el.querySelector(".cal-grid").getBoundingClientRect();
       pop.style.top = (rect.bottom - gridRect.top + 4) + "px";
       pop.style.left = (rect.left - gridRect.left) + "px";
       el.querySelector(".cal-grid").appendChild(pop);
-      setTimeout(() => document.addEventListener("click", onOutsideClick), 0);
+
+      function onOutsideClick(ev) {
+        if (!ev.target.closest(".cal-popover") && !ev.target.closest("[data-day]")) {
+          closePopover();
+        }
+      }
+      removeActiveOutsideClickHandler();
+      activeOutsideClickHandler = onOutsideClick;
+      document.addEventListener("click", activeOutsideClickHandler);
     }
 
     el.querySelectorAll(".cal-cell[data-day]").forEach(cell => {
       cell.addEventListener("click", (ev) => {
         if (ev.target.closest(".cal-pill")) return; // pill 클릭은 바로 이동, 팝오버 안 띄움
+        ev.stopPropagation();
         openPopover(cell, cell.dataset.day);
       });
     });
