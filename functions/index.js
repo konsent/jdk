@@ -70,11 +70,11 @@ function parseSearchResults(xml) {
   return items;
 }
 
-async function fetchWithRetry(url) {
-  let res = await fetch(url);
+async function fetchWithRetry(url, fetchImpl = fetch) {
+  let res = await fetchImpl(url);
   if (res.status === 202) {
     await new Promise((r) => setTimeout(r, 1000));
-    res = await fetch(url);
+    res = await fetchImpl(url);
   }
   if (!res.ok) return null;
   return res.text();

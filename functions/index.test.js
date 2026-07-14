@@ -66,3 +66,49 @@ test("parseSearchResults: yearpublished 없는 아이템은 yearPublished undefi
     { bggId: "42", name: "Mystery Game", yearPublished: undefined }
   ]);
 });
+
+const { fetchWithRetry } = require("./index.js");
+
+test("fetchWithRetry: 200 응답이면 바로 본문을 반환한다", async () => {
+  const fakeFetch = async () => ({
+    status: 200,
+    ok: true,
+    text: async () => "immediate body"
+  });
+  const result = await fetchWithRetry("https://example.com", fakeFetch);
+  assert.strictEqual(result, "immediate body");
+});
+
+test("fetchWithRetry: 202 응답이면 정확히 한 번 재시도하고 재시도 결과를 반환한다", async () => {
+  let callCount = 0;
+  const fakeFetch = async () => {
+    callCount += 1;
+    if (callCount === 1) {
+      return { status: 202, ok: false, text: async () => "queued" };
+    }
+    return { status: 200, ok: true, text: async () => "retried body" };
+  };
+  const result = await fetchWithRetry("https://example.com", fakeFetch);
+  assert.strictEqual(callCount, 2);
+  assert.strictEqual(result, "retried body");
+});
+
+test("fetchWithRetry: 재시도 후에도 실패하면 null을 반환한다", async () => {
+  const fakeFetch = async () => ({
+    status: 202,
+    ok: false,
+    text: async () => "still queued"
+  });
+  const result = await fetchWithRetry("https://example.com", fakeFetch);
+  assert.strictEqual(result, null);
+});
+
+test("fetchWithRetry: 404처럼 재시도 없는 실패 응답도 null을 반환한다", async () => {
+  const fakeFetch = async () => ({
+    status: 404,
+    ok: false,
+    text: async () => "not found"
+  });
+  const result = await fetchWithRetry("https://example.com", fakeFetch);
+  assert.strictEqual(result, null);
+});
