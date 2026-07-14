@@ -1,5 +1,7 @@
 import { db } from "./firebase-init.js";
 import { requireApproved } from "./auth-guard.js";
+import { listMyParties } from "./party.js";
+import { normalizeMembers } from "./party-logic.js";
 import {
   collection, addDoc, getDoc, getDocs, query, where, updateDoc, serverTimestamp, Timestamp,
   doc, setDoc, increment
@@ -8,6 +10,7 @@ import {
 const ROOT_UID = "GNdKNf2KYwgBqOjrX9OmPJO5oEv1";
 const FUNCTIONS_BASE = "https://us-central1-jdk-member-board.cloudfunctions.net";
 let selectedGames = [];
+let selectedPartyAttendees = null;
 
 const params = new URLSearchParams(location.search);
 const editId = params.get("edit"); // 수정 모드: /write/?edit=postId
@@ -37,6 +40,10 @@ requireApproved(async (user, userData) => {
   document.getElementById("select-type").addEventListener("change", updateEventFields);
   updateEventFields();
   setupGameSearch();
+
+  if (!editId) {
+    await setupPartySelect(user);
+  }
 
   if (editId) {
     await loadForEdit(userData);
@@ -147,7 +154,9 @@ document.getElementById("form-write").addEventListener("submit", async (e) => {
       if (type === "event") {
         postData.eventDate = eventDate;
         postData.maxAttendees = parseInt(document.getElementById("input-max").value, 10);
-        postData.attendees = [assignedUid];
+        postData.attendees = selectedPartyAttendees
+          ? normalizeMembers(assignedUid, selectedPartyAttendees)
+          : [assignedUid];
         postData.games = selectedGames;
       }
       const ref = await addDoc(collection(db, "posts"), postData);
@@ -246,6 +255,37 @@ function setupGameSearch() {
         renderCandidates([]);
       }
     }, 300);
+  });
+}
+
+let myParties = [];
+
+async function setupPartySelect(user) {
+  try {
+    myParties = await listMyParties(user.uid);
+  } catch (e) {
+    console.error("파티 목록 조회 실패", e);
+    return;
+  }
+  if (!myParties.length) return;
+
+  const select = document.getElementById("select-party");
+  myParties.forEach((p) => {
+    const opt = document.createElement("option");
+    opt.value = p.id;
+    opt.textContent = `${p.name} (${p.memberUids.length}명)`;
+    select.appendChild(opt);
+  });
+  document.getElementById("section-party").style.display = "block";
+
+  select.addEventListener("change", () => {
+    const party = myParties.find((p) => p.id === select.value);
+    if (!party) {
+      selectedPartyAttendees = null;
+      return;
+    }
+    selectedPartyAttendees = party.memberUids;
+    document.getElementById("input-max").value = party.memberUids.length;
   });
 }
 
