@@ -156,8 +156,13 @@ async function renderPartyList(user) {
   });
   listEl.querySelectorAll(".party-delete-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      await deleteParty(btn.dataset.id);
-      await renderPartyList(user);
+      try {
+        await deleteParty(btn.dataset.id);
+        await renderPartyList(user);
+      } catch (e) {
+        console.error("파티 삭제 실패", e);
+        showError("파티 삭제 중 오류가 발생했습니다.");
+      }
     });
   });
 }
