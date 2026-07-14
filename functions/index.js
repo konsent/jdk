@@ -8,6 +8,7 @@ const {
   checkAttendanceTrophies,
   checkScheduleMakerTrophy,
   checkFullHouseTrophy,
+  checkGame2048Trophy,
   newlyEarnedTrophyIds
 } = require("./trophies.js");
 
@@ -202,3 +203,30 @@ exports.onStatsUpdated = onDocumentWritten("stats/global", async (event) => {
 
 exports.buildTrophyCandidates = buildTrophyCandidates;
 exports.countFullHouseEvents = countFullHouseEvents;
+
+function isTopScorer(allScores, uid) {
+  if (!allScores.length) return false;
+  const top = Math.max(...allScores.map((s) => s.bestScore || 0));
+  if (top === 0) return false;
+  const mine = allScores.find((s) => s.uid === uid);
+  return !!mine && (mine.bestScore || 0) === top;
+}
+
+exports.onGameScoreUpdated = onDocumentWritten("game_scores/{uid}", async (event) => {
+  const afterData = event.data.after.exists ? event.data.after.data() : undefined;
+  if (!afterData) return;
+
+  const uid = event.params.uid;
+  const db = getFirestore();
+
+  try {
+    const scoresSnap = await db.collection("game_scores").get();
+    const allScores = scoresSnap.docs.map((d) => ({ uid: d.id, bestScore: d.data().bestScore || 0 }));
+    const candidates = checkGame2048Trophy(isTopScorer(allScores, uid));
+    await awardTrophies(db, uid, candidates);
+  } catch (err) {
+    logger.error(`2048 트로피 판정 실패 (uid: ${uid})`, err);
+  }
+});
+
+exports.isTopScorer = isTopScorer;
