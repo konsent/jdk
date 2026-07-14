@@ -372,6 +372,7 @@ async function setupRatingSection() {
       return;
     }
 
+    let statsUpdateFailed = false;
     for (const { targetUid, tracks } of entries) {
       const payload = { postId, raterUid: currentUser.uid, targetUid, noShow: false, createdAt: serverTimestamp() };
       tracks.forEach((t) => {
@@ -388,13 +389,21 @@ async function setupRatingSection() {
         alert("이미 제출된 평가가 있어 제출을 중단했습니다. 새로고침 후 다시 시도해주세요.");
         return;
       }
-      await setDoc(doc(db, "stats", "global"), {
-        updatedAt: serverTimestamp(),
-        [`members.${targetUid}.ratingSum.manner`]: increment(payload.manner),
-        [`members.${targetUid}.ratingSum.skill`]: increment(payload.skill),
-        [`members.${targetUid}.ratingSum.again`]: increment(payload.again),
-        [`members.${targetUid}.ratingCount`]: increment(1)
-      }, { merge: true });
+      try {
+        await setDoc(doc(db, "stats", "global"), {
+          updatedAt: serverTimestamp(),
+          [`members.${targetUid}.ratingSum.manner`]: increment(payload.manner),
+          [`members.${targetUid}.ratingSum.skill`]: increment(payload.skill),
+          [`members.${targetUid}.ratingSum.again`]: increment(payload.again),
+          [`members.${targetUid}.ratingCount`]: increment(1)
+        }, { merge: true });
+      } catch (e) {
+        console.error("rating stats update failed", e);
+        statsUpdateFailed = true;
+      }
+    }
+    if (statsUpdateFailed) {
+      alert("평가는 제출되었지만 통계 반영 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
     }
     location.reload();
   });
