@@ -3,7 +3,8 @@ export function getRatingTargets(postData, currentUid) {
   return targets.filter((uid) => uid !== currentUid);
 }
 
-export function canRateNow(eventDate, now = new Date()) {
+export function canRateNow(eventDate, closed = false, now = new Date()) {
+  if (closed) return true;
   const cutoff = new Date(eventDate);
   cutoff.setHours(24, 0, 0, 0);
   return now.getTime() >= cutoff.getTime();

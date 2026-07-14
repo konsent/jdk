@@ -21,19 +21,25 @@ test("getRatingTargets: attendees도 없으면 빈 배열", () => {
 test("canRateNow: eventDate 당일 23:59는 아직 불가", () => {
   const eventDate = new Date("2026-07-10T00:00:00");
   const now = new Date("2026-07-10T23:59:00");
-  assert.strictEqual(canRateNow(eventDate, now), false);
+  assert.strictEqual(canRateNow(eventDate, false, now), false);
 });
 
 test("canRateNow: eventDate 다음날 00:00 이후는 가능", () => {
   const eventDate = new Date("2026-07-10T00:00:00");
   const now = new Date("2026-07-11T00:00:01");
-  assert.strictEqual(canRateNow(eventDate, now), true);
+  assert.strictEqual(canRateNow(eventDate, false, now), true);
 });
 
 test("canRateNow: eventDate 다음날 자정 정각도 가능", () => {
   const eventDate = new Date("2026-07-10T19:00:00");
   const now = new Date("2026-07-11T00:00:00");
-  assert.strictEqual(canRateNow(eventDate, now), true);
+  assert.strictEqual(canRateNow(eventDate, false, now), true);
+});
+
+test("canRateNow: closed가 true면 자정 전이어도 가능", () => {
+  const eventDate = new Date("2026-07-10T00:00:00");
+  const now = new Date("2026-07-10T12:00:00");
+  assert.strictEqual(canRateNow(eventDate, true, now), true);
 });
 
 test("ratingDocId: postId_raterUid_targetUid 형식", () => {

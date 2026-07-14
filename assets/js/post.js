@@ -264,12 +264,28 @@ async function setupConfirmAttendance() {
     document.getElementById("msg-confirm-saved").style.display = "block";
     showViewMode();
   });
+
+  const closeBtn = document.getElementById("btn-close-event");
+  if (postData.closedAt) {
+    closeBtn.style.display = "none";
+  } else {
+    closeBtn.addEventListener("click", async () => {
+      if (!confirm("게임 일정을 마감하시겠습니까? 마감하면 바로 참석 인원 확정 및 평가가 가능해집니다.")) return;
+      try {
+        await updateDoc(doc(db, "posts", postId), { closedAt: serverTimestamp() });
+      } catch (e) {
+        alert("마감 중 오류가 발생했습니다.");
+        return;
+      }
+      location.reload();
+    });
+  }
 }
 
 async function setupRatingSection() {
   const roster = postData.confirmedAttendees || postData.attendees || [];
   if (!roster.includes(currentUser.uid)) return;
-  if (!canRateNow(postData.eventDate?.toDate())) return;
+  if (!canRateNow(postData.eventDate?.toDate(), !!postData.closedAt)) return;
   const targets = getRatingTargets(postData, currentUser.uid);
   if (!targets.length) return;
 
