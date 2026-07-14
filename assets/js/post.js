@@ -1,6 +1,6 @@
 import { auth, db } from "./firebase-init.js";
 import { requireApproved, getUserDoc } from "./auth-guard.js";
-import { getRatingTargets, canRateNow, ratingDocId } from "./rating-logic.js";
+import { getRatingTargets, canRateNow, ratingDocId, computeAverages } from "./rating-logic.js";
 import {
   doc, getDoc, updateDoc, arrayUnion, arrayRemove,
   collection, query, where, orderBy, getDocs,
@@ -138,12 +138,62 @@ async function loadAttendees() {
   document.getElementById("section-attendees").style.display = "block";
   document.getElementById("attendee-count").textContent = `(${attendees.length}/${postData.maxAttendees}명)`;
 
-  const names = await Promise.all(attendees.map(async (uid) => {
+  const statsSnap = await getDoc(doc(db, "stats", "global"));
+  const membersStats = statsSnap.data()?.members || {};
+
+  const entries = await Promise.all(attendees.map(async (uid) => {
     const u = await getUserDoc(uid);
-    return u?.nickname || "알 수 없음";
+    return { uid, name: u?.nickname || "알 수 없음" };
   }));
-  document.getElementById("attendee-list").innerHTML = names
-    .map(n => `<span class="attendee-chip">${n}</span>`).join("");
+
+  document.getElementById("attendee-list").innerHTML = entries
+    .map(({ uid, name }) => `<span class="attendee-chip" data-uid="${escapeHtml(uid)}">${escapeHtml(name)}</span>`)
+    .join("");
+
+  document.querySelectorAll(".attendee-chip[data-uid]").forEach((chip) => {
+    const uid = chip.dataset.uid;
+    bindRatingHoverCard(chip, computeAverages(membersStats[uid]));
+  });
+}
+
+let ratingHoverCardEl = null;
+let ratingHoverHideTimer = null;
+
+function getRatingHoverCard() {
+  if (ratingHoverCardEl) return ratingHoverCardEl;
+  ratingHoverCardEl = document.createElement("div");
+  ratingHoverCardEl.className = "rating-hovercard";
+  document.body.appendChild(ratingHoverCardEl);
+  ratingHoverCardEl.addEventListener("mouseenter", () => clearTimeout(ratingHoverHideTimer));
+  ratingHoverCardEl.addEventListener("mouseleave", scheduleHideRatingHoverCard);
+  return ratingHoverCardEl;
+}
+
+function scheduleHideRatingHoverCard() {
+  clearTimeout(ratingHoverHideTimer);
+  ratingHoverHideTimer = setTimeout(() => {
+    if (ratingHoverCardEl) ratingHoverCardEl.style.display = "none";
+  }, 120);
+}
+
+function bindRatingHoverCard(anchorEl, averages) {
+  anchorEl.addEventListener("mouseenter", () => {
+    clearTimeout(ratingHoverHideTimer);
+    const card = getRatingHoverCard();
+    card.innerHTML = averages.count === 0
+      ? `<p class="rating-hovercard-empty">아직 평가 없음</p>`
+      : `<div class="rating-hovercard-scores">
+          <span>매너 ${averages.manner}</span>
+          <span>실력 ${averages.skill}</span>
+          <span>재만남 ${averages.again}</span>
+        </div>
+        <p class="rating-hovercard-count">${averages.count}회 평가받음</p>`;
+    card.style.display = "block";
+    const rect = anchorEl.getBoundingClientRect();
+    card.style.left = `${rect.left + window.scrollX}px`;
+    card.style.top = `${rect.bottom + window.scrollY + 6}px`;
+  });
+  anchorEl.addEventListener("mouseleave", scheduleHideRatingHoverCard);
 }
 
 async function setupConfirmAttendance() {

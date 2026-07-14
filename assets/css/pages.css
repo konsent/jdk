@@ -472,6 +472,35 @@
   padding: 8px 0;
 }
 
+.rating-hovercard {
+  display: none;
+  position: absolute;
+  z-index: 30;
+  min-width: 160px;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--card-border, #e8e8e4);
+  border-radius: var(--radius, 8px);
+  box-shadow: var(--card-shadow-hover, 0 6px 20px rgba(0,0,0,0.12));
+  padding: 10px 12px;
+  font-size: 0.78rem;
+}
+.rating-hovercard-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.rating-hovercard-count {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+.rating-hovercard-empty {
+  margin: 0;
+  color: var(--text-muted);
+}
+
 .btn-attend-action {
   border: none;
   border-radius: var(--radius-sm);
