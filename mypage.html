@@ -52,6 +52,32 @@ permalink: /mypage/
         <div id="info-rating"></div>
       </div>
 
+      <div id="section-parties" class="mb-4">
+        <div style="font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:4px">내 파티</div>
+        <div id="party-list"></div>
+        <button type="button" id="btn-party-new" style="margin-top:8px;border:1px solid var(--card-border);background:var(--input-bg);color:var(--text-primary);border-radius:6px;padding:7px 16px;cursor:pointer;font-size:0.85rem">+ 새 파티 만들기</button>
+
+        <div id="party-form" style="display:none;margin-top:12px;border:1px solid var(--card-border);border-radius:8px;padding:14px">
+          <input type="hidden" id="party-form-id">
+          <div class="mb-3">
+            <label class="form-label">파티 이름</label>
+            <input type="text" id="party-form-name" class="form-control" placeholder="예: 프로스트헤이븐 파티">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">멤버</label>
+            <div style="position:relative">
+              <input type="text" id="party-member-search" class="form-control" placeholder="닉네임 검색" autocomplete="off">
+              <div id="party-member-candidates" class="game-candidates" style="display:none"></div>
+            </div>
+            <div id="party-member-list" class="selected-games"></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button type="button" id="btn-party-save" style="border:none;background:var(--accent);color:#fff;border-radius:6px;padding:8px 18px;cursor:pointer;font-size:0.85rem;font-weight:600">저장</button>
+            <button type="button" id="btn-party-cancel" style="border:1px solid var(--card-border);background:transparent;border-radius:6px;padding:8px 18px;cursor:pointer;font-size:0.85rem">취소</button>
+          </div>
+        </div>
+      </div>
+
       <hr style="margin:24px 0">
 
       <div>
