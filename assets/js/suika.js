@@ -48,6 +48,10 @@ function escapeHtml(s) {
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+const TROPHIES = ["🥇", "🥈", "🥉"];
+function rankClass(i) { return i < 3 ? `rank-${i + 1}` : ""; }
+function trophy(i) { return i < 3 ? ` <span class="leaderboard-trophy">${TROPHIES[i]}</span>` : ""; }
+
 requireApproved((user, userData) => {
   currentUser = user;
   currentUserData = userData;
@@ -250,8 +254,8 @@ async function loadLeaderboard() {
   const listEl = document.getElementById("leaderboard-list");
   listEl.innerHTML = top10.length
     ? top10.map((e, i) => `
-        <div class="leaderboard-row ${currentUser && e.uid === currentUser.uid ? "is-me" : ""}">
-          <span><span class="leaderboard-rank">${i + 1}</span>${escapeHtml(e.nickname)}</span>
+        <div class="leaderboard-row ${rankClass(i)} ${currentUser && e.uid === currentUser.uid ? "is-me" : ""}">
+          <span><span class="leaderboard-rank">${i + 1}</span>${escapeHtml(e.nickname)}${trophy(i)}</span>
           <span>${e.value}</span>
         </div>`).join("")
     : `<p class="text-muted small">아직 기록이 없습니다.</p>`;
