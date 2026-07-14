@@ -194,7 +194,7 @@ function bindRatingHoverCard(anchorEl, averages) {
       : `<div class="rating-hovercard-scores">
           <span>매너 ${averages.manner}</span>
           <span>실력 ${averages.skill}</span>
-          <span>재만남 ${averages.again}</span>
+          <span>또 놀고 싶어요 ${averages.again}</span>
         </div>
         <p class="rating-hovercard-count">${averages.count}회 평가받음</p>`;
     card.style.display = "block";
@@ -341,7 +341,7 @@ async function setupRatingSection() {
       <div class="rating-scores">
         ${scoreTrack("manner", "매너")}
         ${scoreTrack("skill", "실력")}
-        ${scoreTrack("again", "재만남")}
+        ${scoreTrack("again", "또 놀고 싶어요")}
       </div>
     </div>`;
   }).join("");
@@ -369,7 +369,7 @@ async function setupRatingSection() {
       tracks: [...row.querySelectorAll(".rating-track")]
     }));
     if (entries.some(({ tracks }) => tracks.some((t) => !t.dataset.value))) {
-      alert("모든 참석자의 매너, 실력, 재만남 점수를 선택해주세요.");
+      alert("모든 참석자의 매너, 실력, 또 놀고 싶어요 점수를 선택해주세요.");
       return;
     }
 
