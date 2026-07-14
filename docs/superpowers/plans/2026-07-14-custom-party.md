@@ -126,7 +126,7 @@ git commit -m "feat: add party-logic pure functions for member normalization and
 - Produces (사용처: Task 3 mypage.js, Task 4 write.js):
   - `listMyParties(ownerUid)` → `Promise<Array<{id, name, memberUids}>>`
   - `createParty(ownerUid, name, memberUids)` → `Promise<string>` (생성된 partyId 반환)
-  - `updateParty(partyId, name, memberUids)` → `Promise<void>`
+  - `updateParty(partyId, ownerUid, name, memberUids)` → `Promise<void>`
   - `deleteParty(partyId)` → `Promise<void>`
   - `listApprovedUsers()` → `Promise<Array<{uid, nickname}>>` (status == "approved" 유저 전체, 닉네임 검색용 후보 목록)
 
