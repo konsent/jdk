@@ -77,6 +77,14 @@ permalink: /write/
           <label class="form-label">최대 참석 인원 (본인 포함) <span style="color:var(--danger)">*</span></label>
           <input type="number" id="input-max" class="form-control" min="1" max="20" value="5" required>
         </div>
+        <div class="mb-3">
+          <label class="form-label">함께할 게임</label>
+          <div style="position:relative">
+            <input type="text" id="input-game-search" class="form-control" placeholder="게임 이름을 검색하세요 (예: 카탄)" autocomplete="off">
+            <div id="game-candidates" class="game-candidates" style="display:none"></div>
+          </div>
+          <div id="selected-games" class="selected-games"></div>
+        </div>
       </div>
 
       <div class="mb-4">
