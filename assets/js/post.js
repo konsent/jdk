@@ -151,8 +151,12 @@ async function loadAttendees() {
     return { uid, name: u?.nickname || "알 수 없음" };
   }));
 
+  const confirmed = postData.confirmedAttendees;
   document.getElementById("attendee-list").innerHTML = entries
-    .map(({ uid, name }) => `<span class="attendee-chip" data-uid="${escapeHtml(uid)}">${escapeHtml(name)}</span>`)
+    .map(({ uid, name }) => {
+      const isNoShow = confirmed && !confirmed.includes(uid);
+      return `<span class="attendee-chip${isNoShow ? " attendee-chip--noshow" : ""}" data-uid="${escapeHtml(uid)}">${escapeHtml(name)}</span>`;
+    })
     .join("");
 
   document.querySelectorAll(".attendee-chip[data-uid]").forEach((chip) => {
@@ -221,12 +225,15 @@ async function setupConfirmAttendance() {
 
   function renderList() {
     const confirmed = postData.confirmedAttendees || attendees;
-    listEl.innerHTML = names.map(({ uid, name }) => `
-      <label style="display:flex;align-items:center;gap:6px;margin:4px 0;font-size:0.86rem">
+    listEl.innerHTML = names.map(({ uid, name }) => {
+      const isNoShow = !confirmed.includes(uid);
+      return `
+      <label class="confirm-attendance-row${isNoShow ? " confirm-attendance-row--noshow" : ""}" style="display:flex;align-items:center;gap:6px;margin:4px 0;font-size:0.86rem">
         <input type="checkbox" class="confirm-attendance-checkbox" value="${escapeHtml(uid)}" ${confirmed.includes(uid) ? "checked" : ""}>
         ${escapeHtml(name)}
       </label>
-    `).join("");
+    `;
+    }).join("");
   }
 
   function showViewMode() {
@@ -240,6 +247,11 @@ async function setupConfirmAttendance() {
     listEl.style.display = "block";
     saveBtn.style.display = "inline-block";
     editBtn.style.display = "none";
+    listEl.querySelectorAll(".confirm-attendance-checkbox").forEach((cb) => {
+      cb.addEventListener("change", () => {
+        cb.closest(".confirm-attendance-row").classList.toggle("confirm-attendance-row--noshow", !cb.checked);
+      });
+    });
   }
 
   renderList();
@@ -277,7 +289,9 @@ async function setupConfirmAttendance() {
         alert("마감 중 오류가 발생했습니다.");
         return;
       }
-      location.reload();
+      postData.closedAt = { toDate: () => new Date() };
+      closeBtn.style.display = "none";
+      showEditMode();
     });
   }
 }
@@ -316,7 +330,6 @@ async function setupRatingSection() {
     }
     return `<div class="rating-row" data-uid="${escapeHtml(uid)}">
       <span class="rating-row-name">${escapeHtml(name)}</span>
-      <label class="rating-noshow"><input type="checkbox" class="rating-noshow-check"> 불참</label>
       <div class="rating-scores">
         <label>매너 <select class="rating-score" data-field="manner">${[1,2,3,4,5].map(n=>`<option value="${n}">${n}</option>`).join("")}</select></label>
         <label>실력 <select class="rating-score" data-field="skill">${[1,2,3,4,5].map(n=>`<option value="${n}">${n}</option>`).join("")}</select></label>
@@ -328,19 +341,11 @@ async function setupRatingSection() {
 
   document.getElementById("rating-list").querySelectorAll(".rating-row[data-uid]").forEach((row) => {
     const targetUid = row.dataset.uid;
-    const noShowCheck = row.querySelector(".rating-noshow-check");
-    const scoresEl = row.querySelector(".rating-scores");
-    noShowCheck.addEventListener("change", () => {
-      scoresEl.style.display = noShowCheck.checked ? "none" : "flex";
-    });
     row.querySelector(".btn-submit-rating").addEventListener("click", async () => {
-      const noShow = noShowCheck.checked;
-      const payload = { postId, raterUid: currentUser.uid, targetUid, noShow, createdAt: serverTimestamp() };
-      if (!noShow) {
-        row.querySelectorAll(".rating-score").forEach((sel) => {
-          payload[sel.dataset.field] = Number(sel.value);
-        });
-      }
+      const payload = { postId, raterUid: currentUser.uid, targetUid, noShow: false, createdAt: serverTimestamp() };
+      row.querySelectorAll(".rating-score").forEach((sel) => {
+        payload[sel.dataset.field] = Number(sel.value);
+      });
       const ratingRef = doc(db, "ratings", ratingDocId(postId, currentUser.uid, targetUid));
       try {
         await runTransaction(db, async (tx) => {
@@ -352,15 +357,13 @@ async function setupRatingSection() {
         alert("이미 제출된 평가이거나 오류가 발생했습니다.");
         return;
       }
-      if (!noShow) {
-        await setDoc(doc(db, "stats", "global"), {
-          updatedAt: serverTimestamp(),
-          [`members.${targetUid}.ratingSum.manner`]: increment(payload.manner),
-          [`members.${targetUid}.ratingSum.skill`]: increment(payload.skill),
-          [`members.${targetUid}.ratingSum.again`]: increment(payload.again),
-          [`members.${targetUid}.ratingCount`]: increment(1)
-        }, { merge: true });
-      }
+      await setDoc(doc(db, "stats", "global"), {
+        updatedAt: serverTimestamp(),
+        [`members.${targetUid}.ratingSum.manner`]: increment(payload.manner),
+        [`members.${targetUid}.ratingSum.skill`]: increment(payload.skill),
+        [`members.${targetUid}.ratingSum.again`]: increment(payload.again),
+        [`members.${targetUid}.ratingCount`]: increment(1)
+      }, { merge: true });
       location.reload();
     });
   });
@@ -370,10 +373,11 @@ function setupAttendButtons() {
   const attendees = postData.attendees || [];
   const isAttending = attendees.includes(currentUser.uid);
   const isFull = attendees.length >= postData.maxAttendees;
+  const isEventOver = !!postData.closedAt || (postData.eventDate && new Date() >= postData.eventDate.toDate());
 
-  document.getElementById("btn-attend").style.display = (!isAttending && !isFull) ? "inline-block" : "none";
-  document.getElementById("btn-cancel").style.display = isAttending ? "inline-block" : "none";
-  document.getElementById("msg-full").style.display = (!isAttending && isFull) ? "block" : "none";
+  document.getElementById("btn-attend").style.display = (!isAttending && !isFull && !isEventOver) ? "inline-block" : "none";
+  document.getElementById("btn-cancel").style.display = (isAttending && !isEventOver) ? "inline-block" : "none";
+  document.getElementById("msg-full").style.display = (!isAttending && isFull && !isEventOver) ? "block" : "none";
 
   document.getElementById("btn-attend").addEventListener("click", async () => {
     try {

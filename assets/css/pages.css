@@ -441,6 +441,10 @@
   color: var(--text-primary);
   margin: 4px;
 }
+.attendee-chip--noshow,
+.confirm-attendance-row--noshow {
+  opacity: 0.4;
+}
 
 .rating-row {
   display: flex;
@@ -454,13 +458,6 @@
   font-weight: 600;
   font-size: 0.86rem;
   min-width: 80px;
-}
-.rating-noshow {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
 .rating-scores {
   display: flex;
