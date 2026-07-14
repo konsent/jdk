@@ -280,10 +280,7 @@ async function setupPartySelect(user) {
 
   select.addEventListener("change", () => {
     const party = myParties.find((p) => p.id === select.value);
-    if (!party) {
-      selectedPartyAttendees = null;
-      return;
-    }
+    if (!party) return;
     selectedPartyAttendees = party.memberUids;
     document.getElementById("input-max").value = party.memberUids.length;
   });
