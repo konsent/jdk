@@ -65,20 +65,59 @@ async function attachAttendeeNames(events) {
   events.forEach(e => { e.attendeeNames = (e.attendees || []).map(uid => nameMap[uid]); });
 }
 
-function eventTooltip(e) {
-  const attendees = e.attendeeNames?.length ? e.attendeeNames.join(", ") : "없음";
-  const content = e.content ? e.content.slice(0, 100) : "";
-  return `${e.title}\n참석자: ${attendees}${content ? `\n${content}` : ""}`;
-}
-
 function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
 }
 
-function escapeAttr(str) {
-  return escapeHtml(str).replace(/"/g, "&quot;");
+let hoverCardEl = null;
+let hoverCardHideTimer = null;
+
+function getHoverCard() {
+  if (hoverCardEl) return hoverCardEl;
+  hoverCardEl = document.createElement("div");
+  hoverCardEl.className = "event-hovercard";
+  document.body.appendChild(hoverCardEl);
+  hoverCardEl.addEventListener("mouseenter", () => clearTimeout(hoverCardHideTimer));
+  hoverCardEl.addEventListener("mouseleave", scheduleHideHoverCard);
+  return hoverCardEl;
+}
+
+function showHoverCard(anchorEl, e) {
+  clearTimeout(hoverCardHideTimer);
+  const card = getHoverCard();
+  const attendees = e.attendeeNames?.length
+    ? e.attendeeNames.map(n => `<span class="hovercard-chip">${escapeHtml(n)}</span>`).join("")
+    : `<span class="hovercard-empty">아직 참석자가 없어요</span>`;
+  const content = e.content ? e.content.slice(0, 100) : "";
+  card.innerHTML = `
+    <p class="hovercard-title">${escapeHtml(e.title)}</p>
+    <div class="hovercard-attendees">${attendees}</div>
+    ${content ? `<p class="hovercard-content">${escapeHtml(content)}${e.content.length > 100 ? "…" : ""}</p>` : ""}
+  `;
+  card.style.display = "block";
+
+  const rect = anchorEl.getBoundingClientRect();
+  const cardWidth = card.offsetWidth;
+  let left = rect.left + window.scrollX;
+  if (left + cardWidth > window.scrollX + document.documentElement.clientWidth - 12) {
+    left = window.scrollX + document.documentElement.clientWidth - cardWidth - 12;
+  }
+  card.style.left = `${Math.max(12, left)}px`;
+  card.style.top = `${rect.bottom + window.scrollY + 8}px`;
+}
+
+function scheduleHideHoverCard() {
+  clearTimeout(hoverCardHideTimer);
+  hoverCardHideTimer = setTimeout(() => {
+    if (hoverCardEl) hoverCardEl.style.display = "none";
+  }, 120);
+}
+
+function bindHoverCard(el, e) {
+  el.addEventListener("mouseenter", () => showHoverCard(el, e));
+  el.addEventListener("mouseleave", scheduleHideHoverCard);
 }
 
 function renderCalendar(events) {
@@ -139,7 +178,7 @@ function renderCalendar(events) {
         const shown = evts.slice(0, 2);
         const rest = evts.length - shown.length;
         let evtHtml = shown.map(e =>
-          `<div class="cal-pill" title="${escapeAttr(eventTooltip(e))}" onclick="location.href='/post/?id=${e.id}'">${escapeHtml(e.title)}</div>`
+          `<div class="cal-pill" data-event-id="${e.id}" onclick="location.href='/post/?id=${e.id}'">${escapeHtml(e.title)}</div>`
         ).join("");
         if (rest > 0) {
           evtHtml += `<div class="cal-more" data-day="${day}">+${rest}개</div>`;
@@ -152,6 +191,11 @@ function renderCalendar(events) {
 
     html += `</div>`;
     el.innerHTML = html;
+
+    el.querySelectorAll(".cal-pill[data-event-id]").forEach(pillEl => {
+      const evt = events.find(e => e.id === pillEl.dataset.eventId);
+      if (evt) bindHoverCard(pillEl, evt);
+    });
 
     function removeActiveOutsideClickHandler() {
       if (activeOutsideClickHandler) {
@@ -171,13 +215,17 @@ function renderCalendar(events) {
       const pop = document.createElement("div");
       pop.className = "cal-popover";
       pop.innerHTML = evts.map(e =>
-        `<div class="cal-popover-item" title="${escapeAttr(eventTooltip(e))}" onclick="location.href='/post/?id=${e.id}'">${escapeHtml(e.title)}</div>`
+        `<div class="cal-popover-item" data-event-id="${e.id}" onclick="location.href='/post/?id=${e.id}'">${escapeHtml(e.title)}</div>`
       ).join("");
       const rect = cellEl.getBoundingClientRect();
       const gridRect = el.querySelector(".cal-grid").getBoundingClientRect();
       pop.style.top = (rect.bottom - gridRect.top + 4) + "px";
       pop.style.left = (rect.left - gridRect.left) + "px";
       el.querySelector(".cal-grid").appendChild(pop);
+      pop.querySelectorAll(".cal-popover-item[data-event-id]").forEach(itemEl => {
+        const evt = evts.find(e => e.id === itemEl.dataset.eventId);
+        if (evt) bindHoverCard(itemEl, evt);
+      });
 
       function onOutsideClick(ev) {
         if (!ev.target.closest(".cal-popover") && !ev.target.closest("[data-day]")) {
@@ -234,8 +282,12 @@ function renderList(events) {
     const badge = cnt >= e.maxAttendees
       ? `<span class="badge-full">${cnt}/${e.maxAttendees} 마감</span>`
       : `<span class="badge-open">${cnt}/${e.maxAttendees}</span>`;
-    return `<tr class="event-row" title="${escapeAttr(eventTooltip(e))}" onclick="location.href='/post/?id=${e.id}'">
+    return `<tr class="event-row" data-event-id="${e.id}" onclick="location.href='/post/?id=${e.id}'">
       <td>${date}</td><td>${e.title}</td><td>${badge}</td>
     </tr>`;
   }).join("");
+  el.querySelectorAll(".event-row[data-event-id]").forEach(rowEl => {
+    const evt = sorted.find(e => e.id === rowEl.dataset.eventId);
+    if (evt) bindHoverCard(rowEl, evt);
+  });
 }

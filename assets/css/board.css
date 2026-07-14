@@ -177,3 +177,67 @@
   text-overflow: ellipsis;
 }
 .cal-popover-item:hover { background: #f5f5f3; }
+
+.event-hovercard {
+  display: none;
+  position: absolute;
+  z-index: 30;
+  width: 240px;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--card-border, #e8e8e4);
+  border-radius: var(--radius, 8px);
+  box-shadow: var(--card-shadow-hover, 0 6px 20px rgba(0,0,0,0.12));
+  overflow: hidden;
+  animation: hovercard-in 0.14s ease-out;
+}
+@keyframes hovercard-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.event-hovercard::before {
+  content: "";
+  display: block;
+  height: 3px;
+  background: var(--accent, #2e7d32);
+}
+.hovercard-title {
+  margin: 0;
+  padding: 12px 14px 8px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  line-height: 1.35;
+}
+.hovercard-attendees {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 14px 10px;
+}
+.hovercard-chip {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: #eef2ff;
+  color: #3949ab;
+  white-space: nowrap;
+}
+.hovercard-empty {
+  font-size: 0.76rem;
+  color: var(--text-muted, #999);
+}
+.hovercard-content {
+  margin: 0;
+  padding: 10px 14px 12px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-secondary, #666);
+  border-top: 1px solid var(--divider, #f0f0ee);
+}
+
+@media (prefers-color-scheme: dark) {
+  .hovercard-chip { background: #262b4a; color: #a3b1f0; }
+}
+:root[data-theme="dark"] .hovercard-chip { background: #262b4a; color: #a3b1f0; }
+:root[data-theme="light"] .hovercard-chip { background: #eef2ff; color: #3949ab; }
