@@ -127,6 +127,40 @@ function renderCalendar(events) {
     html += `</div>`;
     el.innerHTML = html;
 
+    function closePopover() {
+      const existing = document.querySelector(".cal-popover");
+      if (existing) existing.remove();
+      document.removeEventListener("click", onOutsideClick);
+    }
+    function onOutsideClick(ev) {
+      if (!ev.target.closest(".cal-popover") && !ev.target.closest("[data-day]")) {
+        closePopover();
+      }
+    }
+    function openPopover(cellEl, day) {
+      closePopover();
+      const evts = monthEvents[day] || [];
+      if (!evts.length) return;
+      const pop = document.createElement("div");
+      pop.className = "cal-popover";
+      pop.innerHTML = evts.map(e =>
+        `<div class="cal-popover-item" onclick="location.href='/post/?id=${e.id}'">${e.title}</div>`
+      ).join("");
+      const rect = cellEl.getBoundingClientRect();
+      const gridRect = el.querySelector(".cal-grid").getBoundingClientRect();
+      pop.style.top = (rect.bottom - gridRect.top + 4) + "px";
+      pop.style.left = (rect.left - gridRect.left) + "px";
+      el.querySelector(".cal-grid").appendChild(pop);
+      setTimeout(() => document.addEventListener("click", onOutsideClick), 0);
+    }
+
+    el.querySelectorAll(".cal-cell[data-day]").forEach(cell => {
+      cell.addEventListener("click", (ev) => {
+        if (ev.target.closest(".cal-pill")) return; // pill 클릭은 바로 이동, 팝오버 안 띄움
+        openPopover(cell, cell.dataset.day);
+      });
+    });
+
     document.getElementById("cal-prev").addEventListener("click", () => {
       month--;
       if (month < 0) { month = 11; year--; }
