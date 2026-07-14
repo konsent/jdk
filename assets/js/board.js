@@ -67,6 +67,7 @@ function renderCalendar(events) {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     const monthNames = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+    const weekdayNames = ["일","월","화","수","목","금","토"];
 
     // 이 달의 이벤트만 필터
     const monthEvents = {};
@@ -81,37 +82,33 @@ function renderCalendar(events) {
     });
 
     let html = `
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <button class="btn btn-sm btn-outline-secondary" id="cal-prev">◀</button>
+      <div class="cal-toolbar">
+        <button class="cal-nav-btn" id="cal-prev">◀</button>
         <strong>${year}년 ${monthNames[month]}</strong>
-        <button class="btn btn-sm btn-outline-secondary" id="cal-next">▶</button>
+        <button class="cal-nav-btn" id="cal-next">▶</button>
       </div>
-      <table class="table table-bordered text-center" style="table-layout:fixed">
-        <thead><tr>
-          <th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
-        </tr></thead>
-        <tbody>`;
+      <div class="cal-grid">`;
+
+    weekdayNames.forEach((wd, i) => {
+      html += `<div class="cal-weekday">${wd}</div>`;
+    });
+
+    const totalCells = firstDay + daysInMonth;
+    const totalRows = Math.ceil(totalCells / 7);
 
     let day = 1;
-    for (let row = 0; row < 6; row++) {
-      if (day > daysInMonth) break;
-      html += "<tr>";
-      for (let col = 0; col < 7; col++) {
-        if (row === 0 && col < firstDay || day > daysInMonth) {
-          html += "<td></td>";
-        } else {
-          const evts = monthEvents[day] || [];
-          const evtHtml = evts.map(e =>
-            `<div style="font-size:0.7rem;background:#0d6efd;color:#fff;border-radius:3px;padding:1px 3px;margin-top:2px;cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis" onclick="location.href='/post/?id=${e.id}'">${e.title}</div>`
-          ).join("");
-          html += `<td style="height:60px;vertical-align:top;padding:4px">${day}${evtHtml}</td>`;
-          day++;
-        }
+    for (let i = 0; i < totalRows * 7; i++) {
+      const col = i % 7;
+      if (i < firstDay || day > daysInMonth) {
+        html += `<div class="cal-cell is-empty"></div>`;
+      } else {
+        const evts = monthEvents[day] || [];
+        html += `<div class="cal-cell" data-day="${day}"><span class="cal-day-num">${day}</span></div>`;
+        day++;
       }
-      html += "</tr>";
     }
 
-    html += "</tbody></table>";
+    html += `</div>`;
     el.innerHTML = html;
 
     document.getElementById("cal-prev").addEventListener("click", () => {
