@@ -2,6 +2,16 @@ const { onDocumentWritten } = require("firebase-functions/v2/firestore");
 const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
+const { initializeApp } = require("firebase-admin/app");
+const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const {
+  checkAttendanceTrophies,
+  checkScheduleMakerTrophy,
+  checkFullHouseTrophy,
+  newlyEarnedTrophyIds
+} = require("./trophies.js");
+
+initializeApp();
 
 const TELEGRAM_BOT_TOKEN = defineSecret("TELEGRAM_BOT_TOKEN");
 const TELEGRAM_CHAT_ID = defineSecret("TELEGRAM_CHAT_ID");
@@ -127,3 +137,68 @@ exports.getBoardGameDetail = onRequest(async (req, res) => {
 });
 
 exports.parseGameDetail = parseGameDetail;
+
+function buildTrophyCandidates(memberStats, fullCount) {
+  if (!memberStats) return [];
+  return [
+    ...checkAttendanceTrophies(memberStats.attendCount || 0),
+    ...checkScheduleMakerTrophy(memberStats.postCount || 0),
+    ...checkFullHouseTrophy(fullCount || 0)
+  ];
+}
+
+function countFullHouseEvents(posts, authorUid) {
+  return posts.filter(
+    (p) => p.authorUid === authorUid && (p.attendees?.length || 0) >= p.maxAttendees
+  ).length;
+}
+
+async function awardTrophies(db, uid, candidateIds) {
+  if (!candidateIds.length) return;
+  const userRef = db.collection("users").doc(uid);
+  const userSnap = await userRef.get();
+  if (!userSnap.exists) return;
+
+  const existing = userSnap.data().trophies || [];
+  const existingIds = existing.map((t) => t.id);
+  const toAward = newlyEarnedTrophyIds(existingIds, candidateIds);
+  if (!toAward.length) return;
+
+  const newEntries = toAward.map((id) => ({
+    id,
+    earnedAt: new Date(),
+    seen: false
+  }));
+  await userRef.update({
+    trophies: FieldValue.arrayUnion(...newEntries)
+  });
+}
+
+exports.onStatsUpdated = onDocumentWritten("stats/global", async (event) => {
+  const afterData = event.data.after.exists ? event.data.after.data() : undefined;
+  if (!afterData) return;
+
+  const db = getFirestore();
+  const members = afterData.members || {};
+
+  for (const [uid, memberStats] of Object.entries(members)) {
+    try {
+      const postsSnap = await db
+        .collection("posts")
+        .where("type", "==", "event")
+        .where("authorUid", "==", uid)
+        .get();
+      const fullCount = countFullHouseEvents(
+        postsSnap.docs.map((d) => d.data()),
+        uid
+      );
+      const candidates = buildTrophyCandidates(memberStats, fullCount);
+      await awardTrophies(db, uid, candidates);
+    } catch (err) {
+      logger.error(`트로피 판정 실패 (uid: ${uid})`, err);
+    }
+  }
+});
+
+exports.buildTrophyCandidates = buildTrophyCandidates;
+exports.countFullHouseEvents = countFullHouseEvents;

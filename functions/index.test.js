@@ -154,3 +154,33 @@ test("parseGameDetail: thumbnail 없으면 thumbnail undefined", () => {
     thumbnail: undefined
   });
 });
+
+const { buildTrophyCandidates, countFullHouseEvents } = require("./index.js");
+
+test("buildTrophyCandidates: 출석10+게시글10+만석5 모두 만족하면 4개 트로피 후보", () => {
+  assert.deepStrictEqual(
+    buildTrophyCandidates({ attendCount: 30, postCount: 10 }, 5).sort(),
+    ["full-house-king", "kongz-regular", "kongz-veteran", "schedule-maker"].sort()
+  );
+});
+
+test("buildTrophyCandidates: 아무 조건도 만족 못하면 빈 배열", () => {
+  assert.deepStrictEqual(buildTrophyCandidates({ attendCount: 0, postCount: 0 }, 0), []);
+});
+
+test("buildTrophyCandidates: memberStats가 undefined면 빈 배열", () => {
+  assert.deepStrictEqual(buildTrophyCandidates(undefined, 0), []);
+});
+
+test("countFullHouseEvents: authorUid가 작성한 이벤트 중 만석인 것만 센다", () => {
+  const posts = [
+    { authorUid: "u1", attendees: ["a", "b"], maxAttendees: 2 },
+    { authorUid: "u1", attendees: ["a"], maxAttendees: 2 },
+    { authorUid: "u2", attendees: ["a", "b"], maxAttendees: 2 }
+  ];
+  assert.strictEqual(countFullHouseEvents(posts, "u1"), 1);
+});
+
+test("countFullHouseEvents: 작성한 이벤트가 없으면 0", () => {
+  assert.strictEqual(countFullHouseEvents([], "u1"), 0);
+});
