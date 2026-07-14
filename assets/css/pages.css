@@ -490,9 +490,9 @@
   border-right: 1px solid var(--card-border, #e8e8e4);
   background: var(--page-bg, #fff);
   color: var(--text-muted);
-  font-size: 0.86rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  padding: 10px 0;
+  padding: 5px 0;
   cursor: pointer;
   transition: background 0.12s, color 0.12s;
 }

@@ -342,12 +342,14 @@ async function setupRatingSection() {
         ${scoreTrack("skill", "실력")}
         ${scoreTrack("again", "재만남")}
       </div>
-      <button type="button" class="btn-attend-action join btn-submit-rating">제출</button>
     </div>`;
   }).join("");
 
-  document.getElementById("rating-list").querySelectorAll(".rating-row[data-uid]").forEach((row) => {
-    const targetUid = row.dataset.uid;
+  const pendingRows = [...document.getElementById("rating-list").querySelectorAll(".rating-row[data-uid]")];
+  const submitAllBtn = document.getElementById("btn-submit-all-ratings");
+  submitAllBtn.style.display = pendingRows.length ? "inline-block" : "none";
+
+  pendingRows.forEach((row) => {
     row.querySelectorAll(".rating-track").forEach((track) => {
       track.querySelectorAll(".rating-track-seg").forEach((seg) => {
         seg.addEventListener("click", () => {
@@ -358,12 +360,19 @@ async function setupRatingSection() {
         });
       });
     });
-    row.querySelector(".btn-submit-rating").addEventListener("click", async () => {
-      const tracks = [...row.querySelectorAll(".rating-track")];
-      if (tracks.some((t) => !t.dataset.value)) {
-        alert("매너, 실력, 재만남 점수를 모두 선택해주세요.");
-        return;
-      }
+  });
+
+  submitAllBtn.addEventListener("click", async () => {
+    const entries = pendingRows.map((row) => ({
+      targetUid: row.dataset.uid,
+      tracks: [...row.querySelectorAll(".rating-track")]
+    }));
+    if (entries.some(({ tracks }) => tracks.some((t) => !t.dataset.value))) {
+      alert("모든 참석자의 매너, 실력, 재만남 점수를 선택해주세요.");
+      return;
+    }
+
+    for (const { targetUid, tracks } of entries) {
       const payload = { postId, raterUid: currentUser.uid, targetUid, noShow: false, createdAt: serverTimestamp() };
       tracks.forEach((t) => {
         payload[t.dataset.field] = Number(t.dataset.value);
@@ -376,7 +385,7 @@ async function setupRatingSection() {
           tx.set(ratingRef, payload);
         });
       } catch (e) {
-        alert("이미 제출된 평가이거나 오류가 발생했습니다.");
+        alert("이미 제출된 평가가 있어 제출을 중단했습니다. 새로고침 후 다시 시도해주세요.");
         return;
       }
       await setDoc(doc(db, "stats", "global"), {
@@ -386,8 +395,8 @@ async function setupRatingSection() {
         [`members.${targetUid}.ratingSum.again`]: increment(payload.again),
         [`members.${targetUid}.ratingCount`]: increment(1)
       }, { merge: true });
-      location.reload();
-    });
+    }
+    location.reload();
   });
 }
 
