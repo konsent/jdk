@@ -162,29 +162,43 @@ function setupAttendButtons() {
         if (latestAttendees.includes(currentUser.uid)) throw new Error("이미 신청");
         tx.update(ref, { attendees: arrayUnion(currentUser.uid) });
       });
+    } catch (e) {
+      alert(e.message === "마감" ? "정원이 마감됐습니다." : "오류가 발생했습니다.");
+      return;
+    }
+    try {
       await setDoc(doc(db, "stats", "global"), {
         updatedAt: serverTimestamp(),
         [`members.${currentUser.uid}.nickname`]: currentUserData.nickname,
         [`members.${currentUser.uid}.attendCount`]: increment(1),
         [`members.${currentUser.uid}.postCount`]: increment(0)
       }, { merge: true });
-      location.reload();
     } catch (e) {
-      alert(e.message === "마감" ? "정원이 마감됐습니다." : "오류가 발생했습니다.");
+      console.error("stats update failed", e);
     }
+    location.reload();
   });
 
   document.getElementById("btn-cancel").addEventListener("click", async () => {
-    await updateDoc(doc(db, "posts", postId), { attendees: arrayRemove(currentUser.uid) });
-    const statsSnap = await getDoc(doc(db, "stats", "global"));
-    const currentCount = statsSnap.data()?.members?.[currentUser.uid]?.attendCount || 0;
-    if (currentCount > 0) {
-      await setDoc(doc(db, "stats", "global"), {
-        updatedAt: serverTimestamp(),
-        [`members.${currentUser.uid}.nickname`]: currentUserData.nickname,
-        [`members.${currentUser.uid}.attendCount`]: increment(-1),
-        [`members.${currentUser.uid}.postCount`]: increment(0)
-      }, { merge: true });
+    try {
+      await updateDoc(doc(db, "posts", postId), { attendees: arrayRemove(currentUser.uid) });
+    } catch (e) {
+      alert("오류가 발생했습니다.");
+      return;
+    }
+    try {
+      const statsSnap = await getDoc(doc(db, "stats", "global"));
+      const currentCount = statsSnap.data()?.members?.[currentUser.uid]?.attendCount || 0;
+      if (currentCount > 0) {
+        await setDoc(doc(db, "stats", "global"), {
+          updatedAt: serverTimestamp(),
+          [`members.${currentUser.uid}.nickname`]: currentUserData.nickname,
+          [`members.${currentUser.uid}.attendCount`]: increment(-1),
+          [`members.${currentUser.uid}.postCount`]: increment(0)
+        }, { merge: true });
+      }
+    } catch (e) {
+      console.error("stats update failed", e);
     }
     location.reload();
   });

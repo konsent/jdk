@@ -156,12 +156,16 @@ document.getElementById("form-write").addEventListener("submit", async (e) => {
         const assignedNickname = assignedUid === currentUser.uid
           ? currentUserData.nickname
           : document.getElementById("select-author").selectedOptions[0].textContent;
-        await setDoc(doc(db, "stats", "global"), {
-          updatedAt: serverTimestamp(),
-          [`members.${assignedUid}.nickname`]: assignedNickname,
-          [`members.${assignedUid}.postCount`]: increment(1),
-          [`members.${assignedUid}.attendCount`]: increment(0)
-        }, { merge: true });
+        try {
+          await setDoc(doc(db, "stats", "global"), {
+            updatedAt: serverTimestamp(),
+            [`members.${assignedUid}.nickname`]: assignedNickname,
+            [`members.${assignedUid}.postCount`]: increment(1),
+            [`members.${assignedUid}.attendCount`]: increment(0)
+          }, { merge: true });
+        } catch (e) {
+          console.error("stats update failed", e);
+        }
       }
 
       location.href = `/post/?id=${ref.id}`;

@@ -1,5 +1,5 @@
 import { db } from "./firebase-init.js";
-import { requireApproved } from "./auth-guard.js";
+import { requireApproved, getUserDoc } from "./auth-guard.js";
 import {
   collection, query, where, orderBy, getDocs, limit
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -49,17 +49,36 @@ async function loadEvents() {
       where("type", "==", "event"),
       orderBy("eventDate", "asc")
     ));
-    return snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(e => !e.isAnniversary);
+    const events = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(e => !e.isAnniversary);
+    await attachAttendeeNames(events);
+    return events;
   } catch (e) {
     console.error("이벤트 로드 실패:", e);
     return [];
   }
 }
 
+async function attachAttendeeNames(events) {
+  const uids = [...new Set(events.flatMap(e => e.attendees || []))];
+  const entries = await Promise.all(uids.map(async uid => [uid, (await getUserDoc(uid))?.nickname || "알 수 없음"]));
+  const nameMap = Object.fromEntries(entries);
+  events.forEach(e => { e.attendeeNames = (e.attendees || []).map(uid => nameMap[uid]); });
+}
+
+function eventTooltip(e) {
+  const attendees = e.attendeeNames?.length ? e.attendeeNames.join(", ") : "없음";
+  const content = e.content ? e.content.slice(0, 100) : "";
+  return `${e.title}\n참석자: ${attendees}${content ? `\n${content}` : ""}`;
+}
+
 function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
+}
+
+function escapeAttr(str) {
+  return escapeHtml(str).replace(/"/g, "&quot;");
 }
 
 function renderCalendar(events) {
@@ -120,7 +139,7 @@ function renderCalendar(events) {
         const shown = evts.slice(0, 2);
         const rest = evts.length - shown.length;
         let evtHtml = shown.map(e =>
-          `<div class="cal-pill" onclick="location.href='/post/?id=${e.id}'">${escapeHtml(e.title)}</div>`
+          `<div class="cal-pill" title="${escapeAttr(eventTooltip(e))}" onclick="location.href='/post/?id=${e.id}'">${escapeHtml(e.title)}</div>`
         ).join("");
         if (rest > 0) {
           evtHtml += `<div class="cal-more" data-day="${day}">+${rest}개</div>`;
@@ -152,7 +171,7 @@ function renderCalendar(events) {
       const pop = document.createElement("div");
       pop.className = "cal-popover";
       pop.innerHTML = evts.map(e =>
-        `<div class="cal-popover-item" onclick="location.href='/post/?id=${e.id}'">${escapeHtml(e.title)}</div>`
+        `<div class="cal-popover-item" title="${escapeAttr(eventTooltip(e))}" onclick="location.href='/post/?id=${e.id}'">${escapeHtml(e.title)}</div>`
       ).join("");
       const rect = cellEl.getBoundingClientRect();
       const gridRect = el.querySelector(".cal-grid").getBoundingClientRect();
@@ -208,13 +227,14 @@ function renderList(events) {
     el.innerHTML = `<tr><td colspan="3" class="text-muted">등록된 일정이 없습니다.</td></tr>`;
     return;
   }
-  el.innerHTML = events.map(e => {
+  const sorted = [...events].sort((a, b) => b.eventDate?.toMillis() - a.eventDate?.toMillis());
+  el.innerHTML = sorted.map(e => {
     const date = formatEventDate(e.eventDate);
     const cnt = e.attendees?.length || 0;
     const badge = cnt >= e.maxAttendees
       ? `<span class="badge-full">${cnt}/${e.maxAttendees} 마감</span>`
       : `<span class="badge-open">${cnt}/${e.maxAttendees}</span>`;
-    return `<tr class="event-row" onclick="location.href='/post/?id=${e.id}'">
+    return `<tr class="event-row" title="${escapeAttr(eventTooltip(e))}" onclick="location.href='/post/?id=${e.id}'">
       <td>${date}</td><td>${e.title}</td><td>${badge}</td>
     </tr>`;
   }).join("");
