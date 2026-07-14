@@ -174,6 +174,7 @@ function renderCalendar(events) {
         if (isToday) cellClasses.push("is-today");
         if (col === 0) cellClasses.push("is-sun");
         if (col === 6) cellClasses.push("is-sat");
+        if (evts.length) cellClasses.push("has-events");
 
         const shown = evts.slice(0, 2);
         const rest = evts.length - shown.length;

@@ -178,6 +178,24 @@
 }
 .cal-popover-item:hover { background: #f5f5f3; }
 
+@media (max-width: 480px) {
+  .cal-cell .cal-pill,
+  .cal-cell .cal-more {
+    display: none;
+  }
+  .cal-cell.has-events::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #3949ab;
+  }
+}
+
 .event-hovercard {
   display: none;
   position: absolute;
