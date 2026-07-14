@@ -10,6 +10,12 @@ import {
 const postId = new URLSearchParams(location.search).get("id");
 let currentUser = null;
 
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str || "";
+  return div.innerHTML;
+}
+
 function formatEventDate(ts) {
   if (!ts) return "";
   const d = ts.toDate();
@@ -17,6 +23,23 @@ function formatEventDate(ts) {
   const h = d.getHours(), m = d.getMinutes();
   return (h || m) ? `${date} ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}` : date;
 }
+
+function renderGamesSection(games) {
+  if (!games || !games.length) return "";
+  const cards = games.map((g) => `
+    <a class="game-card" href="https://boardgamegeek.com/boardgame/${g.bggId}" target="_blank" rel="noopener">
+      ${g.thumbnail ? `<img src="${g.thumbnail}" alt="${escapeHtml(g.name)}">` : `<div class="game-card-noimg"></div>`}
+      <span>${escapeHtml(g.name)}${g.yearPublished ? ` (${g.yearPublished})` : ""}</span>
+    </a>
+  `).join("");
+  return `
+    <div class="post-games-section">
+      <p class="attendee-section-title">함께 할 게임</p>
+      <div class="game-card-list">${cards}</div>
+    </div>
+  `;
+}
+
 let currentUserData = null;
 let postData = null;
 
@@ -70,6 +93,7 @@ async function loadPost() {
     </div>
     <div class="post-body">${postData.content}</div>
   `;
+  document.getElementById("post-content").insertAdjacentHTML("afterend", renderGamesSection(postData.games));
 
   if (postData.type === "event") {
     document.getElementById("btn-kakao-share").addEventListener("click", () => {
