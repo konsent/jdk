@@ -31,12 +31,16 @@ requireApproved(async (user, userData) => {
   }
   document.getElementById("info-tags").innerHTML = tags.join(" ");
 
-  const statsSnap = await getDoc(doc(db, "stats", "global"));
-  const myStats = statsSnap.data()?.members?.[user.uid];
-  const averages = computeAverages(myStats);
-  document.getElementById("info-rating").innerHTML = averages.count === 0
-    ? `<div style="font-size:0.86rem;color:var(--text-muted)">아직 받은 평가가 없습니다.</div>`
-    : `<div style="font-size:0.92rem;color:var(--text-secondary)">매너 ${averages.manner} · 실력 ${averages.skill} · 재만남 ${averages.again} <span style="color:var(--text-muted);font-size:0.78rem">(${averages.count}회 평가받음)</span></div>`;
+  try {
+    const statsSnap = await getDoc(doc(db, "stats", "global"));
+    const myStats = statsSnap.data()?.members?.[user.uid];
+    const averages = computeAverages(myStats);
+    document.getElementById("info-rating").innerHTML = averages.count === 0
+      ? `<div style="font-size:0.86rem;color:var(--text-muted)">아직 받은 평가가 없습니다.</div>`
+      : `<div style="font-size:0.92rem;color:var(--text-secondary)">매너 ${averages.manner} · 실력 ${averages.skill} · 재만남 ${averages.again} <span style="color:var(--text-muted);font-size:0.78rem">(${averages.count}회 평가받음)</span></div>`;
+  } catch (e) {
+    console.error("rating stats load failed", e);
+  }
 
   document.getElementById("btn-withdraw").addEventListener("click", () => {
     document.getElementById("confirm-modal").style.display = "flex";

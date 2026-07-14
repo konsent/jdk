@@ -138,8 +138,13 @@ async function loadAttendees() {
   document.getElementById("section-attendees").style.display = "block";
   document.getElementById("attendee-count").textContent = `(${attendees.length}/${postData.maxAttendees}명)`;
 
-  const statsSnap = await getDoc(doc(db, "stats", "global"));
-  const membersStats = statsSnap.data()?.members || {};
+  let membersStats = {};
+  try {
+    const statsSnap = await getDoc(doc(db, "stats", "global"));
+    membersStats = statsSnap.data()?.members || {};
+  } catch (e) {
+    console.error("rating stats load failed", e);
+  }
 
   const entries = await Promise.all(attendees.map(async (uid) => {
     const u = await getUserDoc(uid);
