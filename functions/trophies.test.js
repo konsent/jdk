@@ -6,11 +6,12 @@ const {
   checkScheduleMakerTrophy,
   checkFullHouseTrophy,
   checkGame2048Trophy,
+  checkWritingMasterTrophy,
   newlyEarnedTrophyIds
 } = require("./trophies.js");
 
-test("TROPHIES: 5개 트로피 각각 id/name/description/image를 가진다", () => {
-  assert.strictEqual(TROPHIES.length, 5);
+test("TROPHIES: 9개 트로피 각각 id/name/description/image를 가진다", () => {
+  assert.strictEqual(TROPHIES.length, 9);
   TROPHIES.forEach((t) => {
     assert.ok(typeof t.id === "string" && t.id.length > 0);
     assert.ok(typeof t.name === "string" && t.name.length > 0);
@@ -44,6 +45,33 @@ test("checkFullHouseTrophy: 4회면 빈 배열, 5회면 full-house-king", () => 
 test("checkGame2048Trophy: 1위가 아니면 빈 배열, 1위면 game-2048-champion", () => {
   assert.deepStrictEqual(checkGame2048Trophy(false), []);
   assert.deepStrictEqual(checkGame2048Trophy(true), ["game-2048-champion"]);
+});
+
+test("checkAttendanceTrophies: 49회면 kongz-regular/veteran만, paju-ghost 없음", () => {
+  assert.deepStrictEqual(checkAttendanceTrophies(49), ["kongz-regular", "kongz-veteran"]);
+});
+
+test("checkAttendanceTrophies: 50회면 paju-ghost-1까지", () => {
+  assert.deepStrictEqual(checkAttendanceTrophies(50), ["kongz-regular", "kongz-veteran", "paju-ghost-1"]);
+});
+
+test("checkAttendanceTrophies: 75회면 paju-ghost-2까지", () => {
+  assert.deepStrictEqual(
+    checkAttendanceTrophies(75),
+    ["kongz-regular", "kongz-veteran", "paju-ghost-1", "paju-ghost-2"]
+  );
+});
+
+test("checkAttendanceTrophies: 100회면 paju-ghost-3까지 전부", () => {
+  assert.deepStrictEqual(
+    checkAttendanceTrophies(100),
+    ["kongz-regular", "kongz-veteran", "paju-ghost-1", "paju-ghost-2", "paju-ghost-3"]
+  );
+});
+
+test("checkWritingMasterTrophy: 29개면 빈 배열, 30개면 writing-master", () => {
+  assert.deepStrictEqual(checkWritingMasterTrophy(29), []);
+  assert.deepStrictEqual(checkWritingMasterTrophy(30), ["writing-master"]);
 });
 
 test("newlyEarnedTrophyIds: 이미 보유한 id는 제외하고 신규만 반환", () => {
