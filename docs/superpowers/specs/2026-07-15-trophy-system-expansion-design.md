@@ -34,7 +34,7 @@
 
 - **파주 귀신 I·II·III**: `checkAttendanceTrophies`를 50/75/100 임계값까지 확장 (기존 10/30과 같은 배열에 이어서 반환).
 - **글쓰기 장인**: `checkScheduleMakerTrophy`와 같은 방식으로 `postCount >= 30`을 추가 반환하는 함수로 확장(또는 별도 함수).
-- **인기 만점**: `memberStats.ratingSum`/`ratingCount`에서 단순 평균 `(manner+skill+again)/3/count`를 계산해 4.5 이상이고 `ratingCount >= 10`이면 충족. `rating-logic.js`의 `computeAverages`가 반환하는 개별 항목 평균(manner/skill/again)을 다시 평균낸다 — 새 계산식 도입이 아니라 기존 `computeAverages` 결과의 산술평균.
+- **인기 만점**: `memberStats.ratingSum`/`ratingCount`에서 반올림 없이 원시 합계 기준 단순 산술평균 `(manner+skill+again)/3/count`를 계산해 4.5 이상이고 `ratingCount >= 10`이면 충족. `computeAverages`가 반환하는(카테고리별로 반올림된) 값을 다시 평균내는 것이 아니라, `computeAverages`와 별개로 원시 합계에서 직접 계산한다 — 새 계산식 도입은 아니지만 `computeAverages`의 반올림 결과를 재사용하지는 않는다.
 - **콩즈 온도왕 / 쏘핫**: `rating-logic.js`의 `computeKongzTemp(memberStats)`를 그대로 이식(Cloud Functions에는 ESM import가 아니라 동일 로직을 `functions/trophies.js`에 CommonJS로 재작성, 클라이언트와 로직은 동일하되 파일은 별도 — 기존 트로피 메타 이중관리와 같은 이유).
 
 이 트리거는 이미 `members` 맵을 순회하며 `memberStats`를 들고 있으므로, 위 신규 조건들은 **추가 Firestore 쿼리 없이** 같은 순회 루프 안에서 판정 가능하다.
