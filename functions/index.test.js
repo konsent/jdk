@@ -172,6 +172,34 @@ test("buildTrophyCandidates: memberStats가 undefined면 빈 배열", () => {
   assert.deepStrictEqual(buildTrophyCandidates(undefined, 0), []);
 });
 
+test("buildTrophyCandidates: 출석100+게시글30+평점10회5.0+온도62.5 모두 만족하면 전체 트로피 반환", () => {
+  const memberStats = {
+    attendCount: 100,
+    postCount: 30,
+    ratingCount: 10,
+    ratingSum: { manner: 50, skill: 50, again: 50 }
+  };
+  const result = buildTrophyCandidates(memberStats, 5).sort();
+  assert.deepStrictEqual(result, [
+    "full-house-king",
+    "heartthrob",
+    "kongz-hot",
+    "kongz-regular",
+    "kongz-veteran",
+    "paju-ghost-1",
+    "paju-ghost-2",
+    "paju-ghost-3",
+    "schedule-maker",
+    "so-hot",
+    "writing-master"
+  ].sort());
+});
+
+test("buildTrophyCandidates: 평점/온도 조건 미달이면 heartthrob/kongz-hot/so-hot 없음", () => {
+  const memberStats = { attendCount: 0, postCount: 0, ratingCount: 0, ratingSum: {} };
+  assert.deepStrictEqual(buildTrophyCandidates(memberStats, 0), []);
+});
+
 test("countFullHouseEvents: authorUid가 작성한 이벤트 중 만석인 것만 센다", () => {
   const posts = [
     { authorUid: "u1", attendees: ["a", "b"], maxAttendees: 2 },

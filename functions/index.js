@@ -9,6 +9,9 @@ const {
   checkScheduleMakerTrophy,
   checkFullHouseTrophy,
   checkGame2048Trophy,
+  checkWritingMasterTrophy,
+  checkHeartthrobTrophy,
+  checkKongzTempTrophies,
   newlyEarnedTrophyIds
 } = require("./trophies.js");
 
@@ -144,7 +147,10 @@ function buildTrophyCandidates(memberStats, fullCount) {
   return [
     ...checkAttendanceTrophies(memberStats.attendCount || 0),
     ...checkScheduleMakerTrophy(memberStats.postCount || 0),
-    ...checkFullHouseTrophy(fullCount || 0)
+    ...checkWritingMasterTrophy(memberStats.postCount || 0),
+    ...checkFullHouseTrophy(fullCount || 0),
+    ...checkHeartthrobTrophy(memberStats),
+    ...checkKongzTempTrophies(memberStats)
   ];
 }
 
