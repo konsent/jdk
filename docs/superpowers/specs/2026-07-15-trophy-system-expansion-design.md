@@ -22,7 +22,7 @@
 | `writing-master` | 글쓰기 장인 | 누적 게시글 30개 (`postCount >= 30`) | `stats/global` |
 | `weekend-regular` | 주말 개근 | `confirmedAttendees` 기준 주말(토/일) 이벤트 실제 참석 누적 10회 | `posts` |
 | `kongz-hot` | 콩즈 온도왕 | 콩즈 온도(`computeKongzTemp`) 60도 이상 | `stats/global` |
-| `so-hot` | 쏘핫 | 콩즈 온도 80도 이상 | `stats/global` |
+| `so-hot` | 쏘핫 | 콩즈 온도 62도 이상 | `stats/global` |
 
 이미지 경로는 기존과 동일한 규칙: `/assets/trophies/{id}.png` (실제 이미지 파일 제작은 범위 밖).
 
@@ -82,7 +82,7 @@
 - `checkAttendanceTrophies(attendCount)`: 임계값 배열을 `[10, 30, 50, 75, 100]`으로 확장, 각각 `kongz-regular`/`kongz-veteran`/`paju-ghost-1`/`paju-ghost-2`/`paju-ghost-3` 반환.
 - `checkWritingMasterTrophy(postCount)`: `postCount >= 30`이면 `["writing-master"]`.
 - `checkHeartthrobTrophy(memberStats)`: `ratingCount >= 10`이고 3항목 평균 `>= 4.5`면 `["heartthrob"]`.
-- `checkKongzTempTrophies(memberStats)`: `computeKongzTemp`를 이식한 내부 계산으로 60/80도 임계값 판정, `kongz-hot`/`so-hot` 반환.
+- `checkKongzTempTrophies(memberStats)`: `computeKongzTemp`를 이식한 내부 계산으로 60/62도 임계값 판정, `kongz-hot`/`so-hot` 반환.
 - `checkAnnualMemberTrophy(annualMember)`: `true`면 `["annual-member"]`.
 - `checkSuikaMasterTrophy(isTopScorer)`: `checkGame2048Trophy`와 동일 시그니처, `["suika-master"]` 반환.
 - `checkPartyPlannerTrophy(partyCount)`: `partyCount >= 3`이면 `["party-planner"]`.

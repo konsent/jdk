@@ -68,7 +68,7 @@ const TROPHIES = [
   {
     id: "so-hot",
     name: "쏘핫",
-    description: "콩즈 온도 80도 이상 달성",
+    description: "콩즈 온도 62도 이상 달성",
     image: "/assets/trophies/so-hot.png"
   }
 ];
@@ -117,7 +117,7 @@ function checkKongzTempTrophies(memberStats) {
   const { temp } = computeKongzTempServer(memberStats);
   const ids = [];
   if (temp >= 60) ids.push("kongz-hot");
-  if (temp >= 80) ids.push("so-hot");
+  if (temp >= 62) ids.push("so-hot");
   return ids;
 }
 

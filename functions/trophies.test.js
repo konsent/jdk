@@ -121,13 +121,12 @@ test("checkKongzTempTrophies: 60도 미만이면 빈 배열", () => {
   assert.deepStrictEqual(checkKongzTempTrophies(stats), []);
 });
 
-test("checkKongzTempTrophies: 60도 이상이면 kongz-hot", () => {
-  const stats = { ratingCount: 1, ratingSum: { manner: 5, skill: 5, again: 5 } };
+test("checkKongzTempTrophies: 60도 이상 62도 미만이면 kongz-hot만", () => {
+  const stats = { ratingCount: 10, ratingSum: { manner: 50, skill: 50, again: 47 } };
   assert.deepStrictEqual(checkKongzTempTrophies(stats), ["kongz-hot"]);
 });
 
-test("checkKongzTempTrophies: 80도 이상이면 kongz-hot과 so-hot 모두 (현재 계산식 최대 62.5도이므로 테스트값 조정)", () => {
+test("checkKongzTempTrophies: 62도 이상이면 kongz-hot과 so-hot 모두", () => {
   const stats = { ratingCount: 1, ratingSum: { manner: 5, skill: 5, again: 5 } };
-  const result = checkKongzTempTrophies(stats);
-  assert(result.includes("kongz-hot"));
+  assert.deepStrictEqual(checkKongzTempTrophies(stats), ["kongz-hot", "so-hot"]);
 });
