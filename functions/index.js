@@ -13,6 +13,7 @@ const {
   checkHeartthrobTrophy,
   checkKongzTempTrophies,
   checkSuikaMasterTrophy,
+  checkPartyPlannerTrophy,
   newlyEarnedTrophyIds
 } = require("./trophies.js");
 
@@ -261,3 +262,26 @@ exports.onSuikaScoreUpdated = onDocumentWritten("suika_scores/{uid}", async (eve
 });
 
 exports.mapSuikaScores = mapSuikaScores;
+
+function countPartiesByOwner(parties, ownerUid) {
+  return parties.filter((p) => p.ownerUid === ownerUid).length;
+}
+
+exports.onPartyUpdated = onDocumentWritten("parties/{partyId}", async (event) => {
+  const afterData = event.data.after.exists ? event.data.after.data() : undefined;
+  if (!afterData || !afterData.ownerUid) return;
+
+  const ownerUid = afterData.ownerUid;
+  const db = getFirestore();
+
+  try {
+    const partiesSnap = await db.collection("parties").where("ownerUid", "==", ownerUid).get();
+    const partyCount = countPartiesByOwner(partiesSnap.docs.map((d) => d.data()), ownerUid);
+    const candidates = checkPartyPlannerTrophy(partyCount);
+    await awardTrophies(db, ownerUid, candidates);
+  } catch (err) {
+    logger.error(`파티 플래너 트로피 판정 실패 (ownerUid: ${ownerUid})`, err);
+  }
+});
+
+exports.countPartiesByOwner = countPartiesByOwner;

@@ -254,3 +254,18 @@ test("isTopScorer: mapSuikaScores로 매핑한 결과에도 동일하게 동작"
   assert.strictEqual(isTopScorer(mapped, "u2"), true);
   assert.strictEqual(isTopScorer(mapped, "u1"), false);
 });
+
+const { countPartiesByOwner } = require("./index.js");
+
+test("countPartiesByOwner: 특정 ownerUid의 파티만 센다", () => {
+  const parties = [
+    { ownerUid: "u1" },
+    { ownerUid: "u1" },
+    { ownerUid: "u2" }
+  ];
+  assert.strictEqual(countPartiesByOwner(parties, "u1"), 2);
+});
+
+test("countPartiesByOwner: 파티가 없으면 0", () => {
+  assert.strictEqual(countPartiesByOwner([], "u1"), 0);
+});
