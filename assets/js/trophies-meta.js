@@ -25,7 +25,7 @@ export const TROPHIES_META = [
   },
   {
     id: "game-2048-champion",
-    name: "2048 간판왕",
+    name: "2048 마스터",
     description: "2048 게임 전체 랭킹 1위 달성",
     image: "/assets/trophy/game-2048-champion.png"
   },
