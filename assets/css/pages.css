@@ -755,3 +755,29 @@
   background: var(--input-bg);
   margin-bottom: 4px;
 }
+
+#trophy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 12px;
+}
+
+.trophy-item img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto;
+}
+
+.trophy-item--locked img {
+  filter: grayscale(100%);
+  opacity: 0.35;
+}
+
+.trophy-item {
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}

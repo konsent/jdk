@@ -4,6 +4,7 @@ title: 내 정보
 permalink: /mypage/
 ---
 <link rel="stylesheet" href="/assets/css/pages.css">
+<link rel="stylesheet" href="/assets/css/game.css">
 
 <!-- 탈퇴 확인 모달 -->
 <div id="confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center">
@@ -76,6 +77,11 @@ permalink: /mypage/
             <button type="button" id="btn-party-cancel" style="border:1px solid var(--card-border);background:transparent;border-radius:6px;padding:8px 18px;cursor:pointer;font-size:0.85rem">취소</button>
           </div>
         </div>
+      </div>
+
+      <div id="section-trophies" class="mb-4">
+        <div style="font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:8px">보유 트로피</div>
+        <div id="trophy-grid"></div>
       </div>
 
       <hr style="margin:24px 0">
