@@ -4,10 +4,12 @@ import { deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-
 import {
   doc, deleteDoc, getDoc, updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { computeAverages, computeKongzTemp, tempToColor } from "./rating-logic.js";
 import { listMyParties, createParty, updateParty, deleteParty, listApprovedUsers } from "./party.js";
 import { filterByNickname } from "./party-logic.js";
 import { TROPHIES_META } from "./trophies-meta.js";
+import { computeVisitStats } from "./mypage-logic.js";
 
 let currentUser = null;
 
@@ -50,6 +52,8 @@ requireApproved(async (user, userData) => {
   } catch (e) {
     console.error("rating stats load failed", e);
   }
+
+  await renderVisitStats(user);
 
   await setupParties(user);
 
@@ -96,6 +100,24 @@ function showError(msg) {
   const el = document.getElementById("msg-error");
   el.textContent = msg;
   el.style.display = "block";
+}
+
+async function renderVisitStats(user) {
+  const el = document.getElementById("visit-stats-text");
+  try {
+    const q = query(
+      collection(db, "posts"),
+      where("type", "==", "event"),
+      where("confirmedAttendees", "array-contains", user.uid)
+    );
+    const snap = await getDocs(q);
+    const events = snap.docs.map((d) => d.data());
+    const { visitDays, participatedSessions } = computeVisitStats(events, user.uid);
+    el.textContent = `아지트 방문 일수 ${visitDays}일 · 참여 게임 세션 ${participatedSessions}회`;
+  } catch (e) {
+    console.error("방문 통계 로드 실패", e);
+    el.textContent = "";
+  }
 }
 
 let allApprovedUsers = [];
