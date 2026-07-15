@@ -292,3 +292,48 @@ test("becameAnnualMember: annualMember가 여전히 false/undefined면 false", (
   assert.strictEqual(becameAnnualMember({ annualMember: false }, { annualMember: false }), false);
   assert.strictEqual(becameAnnualMember(undefined, {}), false);
 });
+
+const { confirmedAttendeesChanged, filterConfirmedClosedEvents, isWeekendDate } = require("./index.js");
+
+test("confirmedAttendeesChanged: 배열 내용이 바뀌면 true", () => {
+  assert.strictEqual(
+    confirmedAttendeesChanged({ confirmedAttendees: ["a"] }, { confirmedAttendees: ["a", "b"] }),
+    true
+  );
+});
+
+test("confirmedAttendeesChanged: 동일하면 false", () => {
+  assert.strictEqual(
+    confirmedAttendeesChanged({ confirmedAttendees: ["a", "b"] }, { confirmedAttendees: ["a", "b"] }),
+    false
+  );
+});
+
+test("confirmedAttendeesChanged: beforeData 없이 처음 설정되면 true", () => {
+  assert.strictEqual(confirmedAttendeesChanged(undefined, { confirmedAttendees: ["a"] }), true);
+});
+
+test("confirmedAttendeesChanged: 둘 다 없으면 false", () => {
+  assert.strictEqual(confirmedAttendeesChanged({}, {}), false);
+});
+
+test("filterConfirmedClosedEvents: type/closedAt/confirmedAttendees 조건 모두 만족하는 것만", () => {
+  const posts = [
+    { type: "event", closedAt: {}, confirmedAttendees: ["u1"], eventDate: "d1" },
+    { type: "event", closedAt: null, confirmedAttendees: ["u1"], eventDate: "d2" },
+    { type: "event", closedAt: {}, confirmedAttendees: ["u2"], eventDate: "d3" },
+    { type: "notice", closedAt: {}, confirmedAttendees: ["u1"], eventDate: "d4" }
+  ];
+  const result = filterConfirmedClosedEvents(posts, "u1");
+  assert.deepStrictEqual(result, [{ type: "event", closedAt: {}, confirmedAttendees: ["u1"], eventDate: "d1" }]);
+});
+
+test("filterConfirmedClosedEvents: 조건 만족하는 게 없으면 빈 배열", () => {
+  assert.deepStrictEqual(filterConfirmedClosedEvents([], "u1"), []);
+});
+
+test("isWeekendDate: 토요일/일요일은 true, 평일은 false", () => {
+  assert.strictEqual(isWeekendDate(new Date("2026-01-03")), true); // 토요일
+  assert.strictEqual(isWeekendDate(new Date("2026-01-04")), true); // 일요일
+  assert.strictEqual(isWeekendDate(new Date("2026-01-05")), false); // 월요일
+});

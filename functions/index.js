@@ -15,6 +15,10 @@ const {
   checkSuikaMasterTrophy,
   checkPartyPlannerTrophy,
   checkAnnualMemberTrophy,
+  checkNoNoshowTrophy,
+  checkFiveDayStreakTrophy,
+  checkWeekendRegularTrophy,
+  hasConsecutiveDays,
   newlyEarnedTrophyIds
 } = require("./trophies.js");
 
@@ -312,3 +316,66 @@ exports.onUserUpdated = onDocumentWritten("users/{uid}", async (event) => {
 });
 
 exports.becameAnnualMember = becameAnnualMember;
+
+function confirmedAttendeesChanged(beforeData, afterData) {
+  const before = JSON.stringify(beforeData?.confirmedAttendees || null);
+  const after = JSON.stringify(afterData?.confirmedAttendees || null);
+  return before !== after;
+}
+
+function filterConfirmedClosedEvents(posts, uid) {
+  return posts.filter(
+    (p) => p.type === "event" && !!p.closedAt && (p.confirmedAttendees || []).includes(uid)
+  );
+}
+
+function isWeekendDate(date) {
+  const day = date.getDay();
+  return day === 0 || day === 6;
+}
+
+exports.onPostConfirmed = onDocumentWritten("posts/{postId}", async (event) => {
+  const beforeData = event.data.before.exists ? event.data.before.data() : undefined;
+  const afterData = event.data.after.exists ? event.data.after.data() : undefined;
+
+  if (!afterData || !confirmedAttendeesChanged(beforeData, afterData)) return;
+
+  const db = getFirestore();
+  const confirmedUids = afterData.confirmedAttendees || [];
+
+  for (const uid of confirmedUids) {
+    try {
+      const postsSnap = await db
+        .collection("posts")
+        .where("type", "==", "event")
+        .where("confirmedAttendees", "array-contains", uid)
+        .get();
+
+      const confirmedEvents = filterConfirmedClosedEvents(
+        postsSnap.docs.map((d) => d.data()),
+        uid
+      );
+
+      const eventDates = confirmedEvents
+        .map((p) => p.eventDate?.toDate?.())
+        .filter((d) => d instanceof Date);
+
+      const weekendCount = eventDates.filter(isWeekendDate).length;
+      const hasStreak = hasConsecutiveDays(eventDates, 5);
+
+      const candidates = [
+        ...checkNoNoshowTrophy(confirmedEvents.length),
+        ...checkWeekendRegularTrophy(weekendCount),
+        ...checkFiveDayStreakTrophy(hasStreak)
+      ];
+
+      await awardTrophies(db, uid, candidates);
+    } catch (err) {
+      logger.error(`참석 확정 트로피 판정 실패 (uid: ${uid})`, err);
+    }
+  }
+});
+
+exports.confirmedAttendeesChanged = confirmedAttendeesChanged;
+exports.filterConfirmedClosedEvents = filterConfirmedClosedEvents;
+exports.isWeekendDate = isWeekendDate;
