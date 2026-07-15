@@ -52,6 +52,24 @@ const TROPHIES = [
     name: "글쓰기 장인",
     description: "누적 게시글 30개 등록",
     image: "/assets/trophies/writing-master.png"
+  },
+  {
+    id: "heartthrob",
+    name: "인기 만점",
+    description: "평균 평점 4.5 이상 (10회 이상 평가받음)",
+    image: "/assets/trophies/heartthrob.png"
+  },
+  {
+    id: "kongz-hot",
+    name: "콩즈 온도왕",
+    description: "콩즈 온도 60도 이상 달성",
+    image: "/assets/trophies/kongz-hot.png"
+  },
+  {
+    id: "so-hot",
+    name: "쏘핫",
+    description: "콩즈 온도 80도 이상 달성",
+    image: "/assets/trophies/so-hot.png"
   }
 ];
 
@@ -77,6 +95,32 @@ function checkWritingMasterTrophy(postCount) {
   return postCount >= 30 ? ["writing-master"] : [];
 }
 
+function checkHeartthrobTrophy(memberStats) {
+  const count = memberStats?.ratingCount || 0;
+  if (count < 10) return [];
+  const sum = memberStats.ratingSum || {};
+  const avg = ((sum.manner || 0) + (sum.skill || 0) + (sum.again || 0)) / 3 / count;
+  return avg >= 4.5 ? ["heartthrob"] : [];
+}
+
+function computeKongzTempServer(memberStats) {
+  const count = memberStats?.ratingCount || 0;
+  if (count === 0) return { temp: 36.5, count: 0 };
+  const sum = memberStats.ratingSum || {};
+  const weighted = (sum.manner || 0) * 0.25 + (sum.skill || 0) * 0.25 + (sum.again || 0) * 0.5;
+  const avg = weighted / count;
+  const temp = Math.round((36.5 + (avg - 3) * 13) * 10) / 10;
+  return { temp, count };
+}
+
+function checkKongzTempTrophies(memberStats) {
+  const { temp } = computeKongzTempServer(memberStats);
+  const ids = [];
+  if (temp >= 60) ids.push("kongz-hot");
+  if (temp >= 80) ids.push("so-hot");
+  return ids;
+}
+
 function checkGame2048Trophy(isTopScorer) {
   return isTopScorer ? ["game-2048-champion"] : [];
 }
@@ -92,5 +136,8 @@ module.exports = {
   checkFullHouseTrophy,
   checkGame2048Trophy,
   checkWritingMasterTrophy,
+  checkHeartthrobTrophy,
+  computeKongzTempServer,
+  checkKongzTempTrophies,
   newlyEarnedTrophyIds
 };

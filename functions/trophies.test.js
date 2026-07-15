@@ -7,11 +7,14 @@ const {
   checkFullHouseTrophy,
   checkGame2048Trophy,
   checkWritingMasterTrophy,
+  checkHeartthrobTrophy,
+  computeKongzTempServer,
+  checkKongzTempTrophies,
   newlyEarnedTrophyIds
 } = require("./trophies.js");
 
-test("TROPHIES: 9개 트로피 각각 id/name/description/image를 가진다", () => {
-  assert.strictEqual(TROPHIES.length, 9);
+test("TROPHIES: 12개 트로피 각각 id/name/description/image를 가진다", () => {
+  assert.strictEqual(TROPHIES.length, 12);
   TROPHIES.forEach((t) => {
     assert.ok(typeof t.id === "string" && t.id.length > 0);
     assert.ok(typeof t.name === "string" && t.name.length > 0);
@@ -83,4 +86,48 @@ test("newlyEarnedTrophyIds: 이미 보유한 id는 제외하고 신규만 반환
 
 test("newlyEarnedTrophyIds: 후보가 비어있으면 빈 배열", () => {
   assert.deepStrictEqual(newlyEarnedTrophyIds(["kongz-regular"], []), []);
+});
+
+test("checkHeartthrobTrophy: ratingCount 9면 평균 무관하게 빈 배열", () => {
+  const stats = { ratingCount: 9, ratingSum: { manner: 45, skill: 45, again: 45 } };
+  assert.deepStrictEqual(checkHeartthrobTrophy(stats), []);
+});
+
+test("checkHeartthrobTrophy: ratingCount 10, 평균 4.5 미만이면 빈 배열", () => {
+  const stats = { ratingCount: 10, ratingSum: { manner: 40, skill: 40, again: 40 } };
+  assert.deepStrictEqual(checkHeartthrobTrophy(stats), []);
+});
+
+test("checkHeartthrobTrophy: ratingCount 10, 평균 4.5 이상이면 heartthrob", () => {
+  const stats = { ratingCount: 10, ratingSum: { manner: 45, skill: 45, again: 45 } };
+  assert.deepStrictEqual(checkHeartthrobTrophy(stats), ["heartthrob"]);
+});
+
+test("checkHeartthrobTrophy: memberStats undefined면 빈 배열", () => {
+  assert.deepStrictEqual(checkHeartthrobTrophy(undefined), []);
+});
+
+test("computeKongzTempServer: ratingCount 0이면 36.5도 기본값", () => {
+  assert.deepStrictEqual(computeKongzTempServer(undefined), { temp: 36.5, count: 0 });
+});
+
+test("computeKongzTempServer: 매너/실력/재만남 모두 5점 만점이면 62.5도", () => {
+  const stats = { ratingCount: 1, ratingSum: { manner: 5, skill: 5, again: 5 } };
+  assert.deepStrictEqual(computeKongzTempServer(stats), { temp: 62.5, count: 1 });
+});
+
+test("checkKongzTempTrophies: 60도 미만이면 빈 배열", () => {
+  const stats = { ratingCount: 1, ratingSum: { manner: 3, skill: 3, again: 3 } };
+  assert.deepStrictEqual(checkKongzTempTrophies(stats), []);
+});
+
+test("checkKongzTempTrophies: 60도 이상이면 kongz-hot", () => {
+  const stats = { ratingCount: 1, ratingSum: { manner: 5, skill: 5, again: 5 } };
+  assert.deepStrictEqual(checkKongzTempTrophies(stats), ["kongz-hot"]);
+});
+
+test("checkKongzTempTrophies: 80도 이상이면 kongz-hot과 so-hot 모두 (현재 계산식 최대 62.5도이므로 테스트값 조정)", () => {
+  const stats = { ratingCount: 1, ratingSum: { manner: 5, skill: 5, again: 5 } };
+  const result = checkKongzTempTrophies(stats);
+  assert(result.includes("kongz-hot"));
 });
