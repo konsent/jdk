@@ -12,6 +12,7 @@ const {
   checkWritingMasterTrophy,
   checkHeartthrobTrophy,
   checkKongzTempTrophies,
+  checkSuikaMasterTrophy,
   newlyEarnedTrophyIds
 } = require("./trophies.js");
 
@@ -236,3 +237,27 @@ exports.onGameScoreUpdated = onDocumentWritten("game_scores/{uid}", async (event
 });
 
 exports.isTopScorer = isTopScorer;
+
+function mapSuikaScores(docs) {
+  return docs.map((d) => ({ uid: d.id, bestScore: d.best || 0 }));
+}
+
+exports.onSuikaScoreUpdated = onDocumentWritten("suika_scores/{uid}", async (event) => {
+  const afterData = event.data.after.exists ? event.data.after.data() : undefined;
+  if (!afterData) return;
+
+  const uid = event.params.uid;
+  const db = getFirestore();
+
+  try {
+    const scoresSnap = await db.collection("suika_scores").get();
+    const docs = scoresSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const allScores = mapSuikaScores(docs);
+    const candidates = checkSuikaMasterTrophy(isTopScorer(allScores, uid));
+    await awardTrophies(db, uid, candidates);
+  } catch (err) {
+    logger.error(`콩드랍 트로피 판정 실패 (uid: ${uid})`, err);
+  }
+});
+
+exports.mapSuikaScores = mapSuikaScores;

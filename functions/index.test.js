@@ -213,7 +213,7 @@ test("countFullHouseEvents: 작성한 이벤트가 없으면 0", () => {
   assert.strictEqual(countFullHouseEvents([], "u1"), 0);
 });
 
-const { isTopScorer } = require("./index.js");
+const { isTopScorer, mapSuikaScores } = require("./index.js");
 
 test("isTopScorer: 최고 점수 보유자면 true", () => {
   const scores = [
@@ -235,4 +235,22 @@ test("isTopScorer: 동점자는 모두 true", () => {
 
 test("isTopScorer: 점수가 없으면 false", () => {
   assert.strictEqual(isTopScorer([], "u1"), false);
+});
+
+test("mapSuikaScores: {id, best} 배열을 {uid, bestScore}로 매핑한다", () => {
+  const docs = [{ id: "u1", best: 100 }, { id: "u2", best: 300 }];
+  assert.deepStrictEqual(mapSuikaScores(docs), [
+    { uid: "u1", bestScore: 100 },
+    { uid: "u2", bestScore: 300 }
+  ]);
+});
+
+test("mapSuikaScores: best 필드가 없으면 bestScore 0으로 매핑", () => {
+  assert.deepStrictEqual(mapSuikaScores([{ id: "u1" }]), [{ uid: "u1", bestScore: 0 }]);
+});
+
+test("isTopScorer: mapSuikaScores로 매핑한 결과에도 동일하게 동작", () => {
+  const mapped = mapSuikaScores([{ id: "u1", best: 100 }, { id: "u2", best: 300 }]);
+  assert.strictEqual(isTopScorer(mapped, "u2"), true);
+  assert.strictEqual(isTopScorer(mapped, "u1"), false);
 });
