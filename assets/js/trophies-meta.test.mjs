@@ -8,7 +8,7 @@ test("TROPHIES_META: 각 트로피가 id/name/description/image를 보유", () =
     assert.ok(typeof t.id === "string" && t.id.length > 0);
     assert.ok(typeof t.name === "string" && t.name.length > 0);
     assert.ok(typeof t.description === "string" && t.description.length > 0);
-    assert.strictEqual(t.image, `/assets/trophies/${t.id}.png`);
+    assert.strictEqual(t.image, `/assets/trophy/${t.id}.png`);
   });
 });
 

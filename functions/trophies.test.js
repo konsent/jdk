@@ -26,7 +26,7 @@ test("TROPHIES: 18개 트로피 각각 id/name/description/image를 가진다", 
     assert.ok(typeof t.id === "string" && t.id.length > 0);
     assert.ok(typeof t.name === "string" && t.name.length > 0);
     assert.ok(typeof t.description === "string" && t.description.length > 0);
-    assert.strictEqual(t.image, `/assets/trophies/${t.id}.png`);
+    assert.strictEqual(t.image, `/assets/trophy/${t.id}.png`);
   });
 });
 
