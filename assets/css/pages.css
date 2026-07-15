@@ -765,8 +765,8 @@
 .trophy-item img {
   width: 64px;
   height: 64px;
-  border-radius: 50%;
-  object-fit: cover;
+  border-radius: 8px;
+  object-fit: contain;
   display: block;
   margin: 0 auto;
 }
