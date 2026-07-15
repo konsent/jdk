@@ -10,11 +10,18 @@ const {
   checkHeartthrobTrophy,
   computeKongzTempServer,
   checkKongzTempTrophies,
-  newlyEarnedTrophyIds
+  newlyEarnedTrophyIds,
+  checkAnnualMemberTrophy,
+  checkSuikaMasterTrophy,
+  checkPartyPlannerTrophy,
+  checkNoNoshowTrophy,
+  checkWeekendRegularTrophy,
+  hasConsecutiveDays,
+  checkFiveDayStreakTrophy
 } = require("./trophies.js");
 
-test("TROPHIES: 12개 트로피 각각 id/name/description/image를 가진다", () => {
-  assert.strictEqual(TROPHIES.length, 12);
+test("TROPHIES: 18개 트로피 각각 id/name/description/image를 가진다", () => {
+  assert.strictEqual(TROPHIES.length, 18);
   TROPHIES.forEach((t) => {
     assert.ok(typeof t.id === "string" && t.id.length > 0);
     assert.ok(typeof t.name === "string" && t.name.length > 0);
@@ -129,4 +136,70 @@ test("checkKongzTempTrophies: 60도 이상 62도 미만이면 kongz-hot만", () 
 test("checkKongzTempTrophies: 62도 이상이면 kongz-hot과 so-hot 모두", () => {
   const stats = { ratingCount: 1, ratingSum: { manner: 5, skill: 5, again: 5 } };
   assert.deepStrictEqual(checkKongzTempTrophies(stats), ["kongz-hot", "so-hot"]);
+});
+
+test("checkAnnualMemberTrophy: true면 annual-member, false/undefined면 빈 배열", () => {
+  assert.deepStrictEqual(checkAnnualMemberTrophy(true), ["annual-member"]);
+  assert.deepStrictEqual(checkAnnualMemberTrophy(false), []);
+  assert.deepStrictEqual(checkAnnualMemberTrophy(undefined), []);
+});
+
+test("checkSuikaMasterTrophy: 1위가 아니면 빈 배열, 1위면 suika-master", () => {
+  assert.deepStrictEqual(checkSuikaMasterTrophy(false), []);
+  assert.deepStrictEqual(checkSuikaMasterTrophy(true), ["suika-master"]);
+});
+
+test("checkPartyPlannerTrophy: 2개면 빈 배열, 3개면 party-planner", () => {
+  assert.deepStrictEqual(checkPartyPlannerTrophy(2), []);
+  assert.deepStrictEqual(checkPartyPlannerTrophy(3), ["party-planner"]);
+});
+
+test("checkNoNoshowTrophy: 19회면 빈 배열, 20회면 no-noshow-20", () => {
+  assert.deepStrictEqual(checkNoNoshowTrophy(19), []);
+  assert.deepStrictEqual(checkNoNoshowTrophy(20), ["no-noshow-20"]);
+});
+
+test("checkWeekendRegularTrophy: 9회면 빈 배열, 10회면 weekend-regular", () => {
+  assert.deepStrictEqual(checkWeekendRegularTrophy(9), []);
+  assert.deepStrictEqual(checkWeekendRegularTrophy(10), ["weekend-regular"]);
+});
+
+test("hasConsecutiveDays: 연속 5일이 있으면 true", () => {
+  const dates = [
+    new Date("2026-01-01"), new Date("2026-01-02"), new Date("2026-01-03"),
+    new Date("2026-01-04"), new Date("2026-01-05")
+  ];
+  assert.strictEqual(hasConsecutiveDays(dates, 5), true);
+});
+
+test("hasConsecutiveDays: 연속 4일뿐이면 false", () => {
+  const dates = [
+    new Date("2026-01-01"), new Date("2026-01-02"), new Date("2026-01-03"), new Date("2026-01-04")
+  ];
+  assert.strictEqual(hasConsecutiveDays(dates, 5), false);
+});
+
+test("hasConsecutiveDays: 중간에 하루라도 빠지면 false", () => {
+  const dates = [
+    new Date("2026-01-01"), new Date("2026-01-02"), new Date("2026-01-04"),
+    new Date("2026-01-05"), new Date("2026-01-06")
+  ];
+  assert.strictEqual(hasConsecutiveDays(dates, 5), false);
+});
+
+test("hasConsecutiveDays: 같은 날짜가 중복돼도 정상 판정", () => {
+  const dates = [
+    new Date("2026-01-01"), new Date("2026-01-01"), new Date("2026-01-02"),
+    new Date("2026-01-03"), new Date("2026-01-04"), new Date("2026-01-05")
+  ];
+  assert.strictEqual(hasConsecutiveDays(dates, 5), true);
+});
+
+test("hasConsecutiveDays: 빈 배열이면 false", () => {
+  assert.strictEqual(hasConsecutiveDays([], 5), false);
+});
+
+test("checkFiveDayStreakTrophy: true면 five-day-streak", () => {
+  assert.deepStrictEqual(checkFiveDayStreakTrophy(true), ["five-day-streak"]);
+  assert.deepStrictEqual(checkFiveDayStreakTrophy(false), []);
 });

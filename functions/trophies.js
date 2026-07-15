@@ -70,6 +70,42 @@ const TROPHIES = [
     name: "쏘핫",
     description: "콩즈 온도 62도 이상 달성",
     image: "/assets/trophies/so-hot.png"
+  },
+  {
+    id: "annual-member",
+    name: "연회원 가입",
+    description: "연회원으로 가입",
+    image: "/assets/trophies/annual-member.png"
+  },
+  {
+    id: "suika-master",
+    name: "콩드랍 마스터",
+    description: "콩드랍(수박게임) 전체 랭킹 1위 달성",
+    image: "/assets/trophies/suika-master.png"
+  },
+  {
+    id: "party-planner",
+    name: "파티 플래너",
+    description: "커스텀 파티 3개 이상 운영 중",
+    image: "/assets/trophies/party-planner.png"
+  },
+  {
+    id: "no-noshow-20",
+    name: "불참 없이 참석 20회",
+    description: "노쇼 없이 실제 참석 누적 20회 달성",
+    image: "/assets/trophies/no-noshow-20.png"
+  },
+  {
+    id: "five-day-streak",
+    name: "5일 연속 참여",
+    description: "달력상 연속 5일간 실제 참석",
+    image: "/assets/trophies/five-day-streak.png"
+  },
+  {
+    id: "weekend-regular",
+    name: "주말 개근",
+    description: "주말 이벤트 노쇼 없이 실제 참석 누적 10회 달성",
+    image: "/assets/trophies/weekend-regular.png"
   }
 ];
 
@@ -125,6 +161,53 @@ function checkGame2048Trophy(isTopScorer) {
   return isTopScorer ? ["game-2048-champion"] : [];
 }
 
+function checkAnnualMemberTrophy(annualMember) {
+  return annualMember === true ? ["annual-member"] : [];
+}
+
+function checkSuikaMasterTrophy(isTopScorer) {
+  return isTopScorer ? ["suika-master"] : [];
+}
+
+function checkPartyPlannerTrophy(partyCount) {
+  return partyCount >= 3 ? ["party-planner"] : [];
+}
+
+function checkNoNoshowTrophy(confirmedEventCount) {
+  return confirmedEventCount >= 20 ? ["no-noshow-20"] : [];
+}
+
+function checkWeekendRegularTrophy(weekendConfirmedCount) {
+  return weekendConfirmedCount >= 10 ? ["weekend-regular"] : [];
+}
+
+function hasConsecutiveDays(dateList, n) {
+  if (!dateList.length) return false;
+  const dayKeys = [...new Set(
+    dateList.map((d) => {
+      const dt = new Date(d);
+      dt.setHours(0, 0, 0, 0);
+      return dt.getTime();
+    })
+  )].sort((a, b) => a - b);
+
+  let streak = 1;
+  const ONE_DAY = 24 * 60 * 60 * 1000;
+  for (let i = 1; i < dayKeys.length; i++) {
+    if (dayKeys[i] - dayKeys[i - 1] === ONE_DAY) {
+      streak++;
+      if (streak >= n) return true;
+    } else {
+      streak = 1;
+    }
+  }
+  return streak >= n;
+}
+
+function checkFiveDayStreakTrophy(hasStreak) {
+  return hasStreak ? ["five-day-streak"] : [];
+}
+
 function newlyEarnedTrophyIds(existingIds, candidateIds) {
   return candidateIds.filter((id) => !existingIds.includes(id));
 }
@@ -139,5 +222,12 @@ module.exports = {
   checkHeartthrobTrophy,
   computeKongzTempServer,
   checkKongzTempTrophies,
-  newlyEarnedTrophyIds
+  newlyEarnedTrophyIds,
+  checkAnnualMemberTrophy,
+  checkSuikaMasterTrophy,
+  checkPartyPlannerTrophy,
+  checkNoNoshowTrophy,
+  checkWeekendRegularTrophy,
+  hasConsecutiveDays,
+  checkFiveDayStreakTrophy
 };
