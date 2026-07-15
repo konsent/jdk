@@ -284,7 +284,11 @@ async function showUnseenTrophyPopups(user, earnedTrophies) {
   }
 
   const updated = earnedTrophies.map((t) => ({ ...t, seen: true }));
-  await updateDoc(doc(db, "users", user.uid), { trophies: updated });
+  try {
+    await updateDoc(doc(db, "users", user.uid), { trophies: updated });
+  } catch (e) {
+    console.error("트로피 seen 업데이트 실패", e);
+  }
 }
 
 function showTrophyPopupAndWait(meta) {
