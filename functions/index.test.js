@@ -269,3 +269,26 @@ test("countPartiesByOwner: 특정 ownerUid의 파티만 센다", () => {
 test("countPartiesByOwner: 파티가 없으면 0", () => {
   assert.strictEqual(countPartiesByOwner([], "u1"), 0);
 });
+
+const { becameAnnualMember } = require("./index.js");
+
+test("becameAnnualMember: annualMember가 false에서 true로 바뀌면 true", () => {
+  assert.strictEqual(becameAnnualMember({ annualMember: false }, { annualMember: true }), true);
+});
+
+test("becameAnnualMember: 처음부터 undefined였다가 true가 되어도 true", () => {
+  assert.strictEqual(becameAnnualMember(undefined, { annualMember: true }), true);
+});
+
+test("becameAnnualMember: 이미 true였다가 다시 true면 false (변화 없음)", () => {
+  assert.strictEqual(becameAnnualMember({ annualMember: true }, { annualMember: true }), false);
+});
+
+test("becameAnnualMember: afterData가 없으면(삭제) false", () => {
+  assert.strictEqual(becameAnnualMember({ annualMember: true }, undefined), false);
+});
+
+test("becameAnnualMember: annualMember가 여전히 false/undefined면 false", () => {
+  assert.strictEqual(becameAnnualMember({ annualMember: false }, { annualMember: false }), false);
+  assert.strictEqual(becameAnnualMember(undefined, {}), false);
+});

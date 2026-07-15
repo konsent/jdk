@@ -14,6 +14,7 @@ const {
   checkKongzTempTrophies,
   checkSuikaMasterTrophy,
   checkPartyPlannerTrophy,
+  checkAnnualMemberTrophy,
   newlyEarnedTrophyIds
 } = require("./trophies.js");
 
@@ -285,3 +286,29 @@ exports.onPartyUpdated = onDocumentWritten("parties/{partyId}", async (event) =>
 });
 
 exports.countPartiesByOwner = countPartiesByOwner;
+
+function becameAnnualMember(beforeData, afterData) {
+  if (!afterData) return false;
+  const wasAnnual = beforeData?.annualMember === true;
+  const isAnnual = afterData.annualMember === true;
+  return isAnnual && !wasAnnual;
+}
+
+exports.onUserUpdated = onDocumentWritten("users/{uid}", async (event) => {
+  const beforeData = event.data.before.exists ? event.data.before.data() : undefined;
+  const afterData = event.data.after.exists ? event.data.after.data() : undefined;
+
+  if (!becameAnnualMember(beforeData, afterData)) return;
+
+  const uid = event.params.uid;
+  const db = getFirestore();
+
+  try {
+    const candidates = checkAnnualMemberTrophy(true);
+    await awardTrophies(db, uid, candidates);
+  } catch (err) {
+    logger.error(`연회원 트로피 판정 실패 (uid: ${uid})`, err);
+  }
+});
+
+exports.becameAnnualMember = becameAnnualMember;
