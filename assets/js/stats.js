@@ -416,12 +416,18 @@ function renderAdminTools() {
   document.getElementById("btn-backfill-trophies").addEventListener("click", async () => {
     if (!confirm("전체 회원의 트로피를 현재 데이터 기준으로 재계산합니다. 계속할까요?")) return;
 
-    document.getElementById("btn-backfill-trophies").disabled = true;
-    const { processedCount, awardedCount, failedCount } = await runTrophyBackfill();
-    document.getElementById("btn-backfill-trophies").disabled = false;
-
-    const failedText = failedCount > 0 ? `, ${failedCount}명 실패` : "";
-    showActionMsg(`${processedCount}명 처리, 총 ${awardedCount}개 트로피 신규 수여${failedText}.`);
+    const btn = document.getElementById("btn-backfill-trophies");
+    btn.disabled = true;
+    try {
+      const { processedCount, awardedCount, failedCount } = await runTrophyBackfill();
+      const failedText = failedCount > 0 ? `, ${failedCount}명 실패` : "";
+      showActionMsg(`${processedCount}명 처리, 총 ${awardedCount}개 트로피 신규 수여${failedText}.`);
+    } catch (e) {
+      console.error("트로피 백필 실패", e);
+      showActionMsg("트로피 재계산 중 오류가 발생했습니다. 콘솔을 확인해 주세요.");
+    } finally {
+      btn.disabled = false;
+    }
   });
 }
 
