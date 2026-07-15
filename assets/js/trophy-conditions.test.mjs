@@ -77,3 +77,60 @@ test("newlyEarnedTrophyIds: 이미 보유한 id 제외", () => {
     ["schedule-maker"]
   );
 });
+
+test("checkGame2048Trophy: 1위가 아니면 빈 배열", () => {
+  assert.deepStrictEqual(checkGame2048Trophy(false), []);
+});
+
+test("checkSuikaMasterTrophy: 1위가 아니면 빈 배열", () => {
+  assert.deepStrictEqual(checkSuikaMasterTrophy(false), []);
+});
+
+test("checkAnnualMemberTrophy: undefined면 빈 배열", () => {
+  assert.deepStrictEqual(checkAnnualMemberTrophy(undefined), []);
+});
+
+test("checkHeartthrobTrophy: memberStats undefined면 빈 배열", () => {
+  assert.deepStrictEqual(checkHeartthrobTrophy(undefined), []);
+});
+
+test("computeKongzTempServer: ratingCount 0이면 36.5도 기본값", () => {
+  assert.deepStrictEqual(computeKongzTempServer(undefined), { temp: 36.5, count: 0 });
+});
+
+test("hasConsecutiveDays: 연속 4일뿐이면 false", () => {
+  const dates = [
+    new Date("2026-01-01"), new Date("2026-01-02"), new Date("2026-01-03"), new Date("2026-01-04")
+  ];
+  assert.strictEqual(hasConsecutiveDays(dates, 5), false);
+});
+
+test("hasConsecutiveDays: 중간에 하루라도 빠지면 false", () => {
+  const dates = [
+    new Date("2026-01-01"), new Date("2026-01-02"), new Date("2026-01-04"),
+    new Date("2026-01-05"), new Date("2026-01-06")
+  ];
+  assert.strictEqual(hasConsecutiveDays(dates, 5), false);
+});
+
+test("hasConsecutiveDays: 같은 날짜가 중복돼도 정상 판정", () => {
+  const dates = [
+    new Date("2026-01-01"), new Date("2026-01-01"), new Date("2026-01-02"),
+    new Date("2026-01-03"), new Date("2026-01-04"), new Date("2026-01-05")
+  ];
+  assert.strictEqual(hasConsecutiveDays(dates, 5), true);
+});
+
+test("hasConsecutiveDays: 빈 배열이면 false", () => {
+  assert.strictEqual(hasConsecutiveDays([], 5), false);
+});
+
+test("checkKongzTempTrophies: 60도 미만이면 빈 배열", () => {
+  const stats = { ratingCount: 1, ratingSum: { manner: 3, skill: 3, again: 3 } };
+  assert.deepStrictEqual(checkKongzTempTrophies(stats), []);
+});
+
+test("checkKongzTempTrophies: 60도 이상 62도 미만이면 kongz-hot만", () => {
+  const stats = { ratingCount: 10, ratingSum: { manner: 50, skill: 50, again: 47 } };
+  assert.deepStrictEqual(checkKongzTempTrophies(stats), ["kongz-hot"]);
+});
