@@ -1,10 +1,17 @@
 import { db } from "./firebase-init.js";
 import { requireAdmin } from "./auth-guard.js";
 import {
-  doc, getDoc, setDoc, getDocs,
+  doc, getDoc, updateDoc, arrayUnion, setDoc, getDocs,
   collection, query, where, orderBy,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  checkAttendanceTrophies, checkScheduleMakerTrophy, checkFullHouseTrophy,
+  checkWritingMasterTrophy, checkHeartthrobTrophy, checkKongzTempTrophies,
+  checkGame2048Trophy, checkSuikaMasterTrophy, checkAnnualMemberTrophy,
+  checkPartyPlannerTrophy, checkNoNoshowTrophy, checkWeekendRegularTrophy,
+  hasConsecutiveDays, checkFiveDayStreakTrophy, newlyEarnedTrophyIds
+} from "./trophy-conditions.js";
 
 let adminUser = null;
 let adminData = null;
@@ -243,6 +250,121 @@ function renderAwards() {
   `;
 }
 
+function isWeekendDate(date) {
+  const day = date.getDay();
+  return day === 0 || day === 6;
+}
+
+function filterConfirmedClosedEvents(posts, uid) {
+  return posts.filter(
+    (p) => p.type === "event" && !!p.closedAt && (p.confirmedAttendees || []).includes(uid)
+  );
+}
+
+function isTopScorerByField(allDocs, uid, field) {
+  const scores = allDocs.map((d) => ({ uid: d.id, value: d[field] || 0 }));
+  const top = Math.max(...scores.map((s) => s.value));
+  if (top === 0) return false;
+  const mine = scores.find((s) => s.uid === uid);
+  return !!mine && mine.value === top;
+}
+
+function countFullHouseEvents(posts, authorUid) {
+  return posts.filter(
+    (p) => p.authorUid === authorUid && (p.attendees?.length || 0) >= p.maxAttendees
+  ).length;
+}
+
+async function backfillTrophiesForMember(uid, ctx) {
+  const memberStats = ctx.statsMembers[uid];
+  const postCount = memberStats?.postCount || 0;
+  const attendCount = memberStats?.attendCount || 0;
+
+  const fullCount = countFullHouseEvents(ctx.eventPosts, uid);
+  const partyCount = ctx.parties.filter((p) => p.ownerUid === uid).length;
+  const is2048Top = isTopScorerByField(ctx.gameScores, uid, "bestScore");
+  const isSuikaTop = isTopScorerByField(ctx.suikaScores, uid, "best");
+
+  const confirmedEvents = filterConfirmedClosedEvents(ctx.eventPosts, uid);
+  const weekendCount = confirmedEvents
+    .map((p) => p.eventDate?.toDate?.())
+    .filter((d) => d instanceof Date && isWeekendDate(d)).length;
+  const eventDates = confirmedEvents
+    .map((p) => p.eventDate?.toDate?.())
+    .filter((d) => d instanceof Date);
+  const hasStreak = hasConsecutiveDays(eventDates, 5);
+
+  const candidates = [
+    ...checkAttendanceTrophies(attendCount),
+    ...checkScheduleMakerTrophy(postCount),
+    ...checkWritingMasterTrophy(postCount),
+    ...checkFullHouseTrophy(fullCount),
+    ...checkHeartthrobTrophy(memberStats),
+    ...checkKongzTempTrophies(memberStats),
+    ...checkGame2048Trophy(is2048Top),
+    ...checkSuikaMasterTrophy(isSuikaTop),
+    ...checkAnnualMemberTrophy(ctx.users[uid]?.annualMember === true),
+    ...checkPartyPlannerTrophy(partyCount),
+    ...checkNoNoshowTrophy(confirmedEvents.length),
+    ...checkWeekendRegularTrophy(weekendCount),
+    ...checkFiveDayStreakTrophy(hasStreak)
+  ];
+
+  if (!candidates.length) return 0;
+
+  const userRef = doc(db, "users", uid);
+  const userSnap = await getDoc(userRef);
+  if (!userSnap.exists()) return 0;
+
+  const existing = userSnap.data().trophies || [];
+  const existingIds = existing.map((t) => t.id);
+  const toAward = newlyEarnedTrophyIds(existingIds, candidates);
+  if (!toAward.length) return 0;
+
+  const newEntries = toAward.map((id) => ({ id, earnedAt: new Date(), seen: false }));
+  await updateDoc(userRef, { trophies: arrayUnion(...newEntries) });
+  return toAward.length;
+}
+
+async function runTrophyBackfill() {
+  const usersSnap = await getDocs(collection(db, "users"));
+  const users = {};
+  usersSnap.forEach((d) => { users[d.id] = d.data(); });
+
+  const statsSnap = await getDoc(doc(db, "stats", "global"));
+  const statsMembers = statsSnap.data()?.members || {};
+
+  const partiesSnap = await getDocs(collection(db, "parties"));
+  const parties = partiesSnap.docs.map((d) => d.data());
+
+  const gameScoresSnap = await getDocs(collection(db, "game_scores"));
+  const gameScores = gameScoresSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+  const suikaScoresSnap = await getDocs(collection(db, "suika_scores"));
+  const suikaScores = suikaScoresSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+  const eventPostsSnap = await getDocs(query(collection(db, "posts"), where("type", "==", "event")));
+  const eventPosts = eventPostsSnap.docs.map((d) => d.data());
+
+  const ctx = { users, statsMembers, parties, gameScores, suikaScores, eventPosts };
+
+  let processedCount = 0;
+  let awardedCount = 0;
+  let failedCount = 0;
+
+  for (const uid of Object.keys(users)) {
+    try {
+      awardedCount += await backfillTrophiesForMember(uid, ctx);
+      processedCount++;
+    } catch (e) {
+      console.error(`트로피 백필 실패 (uid: ${uid})`, e);
+      failedCount++;
+    }
+  }
+
+  return { processedCount, awardedCount, failedCount };
+}
+
 function renderAdminTools() {
   document.getElementById("admin-actions").style.display = "block";
   loadSnapshotList();
@@ -289,6 +411,17 @@ function renderAdminTools() {
     renderAwards();
     renderCharts(currentPeriod);
     showActionMsg("통계가 재계산됐습니다.");
+  });
+
+  document.getElementById("btn-backfill-trophies").addEventListener("click", async () => {
+    if (!confirm("전체 회원의 트로피를 현재 데이터 기준으로 재계산합니다. 계속할까요?")) return;
+
+    document.getElementById("btn-backfill-trophies").disabled = true;
+    const { processedCount, awardedCount, failedCount } = await runTrophyBackfill();
+    document.getElementById("btn-backfill-trophies").disabled = false;
+
+    const failedText = failedCount > 0 ? `, ${failedCount}명 실패` : "";
+    showActionMsg(`${processedCount}명 처리, 총 ${awardedCount}개 트로피 신규 수여${failedText}.`);
   });
 }
 
