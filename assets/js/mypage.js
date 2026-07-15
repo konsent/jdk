@@ -2,11 +2,12 @@ import { auth, db } from "./firebase-init.js";
 import { requireApproved } from "./auth-guard.js";
 import { deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  doc, deleteDoc, getDoc
+  doc, deleteDoc, getDoc, updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { computeAverages, computeKongzTemp, tempToColor } from "./rating-logic.js";
 import { listMyParties, createParty, updateParty, deleteParty, listApprovedUsers } from "./party.js";
 import { filterByNickname } from "./party-logic.js";
+import { TROPHIES_META } from "./trophies-meta.js";
 
 let currentUser = null;
 
@@ -51,6 +52,10 @@ requireApproved(async (user, userData) => {
   }
 
   await setupParties(user);
+
+  const earnedTrophies = userData.trophies || [];
+  renderTrophyGrid(earnedTrophies);
+  await showUnseenTrophyPopups(user, earnedTrophies);
 
   document.getElementById("btn-withdraw").addEventListener("click", () => {
     document.getElementById("confirm-modal").style.display = "flex";
@@ -252,4 +257,47 @@ function escapePartyText(str) {
   const div = document.createElement("div");
   div.textContent = str || "";
   return div.innerHTML.replace(/"/g, "&quot;");
+}
+
+function renderTrophyGrid(earnedTrophies) {
+  const earnedIds = new Set(earnedTrophies.map((t) => t.id));
+  const el = document.getElementById("trophy-grid");
+  el.innerHTML = TROPHIES_META.map((t) => {
+    const locked = !earnedIds.has(t.id);
+    return `
+      <div class="trophy-item ${locked ? "trophy-item--locked" : ""}" title="${escapePartyText(t.name)} - ${escapePartyText(t.description)}">
+        <img src="${t.image}" alt="${escapePartyText(t.name)}">
+        <div>${escapePartyText(t.name)}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+async function showUnseenTrophyPopups(user, earnedTrophies) {
+  const unseen = earnedTrophies.filter((t) => !t.seen);
+  if (!unseen.length) return;
+
+  for (const trophy of unseen) {
+    const meta = TROPHIES_META.find((m) => m.id === trophy.id);
+    if (!meta) continue;
+    await showTrophyPopupAndWait(meta);
+  }
+
+  const updated = earnedTrophies.map((t) => ({ ...t, seen: true }));
+  await updateDoc(doc(db, "users", user.uid), { trophies: updated });
+}
+
+function showTrophyPopupAndWait(meta) {
+  return new Promise((resolve) => {
+    const el = document.createElement("div");
+    el.className = "victory-overlay";
+    el.innerHTML = `<img src="${meta.image}" alt=""><p>${escapePartyText(meta.name)} 획득!</p>`;
+    document.body.appendChild(el);
+    el.addEventListener("animationend", (e) => {
+      if (e.target === el) {
+        el.remove();
+        resolve();
+      }
+    });
+  });
 }
