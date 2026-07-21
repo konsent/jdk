@@ -208,7 +208,9 @@ function escapeGameText(str) {
 }
 
 const THUMBNAIL_PREVIEW_COUNT = 5;
+const THUMBNAIL_FETCH_DELAY = 400;
 const candidateDetailCache = new Map();
+let thumbnailFetchTimer = null;
 
 async function fetchGameDetail(bggId) {
   if (candidateDetailCache.has(bggId)) return candidateDetailCache.get(bggId);
@@ -248,15 +250,18 @@ function renderCandidates(candidates) {
     });
   });
 
-  candidates.slice(0, THUMBNAIL_PREVIEW_COUNT).forEach((c) => {
-    fetchGameDetail(c.bggId).then((detail) => {
-      if (!detail?.thumbnail) return;
-      const row = el.querySelector(`.game-candidate[data-id="${CSS.escape(c.bggId)}"]`);
-      if (row && !row.querySelector("img")) {
-        row.insertAdjacentHTML("afterbegin", `<img src="${escapeGameText(detail.thumbnail)}" alt="">`);
-      }
-    }).catch(() => {});
-  });
+  clearTimeout(thumbnailFetchTimer);
+  thumbnailFetchTimer = setTimeout(() => {
+    candidates.slice(0, THUMBNAIL_PREVIEW_COUNT).forEach((c) => {
+      fetchGameDetail(c.bggId).then((detail) => {
+        if (!detail?.thumbnail) return;
+        const row = el.querySelector(`.game-candidate[data-id="${CSS.escape(c.bggId)}"]`);
+        if (row && !row.querySelector("img")) {
+          row.insertAdjacentHTML("afterbegin", `<img src="${escapeGameText(detail.thumbnail)}" alt="">`);
+        }
+      }).catch(() => {});
+    });
+  }, THUMBNAIL_FETCH_DELAY);
 }
 
 let searchDebounceTimer = null;
