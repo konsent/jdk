@@ -229,7 +229,7 @@ function renderCandidates(candidates) {
   }
   el.innerHTML = candidates.map((c) =>
     `<div class="game-candidate" data-id="${escapeGameText(c.bggId)}" data-name="${escapeGameText(c.name)}">
-      ${escapeGameText(c.name)}${c.yearPublished ? ` (${c.yearPublished})` : ""}
+      <span>${escapeGameText(c.name)}${c.yearPublished ? ` (${c.yearPublished})` : ""}</span>
     </div>`
   ).join("");
   el.style.display = "block";
