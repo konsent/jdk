@@ -75,6 +75,15 @@ exports.notifyOnPendingSignup = onDocumentWritten(
 exports.shouldNotify = shouldNotify;
 exports.buildMessage = buildMessage;
 
+function decodeXmlEntities(str) {
+  return str
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, "\"")
+    .replace(/&#0*39;/g, "'");
+}
+
 function parseSearchResults(xml) {
   const items = [];
   const itemRegex = /<item[^>]*\bid="([^"]+)"[^>]*>([\s\S]*?)<\/item>/g;
@@ -85,7 +94,7 @@ function parseSearchResults(xml) {
     const yearMatch = /<yearpublished[^>]*\bvalue="([^"]*)"/.exec(body);
     items.push({
       bggId,
-      name: nameMatch ? nameMatch[1] : "",
+      name: nameMatch ? decodeXmlEntities(nameMatch[1]) : "",
       yearPublished: yearMatch ? yearMatch[1] : undefined
     });
   }
@@ -134,7 +143,7 @@ function parseGameDetail(xml, bggId) {
   const thumbMatch = /<thumbnail>([^<]*)<\/thumbnail>/.exec(body);
   return {
     bggId,
-    name: nameMatch ? nameMatch[1] : "",
+    name: nameMatch ? decodeXmlEntities(nameMatch[1]) : "",
     yearPublished: yearMatch ? yearMatch[1] : undefined,
     thumbnail: thumbMatch ? thumbMatch[1] : undefined
   };

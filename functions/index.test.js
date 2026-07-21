@@ -55,6 +55,19 @@ test("parseSearchResults: 결과 없으면 빈 배열", () => {
   assert.deepStrictEqual(parseSearchResults(xml), []);
 });
 
+test("parseSearchResults: 이름의 XML 엔티티(&amp; 등)를 디코딩한다", () => {
+  const xml = `<?xml version="1.0"?>
+<items total="1" termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">
+<item type="boardgame" id="27760">
+  <name type="primary" value="Catan: Traders &amp; Barbarians"/>
+  <yearpublished value="2007"/>
+</item>
+</items>`;
+  assert.deepStrictEqual(parseSearchResults(xml), [
+    { bggId: "27760", name: "Catan: Traders & Barbarians", yearPublished: "2007" }
+  ]);
+});
+
 test("parseSearchResults: yearpublished 없는 아이템은 yearPublished undefined", () => {
   const xml = `<?xml version="1.0"?>
 <items total="1" termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">
@@ -141,6 +154,23 @@ test("parseGameDetail: thing XML에서 이름/연도/썸네일을 추출한다",
     name: "Catan",
     yearPublished: "1995",
     thumbnail: "https://cf.geekdo-images.com/thumb/catan.jpg"
+  });
+});
+
+test("parseGameDetail: 이름의 XML 엔티티(&amp; 등)를 디코딩한다", () => {
+  const xml = `<?xml version="1.0"?>
+<items termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">
+<item type="boardgame" id="27760">
+  <thumbnail>https://cf.geekdo-images.com/thumb/traders.jpg</thumbnail>
+  <name type="primary" sortindex="1" value="Catan: Traders &amp; Barbarians" />
+  <yearpublished value="2007"/>
+</item>
+</items>`;
+  assert.deepStrictEqual(parseGameDetail(xml, "27760"), {
+    bggId: "27760",
+    name: "Catan: Traders & Barbarians",
+    yearPublished: "2007",
+    thumbnail: "https://cf.geekdo-images.com/thumb/traders.jpg"
   });
 });
 
