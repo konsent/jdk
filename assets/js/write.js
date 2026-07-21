@@ -207,6 +207,17 @@ function escapeGameText(str) {
   return div.innerHTML.replace(/"/g, "&quot;");
 }
 
+const THUMBNAIL_PREVIEW_COUNT = 5;
+const candidateDetailCache = new Map();
+
+async function fetchGameDetail(bggId) {
+  if (candidateDetailCache.has(bggId)) return candidateDetailCache.get(bggId);
+  const res = await fetch(`${FUNCTIONS_BASE}/getBoardGameDetail?id=${encodeURIComponent(bggId)}`);
+  const detail = await res.json();
+  if (detail) candidateDetailCache.set(bggId, detail);
+  return detail;
+}
+
 function renderCandidates(candidates) {
   const el = document.getElementById("game-candidates");
   if (!candidates.length) {
@@ -226,8 +237,7 @@ function renderCandidates(candidates) {
       el.style.display = "none";
       document.getElementById("input-game-search").value = "";
       try {
-        const res = await fetch(`${FUNCTIONS_BASE}/getBoardGameDetail?id=${encodeURIComponent(bggId)}`);
-        const detail = await res.json();
+        const detail = await fetchGameDetail(bggId);
         if (detail) {
           selectedGames.push(detail);
           renderSelectedGames();
@@ -236,6 +246,16 @@ function renderCandidates(candidates) {
         console.error("게임 상세 조회 실패:", e);
       }
     });
+  });
+
+  candidates.slice(0, THUMBNAIL_PREVIEW_COUNT).forEach((c) => {
+    fetchGameDetail(c.bggId).then((detail) => {
+      if (!detail?.thumbnail) return;
+      const row = el.querySelector(`.game-candidate[data-id="${CSS.escape(c.bggId)}"]`);
+      if (row && !row.querySelector("img")) {
+        row.insertAdjacentHTML("afterbegin", `<img src="${escapeGameText(detail.thumbnail)}" alt="">`);
+      }
+    }).catch(() => {});
   });
 }
 

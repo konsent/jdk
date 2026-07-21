@@ -115,6 +115,12 @@ async function fetchWithRetry(url, fetchImpl = fetch, token) {
   return res.text();
 }
 
+function sortGameCandidates(candidates) {
+  return [...candidates].sort((a, b) => (Number(b.yearPublished) || 0) - (Number(a.yearPublished) || 0));
+}
+
+exports.sortGameCandidates = sortGameCandidates;
+
 exports.searchBoardGame = onRequest({ secrets: [BGG_API_TOKEN], cors: true }, async (req, res) => {
   const q = (req.query.q || "").trim();
   if (!q) { res.json([]); return; }
@@ -124,7 +130,7 @@ exports.searchBoardGame = onRequest({ secrets: [BGG_API_TOKEN], cors: true }, as
       fetch,
       BGG_API_TOKEN.value()
     );
-    res.json(xml ? parseSearchResults(xml) : []);
+    res.json(xml ? sortGameCandidates(parseSearchResults(xml)) : []);
   } catch (err) {
     logger.error("BGG 검색 실패", err);
     res.json([]);
@@ -397,3 +403,33 @@ exports.onPostConfirmed = onDocumentWritten("posts/{postId}", async (event) => {
 exports.confirmedAttendeesChanged = confirmedAttendeesChanged;
 exports.filterConfirmedClosedEvents = filterConfirmedClosedEvents;
 exports.isWeekendDate = isWeekendDate;
+
+function becamePostClosed(beforeData, afterData) {
+  if (!afterData || afterData.type !== "event") return false;
+  return !beforeData?.closedAt && !!afterData.closedAt;
+}
+
+exports.becamePostClosed = becamePostClosed;
+
+exports.onPostClosed = onDocumentWritten("posts/{postId}", async (event) => {
+  const beforeData = event.data.before.exists ? event.data.before.data() : undefined;
+  const afterData = event.data.after.exists ? event.data.after.data() : undefined;
+
+  if (!becamePostClosed(beforeData, afterData)) return;
+
+  const games = afterData.games || [];
+  if (!games.length) return;
+
+  const db = getFirestore();
+  for (const game of games) {
+    if (!game.bggId) continue;
+    try {
+      await db.collection("gamePlayStats").doc(game.bggId).set(
+        { name: game.name || "", playCount: FieldValue.increment(1) },
+        { merge: true }
+      );
+    } catch (err) {
+      logger.error(`게임 플레이 통계 업데이트 실패 (bggId: ${game.bggId})`, err);
+    }
+  }
+});

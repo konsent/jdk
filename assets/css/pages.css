@@ -686,6 +686,9 @@
   overflow-y: auto;
 }
 .game-candidate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 8px 12px;
   cursor: pointer;
   font-size: 0.9rem;
@@ -693,6 +696,13 @@
 }
 .game-candidate:hover {
   background: var(--accent-light);
+}
+.game-candidate img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
 }
 .selected-games {
   display: flex;

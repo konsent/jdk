@@ -80,6 +80,35 @@ test("parseSearchResults: yearpublished 없는 아이템은 yearPublished undefi
   ]);
 });
 
+const { sortGameCandidates } = require("./index.js");
+
+test("sortGameCandidates: 출시년도 내림차순으로 정렬한다", () => {
+  const candidates = [
+    { bggId: "1", name: "Old", yearPublished: "1995" },
+    { bggId: "2", name: "New", yearPublished: "2020" },
+    { bggId: "3", name: "Mid", yearPublished: "2010" }
+  ];
+  assert.deepStrictEqual(sortGameCandidates(candidates).map((c) => c.bggId), ["2", "3", "1"]);
+});
+
+test("sortGameCandidates: 연도 없는 항목은 뒤로 밀린다", () => {
+  const candidates = [
+    { bggId: "1", name: "NoYear", yearPublished: undefined },
+    { bggId: "2", name: "Has", yearPublished: "2000" }
+  ];
+  assert.deepStrictEqual(sortGameCandidates(candidates).map((c) => c.bggId), ["2", "1"]);
+});
+
+test("sortGameCandidates: 원본 배열을 변경하지 않는다", () => {
+  const candidates = [
+    { bggId: "1", name: "A", yearPublished: "1995" },
+    { bggId: "2", name: "B", yearPublished: "2020" }
+  ];
+  const original = [...candidates];
+  sortGameCandidates(candidates);
+  assert.deepStrictEqual(candidates, original);
+});
+
 const { fetchWithRetry } = require("./index.js");
 
 test("fetchWithRetry: 200 응답이면 바로 본문을 반환한다", async () => {
@@ -376,4 +405,38 @@ test("isWeekendDate: 토요일/일요일은 true, 평일은 false", () => {
   assert.strictEqual(isWeekendDate(new Date("2026-01-03")), true); // 토요일
   assert.strictEqual(isWeekendDate(new Date("2026-01-04")), true); // 일요일
   assert.strictEqual(isWeekendDate(new Date("2026-01-05")), false); // 월요일
+});
+
+const { becamePostClosed } = require("./index.js");
+
+test("becamePostClosed: event 타입이 closedAt 없다가 생기면 true", () => {
+  assert.strictEqual(
+    becamePostClosed({ type: "event" }, { type: "event", closedAt: {} }),
+    true
+  );
+});
+
+test("becamePostClosed: 이미 closedAt이 있었으면 false (변화 없음)", () => {
+  assert.strictEqual(
+    becamePostClosed({ type: "event", closedAt: {} }, { type: "event", closedAt: {} }),
+    false
+  );
+});
+
+test("becamePostClosed: notice 타입이면 closedAt이 생겨도 false", () => {
+  assert.strictEqual(
+    becamePostClosed({ type: "notice" }, { type: "notice", closedAt: {} }),
+    false
+  );
+});
+
+test("becamePostClosed: afterData가 없으면(삭제) false", () => {
+  assert.strictEqual(becamePostClosed({ type: "event" }, undefined), false);
+});
+
+test("becamePostClosed: beforeData가 없어도(최초 생성) closedAt이 있으면 true", () => {
+  assert.strictEqual(
+    becamePostClosed(undefined, { type: "event", closedAt: {} }),
+    true
+  );
 });
