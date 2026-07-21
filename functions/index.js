@@ -99,7 +99,10 @@ async function fetchWithRetry(url, fetchImpl = fetch, token) {
     await new Promise((r) => setTimeout(r, 1000));
     res = await fetchImpl(url, options);
   }
-  if (!res.ok) return null;
+  if (!res.ok) {
+    logger.error(`BGG 요청 실패: status=${res.status} url=${url}`);
+    return null;
+  }
   return res.text();
 }
 
