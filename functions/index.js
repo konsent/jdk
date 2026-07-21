@@ -103,7 +103,7 @@ async function fetchWithRetry(url, fetchImpl = fetch, token) {
   return res.text();
 }
 
-exports.searchBoardGame = onRequest({ secrets: [BGG_API_TOKEN] }, async (req, res) => {
+exports.searchBoardGame = onRequest({ secrets: [BGG_API_TOKEN], cors: true }, async (req, res) => {
   const q = (req.query.q || "").trim();
   if (!q) { res.json([]); return; }
   try {
@@ -137,7 +137,7 @@ function parseGameDetail(xml, bggId) {
   };
 }
 
-exports.getBoardGameDetail = onRequest({ secrets: [BGG_API_TOKEN] }, async (req, res) => {
+exports.getBoardGameDetail = onRequest({ secrets: [BGG_API_TOKEN], cors: true }, async (req, res) => {
   const id = (req.query.id || "").trim();
   if (!id) { res.json(null); return; }
   try {
