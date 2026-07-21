@@ -229,6 +229,7 @@ function renderCandidates(candidates) {
   }
   el.innerHTML = candidates.map((c) =>
     `<div class="game-candidate" data-id="${escapeGameText(c.bggId)}" data-name="${escapeGameText(c.name)}">
+      <span class="game-candidate-thumb"></span>
       <span>${escapeGameText(c.name)}${c.yearPublished ? ` (${c.yearPublished})` : ""}</span>
     </div>`
   ).join("");
@@ -255,9 +256,9 @@ function renderCandidates(candidates) {
     candidates.slice(0, THUMBNAIL_PREVIEW_COUNT).forEach((c) => {
       fetchGameDetail(c.bggId).then((detail) => {
         if (!detail?.thumbnail) return;
-        const row = el.querySelector(`.game-candidate[data-id="${CSS.escape(c.bggId)}"]`);
-        if (row && !row.querySelector("img")) {
-          row.insertAdjacentHTML("afterbegin", `<img src="${escapeGameText(detail.thumbnail)}" alt="">`);
+        const thumb = el.querySelector(`.game-candidate[data-id="${CSS.escape(c.bggId)}"] .game-candidate-thumb`);
+        if (thumb && !thumb.querySelector("img")) {
+          thumb.innerHTML = `<img src="${escapeGameText(detail.thumbnail)}" alt="">`;
         }
       }).catch(() => {});
     });

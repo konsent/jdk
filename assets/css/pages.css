@@ -697,12 +697,18 @@
 .game-candidate:hover {
   background: var(--accent-light);
 }
-.game-candidate img {
+.game-candidate-thumb {
+  display: block;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+.game-candidate-thumb img {
   width: 32px;
   height: 32px;
   object-fit: cover;
   border-radius: var(--radius-sm);
-  flex-shrink: 0;
+  display: block;
 }
 .selected-games {
   display: flex;
