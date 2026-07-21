@@ -26,6 +26,7 @@ initializeApp();
 
 const TELEGRAM_BOT_TOKEN = defineSecret("TELEGRAM_BOT_TOKEN");
 const TELEGRAM_CHAT_ID = defineSecret("TELEGRAM_CHAT_ID");
+const BGG_API_TOKEN = defineSecret("BGG_API_TOKEN");
 
 const ADMIN_URL = "https://www.jdkclub.click/admin/";
 
@@ -91,22 +92,25 @@ function parseSearchResults(xml) {
   return items;
 }
 
-async function fetchWithRetry(url, fetchImpl = fetch) {
-  let res = await fetchImpl(url);
+async function fetchWithRetry(url, fetchImpl = fetch, token) {
+  const options = token ? { headers: { Authorization: `Bearer ${token}` } } : undefined;
+  let res = await fetchImpl(url, options);
   if (res.status === 202) {
     await new Promise((r) => setTimeout(r, 1000));
-    res = await fetchImpl(url);
+    res = await fetchImpl(url, options);
   }
   if (!res.ok) return null;
   return res.text();
 }
 
-exports.searchBoardGame = onRequest(async (req, res) => {
+exports.searchBoardGame = onRequest({ secrets: [BGG_API_TOKEN] }, async (req, res) => {
   const q = (req.query.q || "").trim();
   if (!q) { res.json([]); return; }
   try {
     const xml = await fetchWithRetry(
-      `https://boardgamegeek.com/xmlapi2/search?type=boardgame&query=${encodeURIComponent(q)}`
+      `https://boardgamegeek.com/xmlapi2/search?type=boardgame&query=${encodeURIComponent(q)}`,
+      fetch,
+      BGG_API_TOKEN.value()
     );
     res.json(xml ? parseSearchResults(xml) : []);
   } catch (err) {
@@ -133,12 +137,14 @@ function parseGameDetail(xml, bggId) {
   };
 }
 
-exports.getBoardGameDetail = onRequest(async (req, res) => {
+exports.getBoardGameDetail = onRequest({ secrets: [BGG_API_TOKEN] }, async (req, res) => {
   const id = (req.query.id || "").trim();
   if (!id) { res.json(null); return; }
   try {
     const xml = await fetchWithRetry(
-      `https://boardgamegeek.com/xmlapi2/thing?id=${encodeURIComponent(id)}`
+      `https://boardgamegeek.com/xmlapi2/thing?id=${encodeURIComponent(id)}`,
+      fetch,
+      BGG_API_TOKEN.value()
     );
     res.json(xml ? parseGameDetail(xml, id) : null);
   } catch (err) {

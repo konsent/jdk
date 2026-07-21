@@ -113,6 +113,16 @@ test("fetchWithRetry: 404처럼 재시도 없는 실패 응답도 null을 반환
   assert.strictEqual(result, null);
 });
 
+test("fetchWithRetry: 토큰이 있으면 Authorization 헤더를 실어 보낸다", async () => {
+  let receivedHeaders;
+  const fakeFetch = async (url, options) => {
+    receivedHeaders = options && options.headers;
+    return { status: 200, ok: true, text: async () => "body" };
+  };
+  await fetchWithRetry("https://example.com", fakeFetch, "my-token");
+  assert.strictEqual(receivedHeaders.Authorization, "Bearer my-token");
+});
+
 const { parseGameDetail } = require("./index.js");
 
 test("parseGameDetail: thing XML에서 이름/연도/썸네일을 추출한다", () => {
