@@ -30,7 +30,7 @@ function renderGamesSection(games) {
   const cards = games.map((g) => `
     <a class="game-card" href="https://boardgamegeek.com/boardgame/${escapeHtml(g.bggId)}" target="_blank" rel="noopener">
       ${g.thumbnail ? `<img src="${escapeHtml(g.thumbnail)}" alt="${escapeHtml(g.name)}">` : `<div class="game-card-noimg"></div>`}
-      <span>${escapeHtml(g.name)}${g.yearPublished ? ` (${g.yearPublished})` : ""}</span>
+      <span title="${escapeHtml(g.name)}${g.yearPublished ? ` (${g.yearPublished})` : ""}">${escapeHtml(g.name)}${g.yearPublished ? ` (${g.yearPublished})` : ""}</span>
     </a>
   `).join("");
   return `
