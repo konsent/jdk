@@ -3,6 +3,7 @@ _site
 .DS_Store
 .ruby-version
 node_modules
+.worktrees/
 .jekyll-cache/
 .jekyll-cache/*
 _vendor
