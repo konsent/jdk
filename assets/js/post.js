@@ -65,7 +65,11 @@ async function deletePostWithEventStats() {
       const currentPostCount = statsSnap.data()?.members?.[latestPost.authorUid]?.postCount;
       tx.set(statsRef, {
         updatedAt: serverTimestamp(),
-        [`members.${latestPost.authorUid}.postCount`]: nextEventPostCount(currentPostCount)
+        members: {
+          [latestPost.authorUid]: {
+            postCount: nextEventPostCount(currentPostCount)
+          }
+        }
       }, { merge: true });
     }
 
