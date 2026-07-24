@@ -10,6 +10,10 @@ test("nextEventPostCount: zero never becomes negative", () => {
   assert.strictEqual(nextEventPostCount(0), 0);
 });
 
+test("nextEventPostCount: one decreases to zero", () => {
+  assert.strictEqual(nextEventPostCount(1), 0);
+});
+
 test("nextEventPostCount: missing or invalid count becomes zero", () => {
   assert.strictEqual(nextEventPostCount(undefined), 0);
   assert.strictEqual(nextEventPostCount(-2), 0);

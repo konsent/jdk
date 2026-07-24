@@ -1,6 +1,7 @@
 import { auth, db } from "./firebase-init.js";
 import { requireApproved, getUserDoc } from "./auth-guard.js";
 import { getRatingTargets, canRateNow, ratingDocId, computeKongzTemp, tempToColor } from "./rating-logic.js";
+import { nextEventPostCount } from "./event-deletion-logic.js";
 import {
   doc, getDoc, updateDoc, arrayUnion, arrayRemove,
   collection, query, where, orderBy, getDocs,
@@ -49,6 +50,28 @@ requireApproved(async (user, userData) => {
   currentUserData = userData;
   await loadPost();
 });
+
+async function deletePostWithEventStats() {
+  const postRef = doc(db, "posts", postId);
+  const statsRef = doc(db, "stats", "global");
+
+  await runTransaction(db, async (tx) => {
+    const latestPostSnap = await tx.get(postRef);
+    if (!latestPostSnap.exists()) throw new Error("게시글을 찾을 수 없습니다.");
+
+    const latestPost = latestPostSnap.data();
+    if (latestPost.type === "event" && latestPost.authorUid) {
+      const statsSnap = await tx.get(statsRef);
+      const currentPostCount = statsSnap.data()?.members?.[latestPost.authorUid]?.postCount;
+      tx.set(statsRef, {
+        updatedAt: serverTimestamp(),
+        [`members.${latestPost.authorUid}.postCount`]: nextEventPostCount(currentPostCount)
+      }, { merge: true });
+    }
+
+    tx.delete(postRef);
+  });
+}
 
 async function loadPost() {
   const snap = await getDoc(doc(db, "posts", postId));
@@ -117,8 +140,13 @@ async function loadPost() {
   if (canEdit) {
     document.getElementById("btn-delete-post").addEventListener("click", async () => {
       if (!confirm("게시글을 삭제하시겠습니까?")) return;
-      await deleteDoc(doc(db, "posts", postId));
-      location.href = "/board/";
+      try {
+        await deletePostWithEventStats();
+        location.href = "/board/";
+      } catch (e) {
+        console.error("post deletion failed", e);
+        alert("게시글 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+      }
     });
   }
 
