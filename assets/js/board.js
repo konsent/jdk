@@ -1,5 +1,6 @@
 import { db } from "./firebase-init.js";
 import { requireApproved, getUserDoc } from "./auth-guard.js";
+import { displayEvents } from "./board-logic.js";
 import {
   collection, query, where, orderBy, getDocs, limit
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -49,7 +50,7 @@ async function loadEvents() {
       where("type", "==", "event"),
       orderBy("eventDate", "asc")
     ));
-    const events = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(e => !e.isAnniversary);
+    const events = displayEvents(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     await attachAttendeeNames(events);
     return events;
   } catch (e) {
