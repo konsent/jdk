@@ -14,6 +14,7 @@
 - 문서 ID는 `anniversary-YYYY`이며 같은 연도에 중복 생성하지 않는다.
 - 제목은 `장단콩 클럽 N주년 기념일 🎉`, `N = YYYY - 2023`이며 본문은 빈 문자열이다.
 - 자동 일정은 `authorUid: "system"`, `authorName: "시스템"`, `maxAttendees: 20`, 빈 `attendees`/`games`를 가진 `event` 문서다.
+- 자동 일정의 `eventDate`는 해당 연도 5월 23일 23:59(`Asia/Seoul`)로 저장해, 당일 내내 참가 신청을 받는다.
 - 자동 일정은 게시판에서 표시되고 참가 신청을 받는다.
 - `isAnniversary === true`는 작성자 `postCount`와 등록 횟수 기반 트로피에서 제외하지만 참석자 `attendCount`는 유지한다.
 
@@ -118,7 +119,7 @@ exports.ensureAnniversarySchedule = onSchedule(
     if (!shouldCreateAnniversary(parts)) return;
     const db = getFirestore();
     const ref = db.collection("posts").doc(anniversaryPostId(parts.year));
-    const eventDate = Timestamp.fromDate(new Date(Date.UTC(parts.year, 4, 22, 15)));
+    const eventDate = Timestamp.fromDate(new Date(Date.UTC(parts.year, 4, 23, 14, 59)));
     await db.runTransaction(async (tx) => {
       if ((await tx.get(ref)).exists) return;
       tx.create(ref, {

@@ -1,7 +1,7 @@
 import { auth, db } from "./firebase-init.js";
 import { requireApproved, getUserDoc } from "./auth-guard.js";
 import { getRatingTargets, canRateNow, ratingDocId, computeKongzTemp, tempToColor } from "./rating-logic.js";
-import { nextEventPostCount } from "./event-deletion-logic.js";
+import { nextEventPostCount, shouldAdjustEventPostCount } from "./event-deletion-logic.js";
 import {
   doc, getDoc, updateDoc, arrayUnion, arrayRemove,
   collection, query, where, orderBy, getDocs,
@@ -60,7 +60,7 @@ async function deletePostWithEventStats() {
     if (!latestPostSnap.exists()) throw new Error("게시글을 찾을 수 없습니다.");
 
     const latestPost = latestPostSnap.data();
-    if (latestPost.type === "event" && latestPost.authorUid) {
+    if (shouldAdjustEventPostCount(latestPost)) {
       const statsSnap = await tx.get(statsRef);
       const currentPostCount = statsSnap.data()?.members?.[latestPost.authorUid]?.postCount;
       tx.set(statsRef, {
@@ -87,7 +87,7 @@ async function loadPost() {
 
   const date = postData.createdAt?.toDate().toLocaleDateString("ko-KR") || "";
   const authorDoc = await getUserDoc(postData.authorUid);
-  const authorName = authorDoc?.nickname || "알 수 없음";
+  const authorName = postData.authorName || authorDoc?.nickname || "알 수 없음";
 
   let eventInfo = "";
   if (postData.type === "event") {
