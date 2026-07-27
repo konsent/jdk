@@ -383,14 +383,21 @@ function isWeekendDate(date) {
   return day === 0 || day === 6;
 }
 
+function trophyEligibleConfirmedUids(beforeData, afterData) {
+  if (!afterData || afterData.type !== "event" || !afterData.closedAt) return [];
+  if (!confirmedAttendeesChanged(beforeData, afterData) && !becamePostClosed(beforeData, afterData)) return [];
+  return [...new Set(afterData.confirmedAttendees || [])];
+}
+
+exports.trophyEligibleConfirmedUids = trophyEligibleConfirmedUids;
+
 exports.onPostConfirmed = onDocumentWritten("posts/{postId}", async (event) => {
   const beforeData = event.data.before.exists ? event.data.before.data() : undefined;
   const afterData = event.data.after.exists ? event.data.after.data() : undefined;
 
-  if (!afterData || !confirmedAttendeesChanged(beforeData, afterData)) return;
-
   const db = getFirestore();
-  const confirmedUids = afterData.confirmedAttendees || [];
+  const confirmedUids = trophyEligibleConfirmedUids(beforeData, afterData);
+  if (!confirmedUids.length) return;
 
   for (const uid of confirmedUids) {
     try {

@@ -1,6 +1,19 @@
 const assert = require("node:assert");
 const { test } = require("node:test");
 const { shouldNotify, buildMessage } = require("./index.js");
+const { trophyEligibleConfirmedUids } = require("./index.js");
+
+test("trophyEligibleConfirmedUids: 마감 전 확정은 제외하고 마감 시 확정 참석자를 반환한다", () => {
+  const before = { type: "event", confirmedAttendees: ["u1"] };
+  const after = { type: "event", confirmedAttendees: ["u1"], closedAt: new Date() };
+  assert.deepStrictEqual(trophyEligibleConfirmedUids(before, after), ["u1"]);
+});
+
+test("trophyEligibleConfirmedUids: 마감 후 참석 확정 시 중복 없는 전체 참석자를 반환한다", () => {
+  const before = { type: "event", closedAt: new Date(), confirmedAttendees: ["u1"] };
+  const after = { type: "event", closedAt: new Date(), confirmedAttendees: ["u1", "u2", "u2"] };
+  assert.deepStrictEqual(trophyEligibleConfirmedUids(before, after), ["u1", "u2"]);
+});
 
 test("shouldNotify: pending으로 신규 생성되면 true", () => {
   assert.strictEqual(shouldNotify(undefined, { status: "pending" }), true);
