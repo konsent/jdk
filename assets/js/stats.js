@@ -393,9 +393,10 @@ function renderAdminTools() {
     postsSnap.docs.forEach(d => {
       const post = d.data();
       const author = post.authorUid;
-      if (!author) return;
-      if (!rebuilt[author]) rebuilt[author] = { nickname: nicknameMap[author] || "", attendCount: 0, postCount: 0 };
-      rebuilt[author].postCount++;
+      if (!post.isAnniversary && author) {
+        if (!rebuilt[author]) rebuilt[author] = { nickname: nicknameMap[author] || "", attendCount: 0, postCount: 0 };
+        rebuilt[author].postCount++;
+      }
       (post.attendees || []).forEach(uid => {
         if (!rebuilt[uid]) rebuilt[uid] = { nickname: nicknameMap[uid] || "", attendCount: 0, postCount: 0 };
         rebuilt[uid].attendCount++;
