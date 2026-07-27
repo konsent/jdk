@@ -295,7 +295,7 @@ test("countFullHouseEvents: 작성한 이벤트가 없으면 0", () => {
   assert.strictEqual(countFullHouseEvents([], "u1"), 0);
 });
 
-const { isTopScorer, mapSuikaScores } = require("./index.js");
+const { isTopScorer, mapGameScores, mapSuikaScores } = require("./index.js");
 
 test("isTopScorer: 최고 점수 보유자면 true", () => {
   const scores = [
@@ -335,6 +335,40 @@ test("isTopScorer: mapSuikaScores로 매핑한 결과에도 동일하게 동작"
   const mapped = mapSuikaScores([{ id: "u1", best: 100 }, { id: "u2", best: 300 }]);
   assert.strictEqual(isTopScorer(mapped, "u2"), true);
   assert.strictEqual(isTopScorer(mapped, "u1"), false);
+});
+
+const {
+  checkGame2048Trophy,
+  checkSuikaMasterTrophy,
+  newlyEarnedTrophyIds
+} = require("./trophies.js");
+
+test("게임 점수 변환: 2048과 콩드랍 스키마를 같은 최고점 형식으로 바꾼다", () => {
+  assert.deepStrictEqual(
+    mapGameScores([{ id: "a", bestScore: 120 }, { id: "b", bestScore: 90 }]),
+    [{ uid: "a", bestScore: 120 }, { uid: "b", bestScore: 90 }]
+  );
+  assert.deepStrictEqual(
+    mapSuikaScores([{ id: "a", best: 120 }, { id: "b", best: 90 }]),
+    [{ uid: "a", bestScore: 120 }, { uid: "b", bestScore: 90 }]
+  );
+});
+
+test("게임 전체 1위: 단독·공동 1위만 수여 후보이고 0점은 제외한다", () => {
+  const scores = [{ uid: "a", bestScore: 120 }, { uid: "b", bestScore: 120 }, { uid: "c", bestScore: 90 }];
+  assert.strictEqual(isTopScorer(scores, "a"), true);
+  assert.strictEqual(isTopScorer(scores, "b"), true);
+  assert.strictEqual(isTopScorer(scores, "c"), false);
+  assert.strictEqual(isTopScorer([{ uid: "a", bestScore: 0 }], "a"), false);
+  assert.deepStrictEqual(checkGame2048Trophy(isTopScorer(scores, "a")), ["game-2048-champion"]);
+  assert.deepStrictEqual(checkSuikaMasterTrophy(isTopScorer(scores, "b")), ["suika-master"]);
+});
+
+test("게임 전체 1위: 이미 수여한 트로피는 다시 기록하지 않는다", () => {
+  assert.deepStrictEqual(
+    newlyEarnedTrophyIds(["game-2048-champion", "suika-master"], ["game-2048-champion", "suika-master"]),
+    []
+  );
 });
 
 const { countPartiesByOwner } = require("./index.js");

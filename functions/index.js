@@ -266,6 +266,17 @@ exports.onStatsUpdated = onDocumentWritten("stats/global", async (event) => {
 exports.buildTrophyCandidates = buildTrophyCandidates;
 exports.countFullHouseEvents = countFullHouseEvents;
 
+function mapGameScores(docs) {
+  return docs.map((d) => ({ uid: d.id, bestScore: d.bestScore || 0 }));
+}
+
+function mapSuikaScores(docs) {
+  return docs.map((d) => ({ uid: d.id, bestScore: d.best || 0 }));
+}
+
+exports.mapGameScores = mapGameScores;
+exports.mapSuikaScores = mapSuikaScores;
+
 function isTopScorer(allScores, uid) {
   if (!allScores.length) return false;
   const top = Math.max(...allScores.map((s) => s.bestScore || 0));
@@ -283,7 +294,8 @@ exports.onGameScoreUpdated = onDocumentWritten("game_scores/{uid}", async (event
 
   try {
     const scoresSnap = await db.collection("game_scores").get();
-    const allScores = scoresSnap.docs.map((d) => ({ uid: d.id, bestScore: d.data().bestScore || 0 }));
+    const docs = scoresSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const allScores = mapGameScores(docs);
     const candidates = checkGame2048Trophy(isTopScorer(allScores, uid));
     await awardTrophies(db, uid, candidates);
   } catch (err) {
@@ -292,10 +304,6 @@ exports.onGameScoreUpdated = onDocumentWritten("game_scores/{uid}", async (event
 });
 
 exports.isTopScorer = isTopScorer;
-
-function mapSuikaScores(docs) {
-  return docs.map((d) => ({ uid: d.id, bestScore: d.best || 0 }));
-}
 
 exports.onSuikaScoreUpdated = onDocumentWritten("suika_scores/{uid}", async (event) => {
   const afterData = event.data.after.exists ? event.data.after.data() : undefined;
@@ -315,7 +323,6 @@ exports.onSuikaScoreUpdated = onDocumentWritten("suika_scores/{uid}", async (eve
   }
 });
 
-exports.mapSuikaScores = mapSuikaScores;
 
 function countPartiesByOwner(parties, ownerUid) {
   return parties.filter((p) => p.ownerUid === ownerUid).length;
