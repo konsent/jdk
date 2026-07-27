@@ -23,8 +23,9 @@
 
 - Modify: `functions/index.js` — 점수 컬렉션을 공통 점수 배열로 변환하고 전체 1위 uid를 판정하는 순수 함수를 노출하며, 두 Firestore 트리거가 이를 사용하도록 통일한다.
 - Modify: `functions/index.test.js` — 2048/콩드랍의 단독·공동 1위, 0점 제외, 스키마 정규화와 트로피 후보를 회귀 테스트한다.
-- Modify: `assets/js/stats.js` — 백필에 쓰이는 현재 게임 1위 판정을 내보내기 쉬운 순수 헬퍼로 분리하고 두 게임의 후보 생성을 그 헬퍼로 통일한다.
-- Modify: `assets/js/stats.test.mjs` — 백필 헬퍼가 2048와 콩드랍의 현재 최고점자만 후보로 만들고, 기존 보유 항목을 제외하는지 확인한다.
+- Create: `assets/js/game-leaderboard-trophy.js` — 브라우저 UI나 Firebase 의존성 없이 두 게임의 현재 전체 1위 트로피 후보를 계산한다.
+- Modify: `assets/js/stats.js` — 백필에서 새 순수 헬퍼를 사용한다.
+- Create: `assets/js/game-leaderboard-trophy.test.mjs` — 백필 헬퍼가 2048와 콩드랍의 현재 최고점자만 후보로 만드는지 확인한다.
 
 ### Task 1: 서버 점수 1위 판정 통일
 
@@ -119,24 +120,25 @@
   git commit -m "fix: award game leaderboard trophies reliably"
   ```
 
-### Task 2: 백필의 게임 1위 후보를 테스트 가능한 헬퍼로 고정
+### Task 2: 백필의 게임 1위 후보를 순수 모듈로 고정
 
 **Files:**
-- Modify: `assets/js/stats.js:280-332`
-- Create: `assets/js/stats.test.mjs`
+- Create: `assets/js/game-leaderboard-trophy.js`
+- Modify: `assets/js/stats.js:1-14,280-332`
+- Create: `assets/js/game-leaderboard-trophy.test.mjs`
 
 **Interfaces:**
 - Consumes: `checkGame2048Trophy(isTopScorer)`, `checkSuikaMasterTrophy(isTopScorer)`, `newlyEarnedTrophyIds(existingIds, candidateIds)` from `assets/js/trophy-conditions.js`.
-- Produces: `gameLeaderboardTrophyCandidates(gameScores, suikaScores, uid) => string[]`; it returns `game-2048-champion` and/or `suika-master` only when `uid` matches a non-zero highest record in the respective collection.
+- Produces: `gameLeaderboardTrophyCandidates(gameScores, suikaScores, uid) => string[]`; it returns `game-2048-champion` and/or `suika-master` only when `uid` matches a non-zero highest record in the respective collection. The module has no Firebase or DOM imports, so Node can test it directly.
 
 - [ ] **Step 1: Write the failing backfill helper tests**
 
-  Create `assets/js/stats.test.mjs`:
+  Create `assets/js/game-leaderboard-trophy.test.mjs`:
 
   ```js
   import assert from "node:assert";
   import { test } from "node:test";
-  import { gameLeaderboardTrophyCandidates } from "./stats.js";
+  import { gameLeaderboardTrophyCandidates } from "./game-leaderboard-trophy.js";
 
   test("게임 백필 후보: 두 게임의 현재 단독 1위에게 각각 트로피를 만든다", () => {
     assert.deepStrictEqual(
@@ -168,15 +170,17 @@
 
 - [ ] **Step 2: Run the backfill test to verify it fails**
 
-  Run: `node --test assets/js/stats.test.mjs`
+  Run: `node --test assets/js/game-leaderboard-trophy.test.mjs`
 
-  Expected: FAIL with `does not provide an export named 'gameLeaderboardTrophyCandidates'`.
+  Expected: FAIL with `Could not find './game-leaderboard-trophy.js'`.
 
 - [ ] **Step 3: Implement the pure backfill helper and use it**
 
-  In `assets/js/stats.js`, add this named export near the existing trophy candidate functions:
+  Create `assets/js/game-leaderboard-trophy.js` with this implementation:
 
   ```js
+  import { checkGame2048Trophy, checkSuikaMasterTrophy } from "./trophy-conditions.js";
+
   export function gameLeaderboardTrophyCandidates(gameScores, suikaScores, uid) {
     const isTop = (scores, key) => {
       const top = Math.max(0, ...scores.map((score) => score[key] || 0));
@@ -189,7 +193,13 @@
   }
   ```
 
-  Replace the two inline game-top candidate expressions in the loop inside `runTrophyBackfill` with:
+  In `assets/js/stats.js`, add this import after the existing `trophy-conditions.js` import:
+
+  ```js
+  import { gameLeaderboardTrophyCandidates } from "./game-leaderboard-trophy.js";
+  ```
+
+  Remove `isTopScorerByField`. In `backfillTrophiesForMember`, remove `is2048Top` and `isSuikaTop`; then replace the two inline game-top candidate expressions with:
 
   ```js
   ...gameLeaderboardTrophyCandidates(gameScores, suikaScores, uid),
@@ -199,14 +209,14 @@
 
 - [ ] **Step 4: Run all relevant tests to verify they pass**
 
-  Run: `node --test assets/js/stats.test.mjs assets/js/trophy-conditions-parity.test.mjs assets/js/mypage-logic.test.mjs`
+  Run: `node --test assets/js/game-leaderboard-trophy.test.mjs assets/js/trophy-conditions-parity.test.mjs assets/js/mypage-logic.test.mjs`
 
   Expected: PASS with all tests passing.
 
 - [ ] **Step 5: Commit the safe backfill path**
 
   ```bash
-  git add assets/js/stats.js assets/js/stats.test.mjs
+  git add assets/js/game-leaderboard-trophy.js assets/js/game-leaderboard-trophy.test.mjs assets/js/stats.js
   git commit -m "fix: backfill missing game leaderboard trophies"
   ```
 
