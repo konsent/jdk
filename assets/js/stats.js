@@ -8,10 +8,11 @@ import {
 import {
   checkAttendanceTrophies, checkScheduleMakerTrophy, checkFullHouseTrophy,
   checkWritingMasterTrophy, checkHeartthrobTrophy, checkKongzTempTrophies,
-  checkGame2048Trophy, checkSuikaMasterTrophy, checkAnnualMemberTrophy,
+  checkAnnualMemberTrophy,
   checkPartyPlannerTrophy, checkNoNoshowTrophy, checkWeekendRegularTrophy,
   hasConsecutiveDays, checkFiveDayStreakTrophy, newlyEarnedTrophyIds
 } from "./trophy-conditions.js";
+import { gameLeaderboardTrophyCandidates } from "./game-leaderboard-trophy.js";
 
 let adminUser = null;
 let adminData = null;
@@ -261,14 +262,6 @@ function filterConfirmedClosedEvents(posts, uid) {
   );
 }
 
-function isTopScorerByField(allDocs, uid, field) {
-  const scores = allDocs.map((d) => ({ uid: d.id, value: d[field] || 0 }));
-  const top = Math.max(...scores.map((s) => s.value));
-  if (top === 0) return false;
-  const mine = scores.find((s) => s.uid === uid);
-  return !!mine && mine.value === top;
-}
-
 function countFullHouseEvents(posts, authorUid) {
   return posts.filter(
     (p) => p.authorUid === authorUid && (p.attendees?.length || 0) >= p.maxAttendees
@@ -282,9 +275,6 @@ async function backfillTrophiesForMember(uid, ctx) {
 
   const fullCount = countFullHouseEvents(ctx.eventPosts, uid);
   const partyCount = ctx.parties.filter((p) => p.ownerUid === uid).length;
-  const is2048Top = isTopScorerByField(ctx.gameScores, uid, "bestScore");
-  const isSuikaTop = isTopScorerByField(ctx.suikaScores, uid, "best");
-
   const confirmedEvents = filterConfirmedClosedEvents(ctx.eventPosts, uid);
   const weekendCount = confirmedEvents
     .map((p) => p.eventDate?.toDate?.())
@@ -301,8 +291,7 @@ async function backfillTrophiesForMember(uid, ctx) {
     ...checkFullHouseTrophy(fullCount),
     ...checkHeartthrobTrophy(memberStats),
     ...checkKongzTempTrophies(memberStats),
-    ...checkGame2048Trophy(is2048Top),
-    ...checkSuikaMasterTrophy(isSuikaTop),
+    ...gameLeaderboardTrophyCandidates(ctx.gameScores, ctx.suikaScores, uid),
     ...checkAnnualMemberTrophy(ctx.users[uid]?.annualMember === true),
     ...checkPartyPlannerTrophy(partyCount),
     ...checkNoNoshowTrophy(confirmedEvents.length),
@@ -338,10 +327,10 @@ async function runTrophyBackfill() {
   const parties = partiesSnap.docs.map((d) => d.data());
 
   const gameScoresSnap = await getDocs(collection(db, "game_scores"));
-  const gameScores = gameScoresSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const gameScores = gameScoresSnap.docs.map((d) => ({ uid: d.id, ...d.data() }));
 
   const suikaScoresSnap = await getDocs(collection(db, "suika_scores"));
-  const suikaScores = suikaScoresSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const suikaScores = suikaScoresSnap.docs.map((d) => ({ uid: d.id, ...d.data() }));
 
   const eventPostsSnap = await getDocs(query(collection(db, "posts"), where("type", "==", "event")));
   const eventPosts = eventPostsSnap.docs.map((d) => d.data());
