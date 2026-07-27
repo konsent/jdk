@@ -87,7 +87,7 @@ async function loadPost() {
 
   const date = postData.createdAt?.toDate().toLocaleDateString("ko-KR") || "";
   const authorDoc = await getUserDoc(postData.authorUid);
-  const authorName = authorDoc?.nickname || "알 수 없음";
+  const authorName = postData.authorName || authorDoc?.nickname || "알 수 없음";
 
   let eventInfo = "";
   if (postData.type === "event") {
