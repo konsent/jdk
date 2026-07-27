@@ -1,9 +1,16 @@
 const { onDocumentWritten } = require("firebase-functions/v2/firestore");
 const { onRequest } = require("firebase-functions/v2/https");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret } = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
 const { initializeApp } = require("firebase-admin/app");
-const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const { getFirestore, FieldValue, Timestamp } = require("firebase-admin/firestore");
+const {
+  getSeoulDateParts,
+  shouldCreateAnniversary,
+  anniversaryPostId,
+  buildAnniversaryPost
+} = require("./anniversary.js");
 const {
   checkAttendanceTrophies,
   checkScheduleMakerTrophy,
@@ -172,6 +179,24 @@ exports.getBoardGameDetail = onRequest({ secrets: [BGG_API_TOKEN], cors: true },
 });
 
 exports.parseGameDetail = parseGameDetail;
+
+exports.ensureAnniversarySchedule = onSchedule(
+  { schedule: "0 0 * * *", timeZone: "Asia/Seoul" },
+  async () => {
+    const parts = getSeoulDateParts(new Date());
+    if (!shouldCreateAnniversary(parts)) return;
+    const db = getFirestore();
+    const ref = db.collection("posts").doc(anniversaryPostId(parts.year));
+    const eventDate = Timestamp.fromDate(new Date(Date.UTC(parts.year, 4, 23, 14, 59)));
+    await db.runTransaction(async (tx) => {
+      if ((await tx.get(ref)).exists) return;
+      tx.create(ref, {
+        ...buildAnniversaryPost(parts.year, eventDate),
+        createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp()
+      });
+    });
+  }
+);
 
 function buildTrophyCandidates(memberStats, fullCount) {
   if (!memberStats) return [];
