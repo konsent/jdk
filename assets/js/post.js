@@ -48,7 +48,18 @@ let postData = null;
 requireApproved(async (user, userData) => {
   currentUser = user;
   currentUserData = userData;
-  await loadPost();
+  if (!postId) {
+    document.getElementById("post-content").innerHTML =
+      `<p>잘못된 주소입니다. <a href="/board/">게시판으로 돌아가기</a></p>`;
+    return;
+  }
+  try {
+    await loadPost();
+  } catch (e) {
+    console.error("게시글 로드 실패", e);
+    document.getElementById("post-content").innerHTML =
+      `<p>게시글을 불러오지 못했습니다. <a href="/board/">게시판으로 돌아가기</a></p>`;
+  }
 });
 
 async function deletePostWithEventStats() {
@@ -80,7 +91,8 @@ async function deletePostWithEventStats() {
 async function loadPost() {
   const snap = await getDoc(doc(db, "posts", postId));
   if (!snap.exists()) {
-    document.getElementById("post-content").innerHTML = "<p>게시글을 찾을 수 없습니다.</p>";
+    document.getElementById("post-content").innerHTML =
+      `<p>게시글을 찾을 수 없습니다. <a href="/board/">게시판으로 돌아가기</a></p>`;
     return;
   }
   postData = snap.data();
@@ -110,16 +122,16 @@ async function loadPost() {
     <div class="post-header">
       <span class="post-type-badge">${postData.type === "event" ? "일정" : "공지"}</span>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-        <h2 class="post-title">${postData.title}</h2>
+        <h2 class="post-title">${escapeHtml(postData.title)}</h2>
         <div style="flex-shrink:0;display:flex;gap:6px">${kakaoBtn}${editBtn}${deleteBtn}</div>
       </div>
       <div class="post-meta">
-        <span>${authorName}</span>
+        <span>${escapeHtml(authorName)}</span>
         <span>${date}</span>
         ${postData.type === "event" ? `<span>📅 ${formatEventDate(postData.eventDate)}</span>` : ""}
       </div>
     </div>
-    <div class="post-body">${postData.content}</div>
+    <div class="post-body">${escapeHtml(postData.content)}</div>
   `;
   document.getElementById("post-content").insertAdjacentHTML("afterend", renderGamesSection(postData.games));
 
@@ -543,21 +555,21 @@ async function loadComments() {
       return `<div class="comment-item comment-reply">
         <div style="display:flex;gap:8px;align-items:center">
           <span style="color:var(--text-muted);font-size:0.8rem">↳</span>
-          <span class="comment-author">${rName}</span>
+          <span class="comment-author">${escapeHtml(rName)}</span>
           ${rDeleteBtn}
         </div>
-        <div class="comment-text">${r.content}</div>
+        <div class="comment-text">${escapeHtml(r.content)}</div>
         <div class="comment-time">${rDate}</div>
       </div>`;
     }));
 
     return `<div class="comment-item">
       <div style="display:flex;gap:8px;align-items:center">
-        <span class="comment-author">${name}</span>
+        <span class="comment-author">${escapeHtml(name)}</span>
         ${replyBtn}
         ${deleteBtn}
       </div>
-      <div class="comment-text">${c.content}</div>
+      <div class="comment-text">${escapeHtml(c.content)}</div>
       <div class="comment-time">${date}</div>
     </div>
     ${replyRows.join("")}

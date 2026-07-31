@@ -440,6 +440,8 @@
   font-size: 0.82rem;
   color: var(--text-primary);
   margin: 4px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 .attendee-chip--noshow,
 .confirm-attendance-row--noshow {

@@ -11,9 +11,17 @@ let adminData = null;
 let pendingAction = null;
 
 function maskEmail(email) {
+  if (!email) return "-";
   const [local, domain] = email.split("@");
+  if (!domain) return escapeHtml(email);
   const masked = local.slice(0, 3) + "*".repeat(Math.max(local.length - 3, 1));
   return `${masked}@${domain}`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str ?? "";
+  return div.innerHTML.replace(/"/g, "&quot;");
 }
 
 requireAdmin(async (user, userData) => {
@@ -48,16 +56,32 @@ async function loadPending() {
     return `
       <div class="card mb-2 p-3 d-flex flex-row justify-content-between align-items-center">
         <div>
-          <strong>${u.nickname}</strong>
-          <span class="text-muted ms-2">${u.displayName}</span>
-          <span class="text-muted ms-2">${maskEmail(u.email)}</span>
+          <strong>${escapeHtml(u.nickname)}</strong>
+          <span class="text-muted ms-2">${escapeHtml(u.displayName)}</span>
+          <span class="text-muted ms-2">${escapeHtml(maskEmail(u.email))}</span>
         </div>
         <div>
-          <button class="btn btn-sm btn-success me-1" onclick="confirmAction('approve','${d.id}','${u.nickname}')">승인</button>
-          <button class="btn btn-sm btn-danger" onclick="confirmAction('reject','${d.id}','${u.nickname}')">거절</button>
+          <button class="btn btn-sm btn-success me-1" data-act="approve" data-uid="${escapeHtml(d.id)}" data-nick="${escapeHtml(u.nickname)}">승인</button>
+          <button class="btn btn-sm btn-danger" data-act="reject" data-uid="${escapeHtml(d.id)}" data-nick="${escapeHtml(u.nickname)}">거절</button>
         </div>
       </div>`;
   }).join("");
+
+  bindActionButtons(el);
+}
+
+// data-act 버튼을 confirmAction에 연결 (인라인 onclick 제거 — 닉네임 XSS 방지)
+function bindActionButtons(root) {
+  root.querySelectorAll("button[data-act]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const { act, uid, nick } = btn.dataset;
+      if (act === "toggle-annual") {
+        window.toggleAnnual(uid, btn.dataset.current === "true", nick);
+      } else {
+        window.confirmAction(act, uid, nick);
+      }
+    });
+  });
 }
 
 async function loadMembers() {
@@ -76,20 +100,22 @@ async function loadMembers() {
       ? `<span style="font-size:0.7rem;font-weight:600;background:#2e7d32;color:#fff;border-radius:4px;padding:2px 7px;margin-left:4px;vertical-align:middle">연회원</span>`
       : "";
     const annualBtn = u.annualMember
-      ? `<button class="btn btn-sm btn-outline-secondary me-1" onclick="toggleAnnual('${d.id}',true,'${u.nickname}')">연회원 해제</button>`
-      : `<button class="btn btn-sm btn-outline-success me-1" onclick="toggleAnnual('${d.id}',false,'${u.nickname}')">연회원 지정</button>`;
+      ? `<button class="btn btn-sm btn-outline-secondary me-1" data-act="toggle-annual" data-current="true" data-uid="${escapeHtml(d.id)}" data-nick="${escapeHtml(u.nickname)}">연회원 해제</button>`
+      : `<button class="btn btn-sm btn-outline-success me-1" data-act="toggle-annual" data-current="false" data-uid="${escapeHtml(d.id)}" data-nick="${escapeHtml(u.nickname)}">연회원 지정</button>`;
     return `
       <div class="card mb-2 p-3 d-flex flex-row justify-content-between align-items-center flex-wrap gap-2">
         <div>
-          <strong>${u.nickname}</strong>${adminTag}${annualTag}
-          <span class="text-muted ms-2" style="font-size:0.85rem">${maskEmail(u.email)}</span>
+          <strong>${escapeHtml(u.nickname)}</strong>${adminTag}${annualTag}
+          <span class="text-muted ms-2" style="font-size:0.85rem">${escapeHtml(maskEmail(u.email))}</span>
         </div>
         <div>
           ${annualBtn}
-          ${d.id !== adminUser.uid ? `<button class="btn btn-sm btn-outline-danger" onclick="confirmAction('force-remove','${d.id}','${u.nickname}')">강제 탈퇴</button>` : ""}
+          ${d.id !== adminUser.uid ? `<button class="btn btn-sm btn-outline-danger" data-act="force-remove" data-uid="${escapeHtml(d.id)}" data-nick="${escapeHtml(u.nickname)}">강제 탈퇴</button>` : ""}
         </div>
       </div>`;
   }).join("");
+
+  bindActionButtons(el);
 }
 
 const LOG_PAGE_SIZE = 20;
@@ -117,7 +143,7 @@ async function loadLogs(page = 0) {
       const date = l.createdAt?.toDate().toLocaleString("ko-KR") || "";
       return `<div class="card mb-1 p-2 px-3" style="font-size:0.85rem">
         <span class="text-muted">${date}</span>
-        <span class="ms-2"><strong>${l.adminNickname}</strong> → <strong>${l.targetNickname}</strong>: ${l.action}</span>
+        <span class="ms-2"><strong>${escapeHtml(l.adminNickname)}</strong> → <strong>${escapeHtml(l.targetNickname)}</strong>: ${escapeHtml(l.action)}</span>
       </div>`;
     }).join("");
 

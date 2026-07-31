@@ -24,11 +24,25 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
+let registering = false;
+
 document.getElementById("form-register").addEventListener("submit", async (e) => {
   e.preventDefault();
+  if (registering) return; // 중복 클릭 방지
   const nickname = document.getElementById("input-nickname").value.trim();
   if (!nickname) { showError("닉네임을 입력해주세요."); return; }
+  if (nickname.length > 12) { showError("닉네임은 12자 이하여야 합니다."); return; }
+  // 한글/영문/숫자/공백/._- 만 허용 — 꺾쇠·따옴표 등 마크업 문자 차단
+  if (!/^[가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9 ._-]+$/.test(nickname)) {
+    showError("닉네임에는 한글, 영문, 숫자, 공백, . _ - 만 사용할 수 있습니다.");
+    return;
+  }
   if (!document.getElementById("checkbox-privacy").checked) { showError("개인정보 수집 및 이용에 동의해주세요."); return; }
+
+  const submitBtn = e.target.querySelector("button[type=submit]");
+  registering = true;
+  if (submitBtn) submitBtn.disabled = true;
+  let succeeded = false;
 
   try {
     let user = currentUser;
@@ -83,6 +97,7 @@ document.getElementById("form-register").addEventListener("submit", async (e) =>
       createdAt: serverTimestamp()
     });
 
+    succeeded = true;
     document.getElementById("form-register").style.display = "none";
     document.getElementById("msg-success").style.display = "block";
   } catch (err) {
@@ -95,6 +110,12 @@ document.getElementById("form-register").addEventListener("submit", async (e) =>
       "auth/missing-email": "이메일을 입력해주세요.",
     };
     showError(errorMessages[err.code] || "오류가 발생했습니다. 다시 시도해주세요.");
+  } finally {
+    // 성공 시에는 잠금 유지(중복 신청 방지), 실패·검증 반려 시에만 해제
+    if (!succeeded) {
+      registering = false;
+      if (submitBtn) submitBtn.disabled = false;
+    }
   }
 });
 

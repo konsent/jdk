@@ -106,8 +106,11 @@ async function loadForEdit(userData) {
   }
 }
 
+let submitting = false;
+
 document.getElementById("form-write").addEventListener("submit", async (e) => {
   e.preventDefault();
+  if (submitting) return; // 중복 클릭 방지
   const title = document.getElementById("input-title").value.trim();
   const content = document.getElementById("input-content").value.trim();
   const type = currentUserData?.isAdmin
@@ -127,6 +130,10 @@ document.getElementById("form-write").addEventListener("submit", async (e) => {
     const combined = timeStr ? `${dateStr}T${timeStr}` : `${dateStr}T00:00`;
     eventDate = Timestamp.fromDate(new Date(combined));
   }
+
+  const submitBtn = document.getElementById("btn-submit");
+  submitting = true;
+  submitBtn.disabled = true;
 
   try {
     if (editId) {
@@ -180,7 +187,10 @@ document.getElementById("form-write").addEventListener("submit", async (e) => {
       location.href = `/post/?id=${ref.id}`;
     }
   } catch (err) {
+    console.error("게시글 저장 실패", err);
     showError(editId ? "수정 중 오류가 발생했습니다." : "등록 중 오류가 발생했습니다.");
+    submitting = false;
+    submitBtn.disabled = false;
   }
 });
 

@@ -36,7 +36,7 @@ async function loadNotices() {
     if (snap.empty) { el.innerHTML = "<p class='text-muted'>공지사항이 없습니다.</p>"; return; }
     el.innerHTML = snap.docs.map(d => {
       const p = d.data();
-      return `<div class="notice-item"><a href="/post/?id=${d.id}">${p.title}</a></div>`;
+      return `<div class="notice-item"><a href="/post/?id=${escapeHtml(d.id)}">${escapeHtml(p.title)}</a></div>`;
     }).join("");
   } catch (e) {
     el.innerHTML = "<p class='text-muted'>공지사항이 없습니다.</p>";
@@ -180,7 +180,7 @@ function renderCalendar(events) {
         const shown = evts.slice(0, 2);
         const rest = evts.length - shown.length;
         let evtHtml = shown.map(e =>
-          `<div class="cal-pill" data-event-id="${e.id}" onclick="location.href='/post/?id=${e.id}'">${escapeHtml(e.title)}</div>`
+          `<div class="cal-pill" data-event-id="${escapeHtml(e.id)}" tabindex="0" role="link" aria-label="${escapeHtml(e.title)} 일정 보기">${escapeHtml(e.title)}</div>`
         ).join("");
         if (rest > 0) {
           evtHtml += `<div class="cal-more" data-day="${day}">+${rest}개</div>`;
@@ -196,6 +196,11 @@ function renderCalendar(events) {
 
     el.querySelectorAll(".cal-pill[data-event-id]").forEach(pillEl => {
       const evt = events.find(e => e.id === pillEl.dataset.eventId);
+      const go = () => { location.href = `/post/?id=${encodeURIComponent(pillEl.dataset.eventId)}`; };
+      pillEl.addEventListener("click", go);
+      pillEl.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); }
+      });
       if (evt) bindHoverCard(pillEl, evt);
     });
 
@@ -217,7 +222,7 @@ function renderCalendar(events) {
       const pop = document.createElement("div");
       pop.className = "cal-popover";
       pop.innerHTML = evts.map(e =>
-        `<div class="cal-popover-item" data-event-id="${e.id}" onclick="location.href='/post/?id=${e.id}'">${escapeHtml(e.title)}</div>`
+        `<div class="cal-popover-item" data-event-id="${escapeHtml(e.id)}" tabindex="0" role="link">${escapeHtml(e.title)}</div>`
       ).join("");
       const rect = cellEl.getBoundingClientRect();
       const gridRect = el.querySelector(".cal-grid").getBoundingClientRect();
@@ -226,6 +231,11 @@ function renderCalendar(events) {
       el.querySelector(".cal-grid").appendChild(pop);
       pop.querySelectorAll(".cal-popover-item[data-event-id]").forEach(itemEl => {
         const evt = evts.find(e => e.id === itemEl.dataset.eventId);
+        const go = () => { location.href = `/post/?id=${encodeURIComponent(itemEl.dataset.eventId)}`; };
+        itemEl.addEventListener("click", go);
+        itemEl.addEventListener("keydown", (ev) => {
+          if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); }
+        });
         if (evt) bindHoverCard(itemEl, evt);
       });
 
@@ -284,12 +294,18 @@ function renderList(events) {
     const badge = cnt >= e.maxAttendees
       ? `<span class="badge-full">${cnt}/${e.maxAttendees} 마감</span>`
       : `<span class="badge-open">${cnt}/${e.maxAttendees}</span>`;
-    return `<tr class="event-row" data-event-id="${e.id}" onclick="location.href='/post/?id=${e.id}'">
-      <td>${date}</td><td>${e.title}</td><td>${badge}</td>
+    return `<tr class="event-row" data-event-id="${escapeHtml(e.id)}" tabindex="0" role="link" aria-label="${escapeHtml(e.title)} 일정 보기">
+      <td>${escapeHtml(date)}</td><td>${escapeHtml(e.title)}</td><td>${badge}</td>
     </tr>`;
   }).join("");
   el.querySelectorAll(".event-row[data-event-id]").forEach(rowEl => {
     const evt = sorted.find(e => e.id === rowEl.dataset.eventId);
+    const go = () => { location.href = `/post/?id=${encodeURIComponent(rowEl.dataset.eventId)}`; };
+    rowEl.addEventListener("click", go);
+    // 키보드 접근성: Enter/Space로도 이동
+    rowEl.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); }
+    });
     if (evt) bindHoverCard(rowEl, evt);
   });
 }

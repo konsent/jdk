@@ -23,6 +23,12 @@ let attendChart = null;
 let postChart = null;
 let monthlyChart = null;
 
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str ?? "";
+  return div.innerHTML.replace(/"/g, "&quot;");
+}
+
 requireAdmin(async (user, userData) => {
   adminUser = user;
   adminData = userData;
@@ -243,7 +249,7 @@ function renderAwards() {
         <div style="border:1px solid #e8e8e4;border-radius:8px;padding:16px;background:#fff;text-align:center">
           <div style="font-size:1.8rem">${c.emoji}</div>
           <div style="font-size:0.75rem;color:#888;margin:4px 0">${c.title}</div>
-          <div style="font-weight:700;font-size:1rem">${c.name}</div>
+          <div style="font-weight:700;font-size:1rem">${escapeHtml(c.name)}</div>
           <div style="font-size:0.8rem;color:#555">${c.value}</div>
         </div>`).join("")}
     </div>
