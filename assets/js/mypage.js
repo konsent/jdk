@@ -1,6 +1,6 @@
 import { auth, db } from "./firebase-init.js";
 import { requireApproved } from "./auth-guard.js";
-import { showError } from "./utils.js";
+import { showError, escapeHtml } from "./utils.js";
 import { deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   doc, deleteDoc, getDoc, updateDoc
@@ -174,14 +174,14 @@ async function renderPartyList(user) {
   }
 
   listEl.innerHTML = parties.map((p) => `
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--card-border)" data-party-id="${escapePartyText(p.id)}">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--card-border)" data-party-id="${escapeHtml(p.id)}">
       <div>
-        <div style="font-weight:600;font-size:0.9rem">${escapePartyText(p.name)}</div>
-        <div style="font-size:0.8rem;color:var(--text-muted)">${p.memberUids.map((uid) => escapePartyText(nicknameOf(uid))).join(", ")}</div>
+        <div style="font-weight:600;font-size:0.9rem">${escapeHtml(p.name)}</div>
+        <div style="font-size:0.8rem;color:var(--text-muted)">${p.memberUids.map((uid) => escapeHtml(nicknameOf(uid))).join(", ")}</div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
-        <button type="button" class="party-edit-btn" data-id="${escapePartyText(p.id)}" style="border:1px solid var(--card-border);background:transparent;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:0.8rem">수정</button>
-        <button type="button" class="party-delete-btn" data-id="${escapePartyText(p.id)}" style="border:1px solid var(--danger);color:var(--danger);background:transparent;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:0.8rem">삭제</button>
+        <button type="button" class="party-edit-btn" data-id="${escapeHtml(p.id)}" style="border:1px solid var(--card-border);background:transparent;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:0.8rem">수정</button>
+        <button type="button" class="party-delete-btn" data-id="${escapeHtml(p.id)}" style="border:1px solid var(--danger);color:var(--danger);background:transparent;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:0.8rem">삭제</button>
       </div>
     </div>
   `).join("");
@@ -236,7 +236,7 @@ function renderPartyMemberCandidates(matches, user) {
     return;
   }
   el.innerHTML = matches.map((u) =>
-    `<div class="game-candidate" data-uid="${escapePartyText(u.uid)}">${escapePartyText(u.nickname)}</div>`
+    `<div class="game-candidate" data-uid="${escapeHtml(u.uid)}">${escapeHtml(u.nickname)}</div>`
   ).join("");
   el.style.display = "block";
   el.querySelectorAll(".game-candidate").forEach((row) => {
@@ -253,10 +253,10 @@ function renderPartyMemberCandidates(matches, user) {
 
 function renderPartyDraftMembers(user) {
   const el = document.getElementById("party-member-list");
-  const ownerChip = `<span class="game-tag">${escapePartyText(nicknameOf(user.uid))} (본인)</span>`;
+  const ownerChip = `<span class="game-tag">${escapeHtml(nicknameOf(user.uid))} (본인)</span>`;
   const memberChips = partyDraftMembers.map((m, i) => `
     <span class="game-tag">
-      ${escapePartyText(m.nickname)}
+      ${escapeHtml(m.nickname)}
       <button type="button" data-idx="${i}" class="game-tag-remove">×</button>
     </span>
   `).join("");
@@ -286,21 +286,15 @@ async function savePartyForm(user) {
   }
 }
 
-function escapePartyText(str) {
-  const div = document.createElement("div");
-  div.textContent = str || "";
-  return div.innerHTML.replace(/"/g, "&quot;");
-}
-
 function renderTrophyGrid(earnedTrophies) {
   const earnedIds = new Set(earnedTrophies.map((t) => t.id));
   const el = document.getElementById("trophy-grid");
   el.innerHTML = TROPHIES_META.map((t) => {
     const locked = !earnedIds.has(t.id);
     return `
-      <div class="trophy-item ${locked ? "trophy-item--locked" : ""}" title="${escapePartyText(t.name)} - ${escapePartyText(t.description)}">
-        <img src="${t.image}" alt="${escapePartyText(t.name)}">
-        <div>${escapePartyText(t.name)}</div>
+      <div class="trophy-item ${locked ? "trophy-item--locked" : ""}" title="${escapeHtml(t.name)} - ${escapeHtml(t.description)}">
+        <img src="${t.image}" alt="${escapeHtml(t.name)}">
+        <div>${escapeHtml(t.name)}</div>
       </div>
     `;
   }).join("");
@@ -331,7 +325,7 @@ function showTrophyPopupAndWait(meta) {
   return new Promise((resolve) => {
     const el = document.createElement("div");
     el.className = "victory-overlay";
-    el.innerHTML = `<img src="${meta.image}" alt=""><p>${escapePartyText(meta.name)} 획득!</p>`;
+    el.innerHTML = `<img src="${meta.image}" alt=""><p>${escapeHtml(meta.name)} 획득!</p>`;
     document.body.appendChild(el);
     el.addEventListener("animationend", (e) => {
       if (e.target === el) {
