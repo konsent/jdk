@@ -26,12 +26,25 @@ service cloud.firestore {
       allow delete: if isAdmin() || request.auth.uid == uid;
     }
 
+    // 참석 신청/취소는 attendees 만, 그것도 "본인 uid 하나"만 넣고 뺄 수 있다.
+    // hasOnly(['attendees']) 만으로는 키만 검사해서, 값을 통째로 바꿔치기할 수 있었다
+    // (정원 초과, 남을 명단에서 제거, 마감된 일정 끼어들기 전부 통과했다).
+    // 아래 두 줄이 각각 "본인 외 추가 없음" / "본인 외 제거 없음" 을 강제한다.
+    function onlySelfAttendance() {
+      return request.resource.data.attendees
+               .hasOnly(resource.data.attendees.concat([request.auth.uid]))
+        && resource.data.attendees
+               .hasOnly(request.resource.data.attendees.concat([request.auth.uid]));
+    }
+
     match /posts/{postId} {
       allow read, create: if isApproved();
       allow update: if isAdmin()
         || request.auth.uid == resource.data.authorUid
-        || (isApproved() && request.resource.data.diff(resource.data)
-              .affectedKeys().hasOnly(['attendees']));
+        || (isApproved()
+            && request.resource.data.diff(resource.data)
+                 .affectedKeys().hasOnly(['attendees'])
+            && onlySelfAttendance());
       allow delete: if isAdmin() || request.auth.uid == resource.data.authorUid;
     }
 
@@ -39,6 +52,7 @@ service cloud.firestore {
       allow read: if isApproved();
       allow create: if isApproved()
         && request.resource.data.authorUid == request.auth.uid;
+      allow update: if false;   // 댓글 수정 기능 없음 — 명시해 둔다
       allow delete: if isAdmin() || request.auth.uid == resource.data.authorUid;
     }
 
