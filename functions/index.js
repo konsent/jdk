@@ -1,5 +1,5 @@
 const { onDocumentWritten } = require("firebase-functions/v2/firestore");
-const { onRequest } = require("firebase-functions/v2/https");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret } = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
@@ -128,19 +128,34 @@ function sortGameCandidates(candidates) {
 
 exports.sortGameCandidates = sortGameCandidates;
 
-exports.searchBoardGame = onRequest({ secrets: [BGG_API_TOKEN], cors: true }, async (req, res) => {
-  const q = (req.query.q || "").trim();
-  if (!q) { res.json([]); return; }
+// BGG 프록시는 우리 토큰과 호출 비용을 쓴다.
+// 예전엔 onRequest + cors:true 라 URL 만 알면 누구나 무제한으로 불렀다.
+// onCall 은 Auth 토큰을 자동으로 검증해주지만, 가입만 한 계정도 통과하므로
+// 승인 회원인지까지 여기서 확인한다.
+async function requireApprovedCaller(request) {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
+  }
+  const snap = await getFirestore().collection("users").doc(request.auth.uid).get();
+  if (!snap.exists || snap.data().status !== "approved") {
+    throw new HttpsError("permission-denied", "승인된 회원만 사용할 수 있습니다.");
+  }
+}
+
+exports.searchBoardGame = onCall({ secrets: [BGG_API_TOKEN] }, async (request) => {
+  await requireApprovedCaller(request);
+  const q = String(request.data?.q || "").trim();
+  if (!q) return [];
   try {
     const xml = await fetchWithRetry(
       `https://boardgamegeek.com/xmlapi2/search?type=boardgame&query=${encodeURIComponent(q)}`,
       fetch,
       BGG_API_TOKEN.value()
     );
-    res.json(xml ? sortGameCandidates(parseSearchResults(xml)) : []);
+    return xml ? sortGameCandidates(parseSearchResults(xml)) : [];
   } catch (err) {
     logger.error("BGG 검색 실패", err);
-    res.json([]);
+    return [];
   }
 });
 
@@ -162,19 +177,20 @@ function parseGameDetail(xml, bggId) {
   };
 }
 
-exports.getBoardGameDetail = onRequest({ secrets: [BGG_API_TOKEN], cors: true }, async (req, res) => {
-  const id = (req.query.id || "").trim();
-  if (!id) { res.json(null); return; }
+exports.getBoardGameDetail = onCall({ secrets: [BGG_API_TOKEN] }, async (request) => {
+  await requireApprovedCaller(request);
+  const id = String(request.data?.id || "").trim();
+  if (!id) return null;
   try {
     const xml = await fetchWithRetry(
       `https://boardgamegeek.com/xmlapi2/thing?id=${encodeURIComponent(id)}`,
       fetch,
       BGG_API_TOKEN.value()
     );
-    res.json(xml ? parseGameDetail(xml, id) : null);
+    return xml ? parseGameDetail(xml, id) : null;
   } catch (err) {
     logger.error("BGG 상세 조회 실패", err);
-    res.json(null);
+    return null;
   }
 });
 

@@ -1,4 +1,4 @@
-import { db } from "./firebase-init.js";
+import { db, functions } from "./firebase-init.js";
 import { requireApproved } from "./auth-guard.js";
 import { showError } from "./utils.js";
 import { listMyParties } from "./party.js";
@@ -7,8 +7,12 @@ import {
   collection, addDoc, getDoc, getDocs, query, where, updateDoc, serverTimestamp, Timestamp,
   doc, setDoc, increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
 
-const FUNCTIONS_BASE = "https://us-central1-jdk-member-board.cloudfunctions.net";
+// onCall 은 SDK 가 Auth 토큰을 자동으로 실어 보낸다.
+// (예전 fetch 방식은 토큰이 없어 누구나 부를 수 있었다)
+const callSearchBoardGame = httpsCallable(functions, "searchBoardGame");
+const callGetBoardGameDetail = httpsCallable(functions, "getBoardGameDetail");
 let selectedGames = [];
 let selectedPartyAttendees = null;
 
@@ -233,8 +237,7 @@ let thumbnailFetchTimer = null;
 
 async function fetchGameDetail(bggId) {
   if (candidateDetailCache.has(bggId)) return candidateDetailCache.get(bggId);
-  const res = await fetch(`${FUNCTIONS_BASE}/getBoardGameDetail?id=${encodeURIComponent(bggId)}`);
-  const detail = await res.json();
+  const { data: detail } = await callGetBoardGameDetail({ id: bggId });
   if (detail) candidateDetailCache.set(bggId, detail);
   return detail;
 }
@@ -293,8 +296,8 @@ function setupGameSearch() {
     if (!q) { renderCandidates([]); return; }
     searchDebounceTimer = setTimeout(async () => {
       try {
-        const res = await fetch(`${FUNCTIONS_BASE}/searchBoardGame?q=${encodeURIComponent(q)}`);
-        renderCandidates(await res.json());
+        const { data } = await callSearchBoardGame({ q });
+        renderCandidates(data);
       } catch (e) {
         console.error("게임 검색 실패:", e);
         renderCandidates([]);
