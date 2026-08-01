@@ -31,9 +31,11 @@ requireApproved(async (user, userData) => {
   if (userData.annualMember) {
     tags.push(`<span style="font-size:0.7rem;font-weight:600;background:#2e7d32;color:#fff;border-radius:4px;padding:2px 8px">연회원</span>`);
     const img = document.getElementById("info-honor-img");
-    img.src = `/assets/honor/${encodeURIComponent(userData.nickname)}.jpg`;
+    // onerror 를 src 보다 먼저 걸어야 한다.
+    // 캐시된 404 는 src 대입과 동시에 발동해서, 뒤늦게 붙인 핸들러는 놓친다.
     img.onerror = () => { img.style.display = "none"; };
     img.style.display = "block";
+    img.src = `/assets/honor/${encodeURIComponent(userData.nickname)}.jpg`;
   }
   document.getElementById("info-tags").innerHTML = tags.join(" ");
 
