@@ -1,5 +1,6 @@
-import { auth, db } from "./firebase-init.js";
+import { db } from "./firebase-init.js";
 import { requireAdmin } from "./auth-guard.js";
+import { escapeHtml } from "./utils.js";
 import {
   collection, query, where, getDocs, orderBy, limit, startAfter,
   doc, updateDoc, addDoc, deleteDoc, serverTimestamp, getDoc
@@ -18,11 +19,6 @@ function maskEmail(email) {
   return `${masked}@${domain}`;
 }
 
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str ?? "";
-  return div.innerHTML.replace(/"/g, "&quot;");
-}
 
 requireAdmin(async (user, userData) => {
   adminUser = user;
@@ -30,10 +26,19 @@ requireAdmin(async (user, userData) => {
   await loadPending();
   await loadMembers();
   setupTabs();
+});
 
-  window.toggleAnnual = async (targetUid, current, targetNickname) => {
-    const next = !current;
+async function toggleAnnual(targetUid, current, targetNickname) {
+  const next = !current;
+  try {
     await updateDoc(doc(db, "users", targetUid), { annualMember: next });
+  } catch (err) {
+    console.error("연회원 변경 실패", err);
+    alert("연회원 상태 변경에 실패했습니다.");
+    return;
+  }
+  // 로그 기록이 실패해도 변경 자체는 이미 반영됐다 — 되돌리지 않고 경고만 남긴다.
+  try {
     await addDoc(collection(db, "admin_logs"), {
       action: next ? "연회원 지정" : "연회원 해제",
       targetUid, targetNickname,
@@ -41,9 +46,11 @@ requireAdmin(async (user, userData) => {
       adminNickname: adminData.nickname,
       createdAt: serverTimestamp()
     });
-    await loadMembers();
-  };
-});
+  } catch (err) {
+    console.error("관리 로그 기록 실패", err);
+  }
+  await loadMembers();
+}
 
 async function loadPending() {
   const q = query(collection(db, "users"), where("status", "==", "pending"));
@@ -76,9 +83,9 @@ function bindActionButtons(root) {
     btn.addEventListener("click", () => {
       const { act, uid, nick } = btn.dataset;
       if (act === "toggle-annual") {
-        window.toggleAnnual(uid, btn.dataset.current === "true", nick);
+        toggleAnnual(uid, btn.dataset.current === "true", nick);
       } else {
-        window.confirmAction(act, uid, nick);
+        confirmAction(act, uid, nick);
       }
     });
   });
@@ -151,9 +158,9 @@ async function loadLogs(page = 0) {
     const hasNext = snap.docs.length === LOG_PAGE_SIZE;
     const pagination = `
       <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-        <button class="btn btn-sm btn-outline-secondary" onclick="goLogPage(${page - 1})" ${hasPrev ? "" : "disabled"}>이전</button>
+        <button class="btn btn-sm btn-outline-secondary" data-log-page="${page - 1}" ${hasPrev ? "" : "disabled"}>이전</button>
         <span style="line-height:2rem;font-size:0.85rem;color:#666">${page + 1}페이지</span>
-        <button class="btn btn-sm btn-outline-secondary" onclick="goLogPage(${page + 1})" ${hasNext ? "" : "disabled"}>다음</button>
+        <button class="btn btn-sm btn-outline-secondary" data-log-page="${page + 1}" ${hasNext ? "" : "disabled"}>다음</button>
       </div>`;
 
     el.innerHTML = rows + pagination;
@@ -162,10 +169,14 @@ async function loadLogs(page = 0) {
   }
 }
 
-window.goLogPage = (page) => loadLogs(page);
+// 로그 목록은 매번 다시 그려지므로 컨테이너에 위임한다.
+document.getElementById("list-logs").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-log-page]");
+  if (btn && !btn.disabled) loadLogs(Number(btn.dataset.logPage));
+});
 
 // 모달 표시
-window.confirmAction = (type, targetUid, targetNickname) => {
+function confirmAction(type, targetUid, targetNickname) {
   const configs = {
     approve:      { title: "승인 확인",      desc: `${targetNickname} 님을 승인하시겠습니까?`,      btnText: "승인", btnColor: "#2e7d32" },
     reject:       { title: "거절 확인",      desc: `${targetNickname} 님의 신청을 거절하시겠습니까?`, btnText: "거절", btnColor: "#c62828" },
@@ -187,12 +198,14 @@ window.confirmAction = (type, targetUid, targetNickname) => {
     closeModal();
     await executeAction(action);
   };
-};
+}
 
-window.closeModal = () => {
+function closeModal() {
   document.getElementById("confirm-modal").style.display = "none";
   pendingAction = null;
-};
+}
+
+document.getElementById("modal-cancel-btn").addEventListener("click", closeModal);
 
 // 모달 바깥 클릭 시 닫기
 document.getElementById("confirm-modal").addEventListener("click", (e) => {
@@ -203,19 +216,31 @@ async function executeAction({ type, targetUid, targetNickname }) {
   const statusMap = { approve: "approved", reject: "rejected" };
   const actionMap = { approve: "승인", reject: "거절", "force-remove": "강제탈퇴" };
 
-  if (type === "force-remove") {
-    await deleteDoc(doc(db, "users", targetUid));
-  } else {
-    await updateDoc(doc(db, "users", targetUid), { status: statusMap[type] });
+  try {
+    if (type === "force-remove") {
+      await deleteDoc(doc(db, "users", targetUid));
+    } else {
+      await updateDoc(doc(db, "users", targetUid), { status: statusMap[type] });
+    }
+  } catch (err) {
+    console.error("회원 상태 변경 실패", err);
+    alert(`${actionMap[type]} 처리에 실패했습니다.`);
+    return;
   }
-  await addDoc(collection(db, "admin_logs"), {
-    action: actionMap[type],
-    targetUid,
-    targetNickname,
-    adminUid: adminUser.uid,
-    adminNickname: adminData.nickname,
-    createdAt: serverTimestamp()
-  });
+
+  // 처리 자체는 끝났으므로 로그 실패로 되돌리지는 않는다.
+  try {
+    await addDoc(collection(db, "admin_logs"), {
+      action: actionMap[type],
+      targetUid,
+      targetNickname,
+      adminUid: adminUser.uid,
+      adminNickname: adminData.nickname,
+      createdAt: serverTimestamp()
+    });
+  } catch (err) {
+    console.error("관리 로그 기록 실패", err);
+  }
 
   await loadPending();
   await loadMembers();

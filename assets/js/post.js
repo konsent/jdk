@@ -1,5 +1,6 @@
 import { auth, db } from "./firebase-init.js";
 import { requireApproved, getUserDoc } from "./auth-guard.js";
+import { escapeHtml, formatEventDate } from "./utils.js";
 import { getRatingTargets, canRateNow, ratingDocId, computeKongzTemp, tempToColor } from "./rating-logic.js";
 import { nextEventPostCount, shouldAdjustEventPostCount } from "./event-deletion-logic.js";
 import {
@@ -11,20 +12,6 @@ import {
 
 const postId = new URLSearchParams(location.search).get("id");
 let currentUser = null;
-
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str || "";
-  return div.innerHTML.replace(/"/g, "&quot;");
-}
-
-function formatEventDate(ts) {
-  if (!ts) return "";
-  const d = ts.toDate();
-  const date = d.toLocaleDateString("ko-KR");
-  const h = d.getHours(), m = d.getMinutes();
-  return (h || m) ? `${date} ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}` : date;
-}
 
 function renderGamesSection(games) {
   if (!games || !games.length) return "";
@@ -174,6 +161,7 @@ async function loadPost() {
     document.getElementById("section-comments").style.display = "block";
     await loadComments();
     setupCommentForm();
+    setupCommentDelegation();
   }
 }
 
@@ -461,6 +449,9 @@ function setupAttendButtons() {
   document.getElementById("msg-full").style.display = (!isAttending && isFull && !isEventOver) ? "block" : "none";
 
   document.getElementById("btn-attend").addEventListener("click", async () => {
+    // await 이후에는 event.currentTarget 이 null 이므로 엘리먼트를 미리 잡아둔다
+    const btn = document.getElementById("btn-attend");
+    btn.disabled = true;   // 트랜잭션 진행 중 연타 방지
     try {
       await runTransaction(db, async (tx) => {
         const ref = doc(db, "posts", postId);
@@ -470,8 +461,9 @@ function setupAttendButtons() {
         if (latestAttendees.includes(currentUser.uid)) throw new Error("이미 신청");
         tx.update(ref, { attendees: arrayUnion(currentUser.uid) });
       });
-    } catch (e) {
-      alert(e.message === "마감" ? "정원이 마감됐습니다." : "오류가 발생했습니다.");
+    } catch (err) {
+      alert(err.message === "마감" ? "정원이 마감됐습니다." : "오류가 발생했습니다.");
+      btn.disabled = false;   // 실패했으면 다시 누를 수 있어야 한다
       return;
     }
     try {
@@ -540,9 +532,9 @@ async function loadComments() {
     const date = c.createdAt?.toDate().toLocaleString("ko-KR") || "";
     const canDelete = c.authorUid === currentUser.uid || currentUserData.isAdmin;
     const deleteBtn = canDelete
-      ? `<button style="background:none;border:none;color:var(--danger);font-size:0.75rem;cursor:pointer;padding:0;" onclick="deleteComment('${c.id}')">삭제</button>`
+      ? `<button class="comment-action comment-action-danger" data-act="delete" data-id="${escapeHtml(c.id)}">삭제</button>`
       : "";
-    const replyBtn = `<button style="background:none;border:none;color:var(--text-muted);font-size:0.75rem;cursor:pointer;padding:0;" onclick="toggleReplyForm('${c.id}')">답글</button>`;
+    const replyBtn = `<button class="comment-action" data-act="reply" data-id="${escapeHtml(c.id)}">답글</button>`;
 
     const childReplies = replies.filter(r => r.parentId === c.id);
     const replyRows = await Promise.all(childReplies.map(async (r) => {
@@ -550,7 +542,7 @@ async function loadComments() {
       const rDate = r.createdAt?.toDate().toLocaleString("ko-KR") || "";
       const rCanDelete = r.authorUid === currentUser.uid || currentUserData.isAdmin;
       const rDeleteBtn = rCanDelete
-        ? `<button style="background:none;border:none;color:var(--danger);font-size:0.75rem;cursor:pointer;padding:0;" onclick="deleteComment('${r.id}')">삭제</button>`
+        ? `<button class="comment-action comment-action-danger" data-act="delete" data-id="${escapeHtml(r.id)}">삭제</button>`
         : "";
       return `<div class="comment-item comment-reply">
         <div style="display:flex;gap:8px;align-items:center">
@@ -573,10 +565,10 @@ async function loadComments() {
       <div class="comment-time">${date}</div>
     </div>
     ${replyRows.join("")}
-    <div id="reply-form-${c.id}" style="display:none;margin-left:20px;margin-bottom:8px">
-      <form onsubmit="submitReply(event, '${c.id}')">
+    <div class="comment-reply-form" id="reply-form-${escapeHtml(c.id)}" style="display:none">
+      <form data-act="submit-reply" data-id="${escapeHtml(c.id)}">
         <div class="comment-input-row">
-          <input type="text" placeholder="답글을 입력하세요" maxlength="200" id="reply-input-${c.id}">
+          <input type="text" placeholder="답글을 입력하세요" maxlength="200" id="reply-input-${escapeHtml(c.id)}">
           <button type="submit">등록</button>
         </div>
       </form>
@@ -586,49 +578,92 @@ async function loadComments() {
   el.innerHTML = rows.join("");
 }
 
-function setupCommentForm() {
-  document.getElementById("form-comment").addEventListener("submit", async (e) => {
+// 댓글 목록은 통째로 다시 그려지므로, 개별 버튼 대신 컨테이너 하나에 위임해 둔다.
+// (예전엔 onclick="deleteComment('...')" 로 id 를 HTML 문자열에 끼워넣었다 — 값에 따옴표가 섞이면 그대로 코드가 됐다.)
+function setupCommentDelegation() {
+  const list = document.getElementById("comment-list");
+
+  list.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-act]");
+    if (!btn || btn.tagName === "FORM") return;
+    const id = btn.dataset.id;
+    if (btn.dataset.act === "delete") deleteComment(id);
+    else if (btn.dataset.act === "reply") toggleReplyForm(id);
+  });
+
+  list.addEventListener("submit", (e) => {
+    const form = e.target.closest('form[data-act="submit-reply"]');
+    if (!form) return;
     e.preventDefault();
-    const content = document.getElementById("input-comment").value.trim();
-    if (!content) return;
-    await addDoc(collection(db, "comments"), {
-      postId, content,
-      authorUid: currentUser.uid,
-      createdAt: serverTimestamp()
-    });
-    location.reload();
+    submitReply(form.dataset.id);
   });
 }
 
-window.toggleReplyForm = (commentId) => {
+function setupCommentForm() {
+  const form = document.getElementById("form-comment");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const input = document.getElementById("input-comment");
+    const content = input.value.trim();
+    if (!content) return;
+
+    const submitBtn = form.querySelector("button[type=submit]");
+    if (submitBtn) submitBtn.disabled = true;   // 연타로 중복 등록되는 것 방지
+    try {
+      await addDoc(collection(db, "comments"), {
+        postId, content,
+        authorUid: currentUser.uid,
+        createdAt: serverTimestamp()
+      });
+      input.value = "";
+      await loadComments();
+    } catch (err) {
+      console.error("댓글 등록 실패", err);
+      alert("댓글 등록에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+}
+
+function toggleReplyForm(commentId) {
   const el = document.getElementById(`reply-form-${commentId}`);
   if (!el) return;
   const isHidden = el.style.display === "none";
   el.style.display = isHidden ? "block" : "none";
   if (isHidden) document.getElementById(`reply-input-${commentId}`)?.focus();
-};
+}
 
-window.submitReply = async (e, parentId) => {
-  e.preventDefault();
+async function submitReply(parentId) {
   const input = document.getElementById(`reply-input-${parentId}`);
   const content = input?.value.trim();
   if (!content) return;
-  await addDoc(collection(db, "comments"), {
-    postId, content, parentId,
-    authorUid: currentUser.uid,
-    createdAt: serverTimestamp()
-  });
-  location.reload();
-};
+  try {
+    await addDoc(collection(db, "comments"), {
+      postId, content, parentId,
+      authorUid: currentUser.uid,
+      createdAt: serverTimestamp()
+    });
+    await loadComments();
+  } catch (err) {
+    console.error("답글 등록 실패", err);
+    alert("답글 등록에 실패했습니다. 잠시 후 다시 시도해주세요.");
+  }
+}
 
-window.deleteComment = async (commentId) => {
+async function deleteComment(commentId) {
   if (!confirm("삭제하시겠습니까?")) return;
-  // 댓글 삭제 시 해당 댓글의 대댓글도 함께 삭제
-  const snap = await getDocs(query(
-    collection(db, "comments"),
-    where("parentId", "==", commentId)
-  ));
-  await Promise.all(snap.docs.map(d => deleteDoc(doc(db, "comments", d.id))));
-  await deleteDoc(doc(db, "comments", commentId));
-  location.reload();
-};
+  try {
+    // 댓글 삭제 시 해당 댓글의 대댓글도 함께 삭제
+    const snap = await getDocs(query(
+      collection(db, "comments"),
+      where("parentId", "==", commentId)
+    ));
+    await Promise.all(snap.docs.map(d => deleteDoc(doc(db, "comments", d.id))));
+    await deleteDoc(doc(db, "comments", commentId));
+    await loadComments();
+  } catch (err) {
+    console.error("댓글 삭제 실패", err);
+    alert("댓글 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+  }
+}

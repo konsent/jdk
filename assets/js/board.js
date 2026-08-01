@@ -1,6 +1,6 @@
 import { db } from "./firebase-init.js";
 import { requireApproved, getUserDoc } from "./auth-guard.js";
-import { displayEvents } from "./board-logic.js";
+import { escapeHtml, formatEventDate } from "./utils.js";
 import {
   collection, query, where, orderBy, getDocs, limit
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -50,7 +50,7 @@ async function loadEvents() {
       where("type", "==", "event"),
       orderBy("eventDate", "asc")
     ));
-    const events = displayEvents(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    const events = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     await attachAttendeeNames(events);
     return events;
   } catch (e) {
@@ -66,11 +66,6 @@ async function attachAttendeeNames(events) {
   events.forEach(e => { e.attendeeNames = (e.attendees || []).map(uid => nameMap[uid]); });
 }
 
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
-}
 
 let hoverCardEl = null;
 let hoverCardHideTimer = null;
@@ -116,7 +111,14 @@ function scheduleHideHoverCard() {
   }, 120);
 }
 
+// 터치 기기에는 hover 가 없다. 예전에는 mouseenter 만 걸어둬서
+// 모바일에서는 미리보기 카드가 아예 뜨지 않았고, 에뮬레이션되는 기기에서는
+// 카드가 뜬 채로 링크까지 눌려 두 동작이 겹쳤다.
+// 포인터가 진짜 hover 를 지원할 때만 붙인다(모바일은 탭 → 바로 상세로 이동).
+const supportsHover = window.matchMedia?.("(hover: hover)").matches ?? true;
+
 function bindHoverCard(el, e) {
+  if (!supportsHover) return;
   el.addEventListener("mouseenter", () => showHoverCard(el, e));
   el.addEventListener("mouseleave", scheduleHideHoverCard);
 }
@@ -272,13 +274,6 @@ function renderCalendar(events) {
   buildCalendar();
 }
 
-function formatEventDate(ts) {
-  if (!ts) return "";
-  const d = ts.toDate();
-  const date = d.toLocaleDateString("ko-KR");
-  const h = d.getHours(), m = d.getMinutes();
-  return (h || m) ? `${date} ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}` : date;
-}
 
 function renderList(events) {
   const el = document.getElementById("event-list");

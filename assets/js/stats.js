@@ -1,5 +1,6 @@
 import { db } from "./firebase-init.js";
 import { requireAdmin } from "./auth-guard.js";
+import { escapeHtml } from "./utils.js";
 import {
   doc, getDoc, updateDoc, arrayUnion, setDoc, getDocs,
   collection, query, where, orderBy,
@@ -23,11 +24,6 @@ let attendChart = null;
 let postChart = null;
 let monthlyChart = null;
 
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str ?? "";
-  return div.innerHTML.replace(/"/g, "&quot;");
-}
 
 requireAdmin(async (user, userData) => {
   adminUser = user;
@@ -73,12 +69,18 @@ function renderPeriodFilter() {
   const el = document.getElementById("period-filter");
   const buttons = ["all", ...years].map(p => {
     const label = p === "all" ? "전체" : `${p}년`;
-    return `<button class="btn btn-sm ${p == currentPeriod ? "btn-dark" : "btn-outline-secondary"} me-1 mb-1" onclick="setPeriod('${p}')">${label}</button>`;
+    return `<button class="btn btn-sm ${p == currentPeriod ? "btn-dark" : "btn-outline-secondary"} me-1 mb-1" data-period="${escapeHtml(p)}">${label}</button>`;
   });
   el.innerHTML = buttons.join("");
 }
 
-window.setPeriod = async (period) => {
+// 기간 버튼/배지는 여러 영역에서 다시 그려지므로 document 레벨에 한 번만 위임한다.
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("[data-period]");
+  if (el) setPeriod(el.dataset.period);
+});
+
+async function setPeriod(period) {
   currentPeriod = period;
   renderPeriodFilter();
 
@@ -119,7 +121,7 @@ window.setPeriod = async (period) => {
     postChart, c => { postChart = c; }
   );
   renderMonthlyChart(parseInt(period));
-};
+}
 
 function renderCharts(period) {
   const members = globalStats.members || {};
@@ -433,7 +435,7 @@ async function loadSnapshotList() {
   if (snap.empty) { el.innerHTML = "<p class='text-muted small'>저장된 스냅샷이 없습니다.</p>"; return; }
   const sorted = snap.docs.sort((a, b) => b.id.localeCompare(a.id));
   el.innerHTML = `<p class="small text-muted mb-1">저장된 월별 스냅샷:</p>` +
-    sorted.map(d => `<span class="badge bg-secondary me-1 mb-1" style="cursor:pointer" onclick="setPeriod('${d.id.slice(0, 4)}')">${d.id}</span>`).join("");
+    sorted.map(d => `<span class="badge bg-secondary me-1 mb-1" style="cursor:pointer" data-period="${escapeHtml(d.id.slice(0, 4))}">${escapeHtml(d.id)}</span>`).join("");
 }
 
 function showActionMsg(msg) {

@@ -1,5 +1,6 @@
 import { db } from "./firebase-init.js";
 import { requireApproved } from "./auth-guard.js";
+import { showError } from "./utils.js";
 import { listMyParties } from "./party.js";
 import { normalizeMembers } from "./party-logic.js";
 import {
@@ -7,7 +8,6 @@ import {
   doc, setDoc, increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const ROOT_UID = "GNdKNf2KYwgBqOjrX9OmPJO5oEv1";
 const FUNCTIONS_BASE = "https://us-central1-jdk-member-board.cloudfunctions.net";
 let selectedGames = [];
 let selectedPartyAttendees = null;
@@ -26,8 +26,10 @@ requireApproved(async (user, userData) => {
     document.getElementById("section-type").style.display = "block";
   }
 
-  if (user.uid === ROOT_UID) {
-    await loadAuthorOptions();
+  // 예전에는 특정 UID 를 소스에 박아뒀다. 공개 저장소라 그대로 노출됐고,
+  // 계정이 바뀌면 코드를 고쳐야 했다 — users 문서의 플래그로 옮겼다.
+  if (userData.canPostAsOther) {
+    await loadAuthorOptions(user.uid);
     document.getElementById("section-author").style.display = "block";
   }
 
@@ -50,11 +52,11 @@ requireApproved(async (user, userData) => {
   }
 });
 
-async function loadAuthorOptions() {
+async function loadAuthorOptions(selfUid) {
   const select = document.getElementById("select-author");
   const snap = await getDocs(query(collection(db, "users"), where("status", "==", "approved")));
   snap.docs
-    .filter(d => d.id !== ROOT_UID)
+    .filter(d => d.id !== selfUid)
     .forEach(d => {
       const opt = document.createElement("option");
       opt.value = d.id;
@@ -128,7 +130,14 @@ document.getElementById("form-write").addEventListener("submit", async (e) => {
     if (!dateStr) { showError("일정 날짜를 선택해주세요."); return; }
     const timeStr = (hourStr && minuteStr) ? `${hourStr}:${minuteStr}` : "";
     const combined = timeStr ? `${dateStr}T${timeStr}` : `${dateStr}T00:00`;
-    eventDate = Timestamp.fromDate(new Date(combined));
+    const parsed = new Date(combined);
+    // 브라우저/입력기에 따라 형식이 어긋나면 Invalid Date 가 되고,
+    // 그대로 Timestamp.fromDate 에 넣으면 안내 없이 예외로 죽는다.
+    if (Number.isNaN(parsed.getTime())) {
+      showError("일정 날짜/시간 형식이 올바르지 않습니다.");
+      return;
+    }
+    eventDate = Timestamp.fromDate(parsed);
   }
 
   const submitBtn = document.getElementById("btn-submit");
@@ -148,7 +157,7 @@ document.getElementById("form-write").addEventListener("submit", async (e) => {
       location.href = `/post/?id=${editId}`;
     } else {
       // 신규 등록
-      const assignedUid = currentUser.uid === ROOT_UID
+      const assignedUid = currentUserData?.canPostAsOther
         ? (document.getElementById("select-author")?.value || currentUser.uid)
         : currentUser.uid;
 
@@ -322,8 +331,3 @@ async function setupPartySelect(user) {
   });
 }
 
-function showError(msg) {
-  const el = document.getElementById("msg-error");
-  el.textContent = msg;
-  el.style.display = "block";
-}

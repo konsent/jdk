@@ -201,6 +201,8 @@
   position: absolute;
   z-index: 30;
   width: 240px;
+  /* 좁은 화면에서 240px 고정폭이 화면 밖으로 밀려나던 것 방지 */
+  max-width: calc(100vw - 24px);
   background: var(--card-bg, #fff);
   border: 1px solid var(--card-border, #e8e8e4);
   border-radius: var(--radius, 8px);

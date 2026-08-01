@@ -1,5 +1,6 @@
 import { auth, db } from "./firebase-init.js";
 import { requireApproved } from "./auth-guard.js";
+import { showError } from "./utils.js";
 import { deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   doc, deleteDoc, getDoc, updateDoc
@@ -83,24 +84,32 @@ requireApproved(async (user, userData) => {
 });
 
 async function withdraw(user) {
+  // 순서가 중요하다. 예전에는 users 문서를 먼저 지웠는데,
+  // 이때 deleteUser 가 requires-recent-login 으로 실패하면
+  // 계정은 살아있고 프로필 문서만 사라져 로그인해도 계속 튕기는 상태가 됐다.
+  // Auth 계정을 먼저 지우면 실패해도 아무것도 잃지 않는다.
   try {
-    await deleteDoc(doc(db, "users", user.uid));
     await deleteUser(user);
-    location.href = "/";
   } catch (err) {
     if (err.code === "auth/requires-recent-login") {
       showError("보안을 위해 로그아웃 후 다시 로그인하고 탈퇴를 진행해 주세요.");
     } else {
+      console.error("계정 삭제 실패", err);
       showError("탈퇴 중 오류가 발생했습니다. 다시 시도해 주세요.");
     }
+    document.getElementById("modal-confirm").disabled = false;
+    return;
   }
+
+  try {
+    await deleteDoc(doc(db, "users", user.uid));
+  } catch (err) {
+    // 계정은 이미 사라졌으므로 탈퇴는 성립한다. 남은 문서는 관리자가 정리하면 된다.
+    console.error("회원 문서 삭제 실패", err);
+  }
+  location.href = "/";
 }
 
-function showError(msg) {
-  const el = document.getElementById("msg-error");
-  el.textContent = msg;
-  el.style.display = "block";
-}
 
 async function renderVisitStats(user) {
   const el = document.getElementById("visit-stats-text");
