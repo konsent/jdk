@@ -16,13 +16,26 @@ service cloud.firestore {
         .hasAny(['status', 'isAdmin', 'canPostAsOther', 'annualMember']);
     }
 
+    // 닉네임은 화면 곳곳에 렌더된다. 지금까지는 register.js 의 정규식이
+    // 유일한 방어선이었는데, 콘솔에서 직접 쓰면 그냥 통과했다.
+    // 렌더 지점 한 곳만 이스케이프를 놓쳐도 XSS 가 되므로 서버에서도 막는다.
+    function validNickname() {
+      return request.resource.data.nickname is string
+        && request.resource.data.nickname.size() > 0
+        && request.resource.data.nickname.size() <= 12
+        && request.resource.data.nickname.matches('^[가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9 ._-]+$');
+    }
+
     match /users/{uid} {
       allow read: if request.auth != null;
       allow create: if request.auth != null && request.auth.uid == uid
         && request.resource.data.status == "pending"
-        && request.resource.data.isAdmin == false;
+        && request.resource.data.isAdmin == false
+        && validNickname();
       allow update: if isAdmin()
-        || (request.auth.uid == uid && keepsPrivileged());
+        || (request.auth.uid == uid && keepsPrivileged()
+            && (!request.resource.data.diff(resource.data).affectedKeys()
+                  .hasAny(['nickname']) || validNickname()));
       allow delete: if isAdmin() || request.auth.uid == uid;
     }
 
@@ -37,10 +50,24 @@ service cloud.firestore {
                .hasOnly(request.resource.data.attendees.concat([request.auth.uid]));
     }
 
+    // comments 는 authorUid 를 검증하는데 posts 는 빠져 있었다.
+    // canPostAsOther 를 가진 사람만 남의 명의로 쓸 수 있다(write.js 의 대리작성 기능).
+    // notice 는 관리자 전용이다 — 예전엔 아무나 type 만 바꿔 공지를 만들 수 있었다.
+    function validPostAuthor() {
+      return request.resource.data.authorUid == request.auth.uid
+        || userDoc().canPostAsOther == true;
+    }
+    function validPostType() {
+      return request.resource.data.type == "event" || isAdmin();
+    }
+
     match /posts/{postId} {
-      allow read, create: if isApproved();
+      allow read: if isApproved();
+      allow create: if isApproved() && validPostAuthor() && validPostType();
       allow update: if isAdmin()
-        || request.auth.uid == resource.data.authorUid
+        || (request.auth.uid == resource.data.authorUid
+            && request.resource.data.authorUid == resource.data.authorUid
+            && request.resource.data.type == resource.data.type)
         || (isApproved()
             && request.resource.data.diff(resource.data)
                  .affectedKeys().hasOnly(['attendees'])

@@ -3,12 +3,13 @@
 
 /**
  * 문자열을 HTML 텍스트로 안전하게 이스케이프한다.
- * 속성값(`attr="..."`)에 넣어도 안전하도록 따옴표까지 처리한다.
+ * 속성값에 넣어도 안전하도록 따옴표를 둘 다 처리한다 —
+ * 홑따옴표를 빼두면 attr='...' 로 쓴 곳 하나에서 바로 뚫린다.
  */
 export function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str ?? "";
-  return div.innerHTML.replace(/"/g, "&quot;");
+  return div.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
 /**

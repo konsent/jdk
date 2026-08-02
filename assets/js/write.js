@@ -1,6 +1,6 @@
 import { db, functions } from "./firebase-init.js";
 import { requireApproved } from "./auth-guard.js";
-import { showError } from "./utils.js";
+import { showError, escapeHtml } from "./utils.js";
 import { listMyParties } from "./party.js";
 import { normalizeMembers } from "./party-logic.js";
 import {
@@ -211,8 +211,8 @@ function renderSelectedGames() {
   const el = document.getElementById("selected-games");
   el.innerHTML = selectedGames.map((g, i) => `
     <span class="game-tag">
-      ${g.thumbnail ? `<img src="${escapeGameText(g.thumbnail)}" alt="">` : ""}
-      ${escapeGameText(g.name)}${g.yearPublished ? ` (${g.yearPublished})` : ""}
+      ${g.thumbnail ? `<img src="${escapeHtml(g.thumbnail)}" alt="">` : ""}
+      ${escapeHtml(g.name)}${g.yearPublished ? ` (${g.yearPublished})` : ""}
       <button type="button" data-idx="${i}" class="game-tag-remove">×</button>
     </span>
   `).join("");
@@ -222,12 +222,6 @@ function renderSelectedGames() {
       renderSelectedGames();
     });
   });
-}
-
-function escapeGameText(str) {
-  const div = document.createElement("div");
-  div.textContent = str || "";
-  return div.innerHTML.replace(/"/g, "&quot;");
 }
 
 const THUMBNAIL_PREVIEW_COUNT = 5;
@@ -250,9 +244,9 @@ function renderCandidates(candidates) {
     return;
   }
   el.innerHTML = candidates.map((c) =>
-    `<div class="game-candidate" data-id="${escapeGameText(c.bggId)}" data-name="${escapeGameText(c.name)}">
+    `<div class="game-candidate" data-id="${escapeHtml(c.bggId)}" data-name="${escapeHtml(c.name)}">
       <span class="game-candidate-thumb"></span>
-      <span>${escapeGameText(c.name)}${c.yearPublished ? ` (${c.yearPublished})` : ""}</span>
+      <span>${escapeHtml(c.name)}${c.yearPublished ? ` (${c.yearPublished})` : ""}</span>
     </div>`
   ).join("");
   el.style.display = "block";
@@ -280,7 +274,7 @@ function renderCandidates(candidates) {
         if (!detail?.thumbnail) return;
         const thumb = el.querySelector(`.game-candidate[data-id="${CSS.escape(c.bggId)}"] .game-candidate-thumb`);
         if (thumb && !thumb.querySelector("img")) {
-          thumb.innerHTML = `<img src="${escapeGameText(detail.thumbnail)}" alt="">`;
+          thumb.innerHTML = `<img src="${escapeHtml(detail.thumbnail)}" alt="">`;
         }
       }).catch(() => {});
     });
