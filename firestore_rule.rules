@@ -35,7 +35,16 @@ service cloud.firestore {
       allow update: if isAdmin()
         || (request.auth.uid == uid && keepsPrivileged()
             && (!request.resource.data.diff(resource.data).affectedKeys()
-                  .hasAny(['nickname']) || validNickname()));
+                  .hasAny(['nickname']) || validNickname()))
+        // 거절당한 본인의 재신청. setDoc 이 기존 문서를 덮으므로 create 가
+        // 아니라 update 로 잡히고, status 가 바뀌어 keepsPrivileged() 에
+        // 걸려 있었다 — rejected 회원은 재가입 자체가 불가능했다.
+        // rejected → pending 한 방향만 열어 자가 승인은 계속 막는다.
+        || (request.auth.uid == uid
+            && resource.data.status == "rejected"
+            && request.resource.data.status == "pending"
+            && request.resource.data.isAdmin == false
+            && validNickname());
       allow delete: if isAdmin() || request.auth.uid == uid;
     }
 
