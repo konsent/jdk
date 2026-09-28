@@ -214,6 +214,42 @@ exports.ensureAnniversarySchedule = onSchedule(
   }
 );
 
+// 전체 posts를 훑어 attendCount/postCount를 다시 센다. 클라이언트 관리자
+// 페이지의 "재집계"(stats.js btn-rebuild)와 동일한 규칙: 기념일 제외,
+// author -> postCount, attendees -> attendCount. 결과를 stats/global 에
+// 쓰면 onStatsUpdated 트리거가 트로피 백필까지 자동으로 이어서 처리한다.
+async function rebuildMemberStats(db) {
+  const [postsSnap, usersSnap] = await Promise.all([
+    db.collection("posts").where("type", "==", "event").get(),
+    db.collection("users").get()
+  ]);
+  const nickname = {};
+  usersSnap.forEach((d) => { nickname[d.id] = d.data().nickname || ""; });
+
+  const members = {};
+  const ensure = (uid) => (members[uid] ||= { nickname: nickname[uid] || "", attendCount: 0, postCount: 0 });
+
+  postsSnap.forEach((d) => {
+    const post = d.data();
+    if (post.authorUid && !post.isAnniversary) ensure(post.authorUid).postCount++;
+    (post.attendees || []).forEach((uid) => { ensure(uid).attendCount++; });
+  });
+  return members;
+}
+
+exports.dailyStatsRebuild = onSchedule(
+  { schedule: "30 4 * * *", timeZone: "Asia/Seoul" },
+  async () => {
+    const db = getFirestore();
+    const members = await rebuildMemberStats(db);
+    await db.collection("stats").doc("global").set(
+      { updatedAt: FieldValue.serverTimestamp(), members },
+      { merge: true }
+    );
+    logger.info(`일일 재집계 완료: ${Object.keys(members).length}명`);
+  }
+);
+
 function buildTrophyCandidates(memberStats, fullCount) {
   if (!memberStats) return [];
   return [
