@@ -6,7 +6,7 @@ title: 명예의 전당
 <style>
   .honor-group { width: 100%; max-width: 600px; margin: 0 auto 40px; }
   .honor-title { font-size: 1.6em; font-weight: bold; margin: 30px 0 10px; }
-  .honor-row { position: relative; display: flex; justify-content: center; padding-bottom: 12%; }
+  .honor-row { position: relative; display: flex; justify-content: center; padding-bottom: 12%; margin-bottom: 40px; }
   /* 흰 배경 jpg를 월계수 위에 겹치기 위해 multiply로 흰색을 투명처럼 처리. 여백이 커서 살짝 겹쳐 배치 */
   .honor-row img.member { position: relative; z-index: 1; width: 37%; margin: 0 -2%; mix-blend-mode: multiply; }
   /* 3명일 때만 가운데를 아래로 */
@@ -21,12 +21,16 @@ title: 명예의 전당
   {% for group in site.data.honor %}
   <div class="honor-group">
     {% if group.title %}<div class="honor-title">{{ group.title }}</div>{% endif %}
+    {% assign rows = group.members.size | plus: 2 | divided_by: 3 %}
+    {% for r in (1..rows) %}
+    {% assign start = forloop.index0 | times: 3 %}
     <div class="honor-row">
-      {% for m in group.members %}
+      {% for m in group.members limit: 3 offset: start %}
       <img class="member" src="{{ '/assets/honor/' | append: m | append: '.jpg' | relative_url | uri_escape }}" alt="{{ m }}">
       {% endfor %}
       <img class="laurel" src="{{ '/assets/honor/laurel-' | append: group.laurel | append: '.png' | relative_url }}" alt="">
     </div>
+    {% endfor %}
   </div>
   {% endfor %}
 </div>
