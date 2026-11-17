@@ -4,12 +4,13 @@ title: 명예의 전당
 ---
 
 <style>
-  .honor-group { width: 100%; max-width: 500px; margin: 0 auto 40px; }
+  .honor-group { width: 100%; max-width: 600px; margin: 0 auto 40px; }
   .honor-title { font-size: 1.6em; font-weight: bold; margin: 30px 0 10px; }
-  .honor-row { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); padding-bottom: 14%; }
-  /* 흰 배경 jpg를 월계수 위에 겹치기 위해 multiply로 흰색을 투명처럼 처리 */
-  .honor-row img.member { position: relative; z-index: 1; width: 100%; mix-blend-mode: multiply; }
-  .honor-row img.member:nth-child(2) { transform: translateY(14%); }
+  .honor-row { position: relative; display: flex; justify-content: center; padding-bottom: 12%; }
+  /* 흰 배경 jpg를 월계수 위에 겹치기 위해 multiply로 흰색을 투명처럼 처리. 여백이 커서 살짝 겹쳐 배치 */
+  .honor-row img.member { position: relative; z-index: 1; width: 37%; margin: 0 -2%; mix-blend-mode: multiply; }
+  /* 3명일 때만 가운데를 아래로 */
+  .honor-row img.member:nth-child(2):nth-last-child(3) { transform: translateY(14%); }
   .honor-row img.laurel { position: absolute; left: 0; bottom: 0; width: 100%; }
 </style>
 
