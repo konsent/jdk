@@ -1,0 +1,27 @@
+# 명예의 전당 (honor.md) 명단
+# - members: assets/honor/<이름>.jpg 파일명. 3명씩, 가운데 사람이 살짝 아래로 내려감
+# - laurel: gold(백두혈통) / green(일반)
+# - title: 그룹 위에 표시할 제목 (없으면 생략)
+
+- title: 장단콩 창립 멤버
+  laurel: gold
+  members: [산도깨비, 헨리에타쨩, 찰리]
+
+- title: 후원해 주신 분
+  laurel: green
+  members: [hare, 2사분, 잠자는 사자]
+
+- laurel: green
+  members: [임요, 다소, sokim]
+
+- laurel: green
+  members: [부산갈매기, 나탄, 오버쿡]
+
+- laurel: green
+  members: [동원, 그냥s, 캐스퍼]
+
+- laurel: green
+  members: [흑표범, 도토, 카레]
+
+- laurel: green
+  members: [유베알레, 무지, 통사부]
